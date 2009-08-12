@@ -2,9 +2,6 @@
 include "inc/header.php";
 include "inc/config.php";
 
-//$dbname = "database/vm";
-
-
 $vm			= $_GET['vm']; 			// vm number
 $action		= $_GET['action']; 		// action to do (see switch)
 $target		= $_GET['target']; 		// target for migration
@@ -13,13 +10,9 @@ $dom0name 	= $domain[$domN]; 		// dom0 name
 
 
 $other_domains = array_diff($domain,array($domN => $dom0name));
-
-
 $dom0 = unserialize($_SESSION["'.$domN.'"]); // get dom0 object
 
-//print_r(($_SESSION['dom0'][0]));
-//print_r($domain);
-//$other_domain = 
+
 switch ($action) {
 	case 1:
 	$dom0->pause_vm($vm);
@@ -37,6 +30,6 @@ switch ($action) {
 
 
 $dom0->display_page_vm($vm,$other_domains);
-//print_r($dom0->get_record($vm));
+
 
 include "inc/footer.php";
