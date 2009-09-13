@@ -1,6 +1,7 @@
 <?php
 require_once dirname (__FILE__) . '/../includes/prepend.php';
 require 'includes/header.php';
+echo '<div id="main">';
 require 'naked.php';
 ?>
 </div>

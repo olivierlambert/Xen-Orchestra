@@ -8,7 +8,6 @@ $target		= isset ($_GET['target']) ? $_GET['target'] : false; 		// target for mi
 $domN 		= isset ($_GET['dom0']) ? $_GET['dom0'] : false; 		// dom0 number
 
 // the 'main' div, which is dynamic
-echo '<div id="main">';
 // create object in order to play with SQLite database
 $db = Db::get_instance();
 

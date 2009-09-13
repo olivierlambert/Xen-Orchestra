@@ -390,7 +390,7 @@ class Dom0 {
 			</td>';
 			// add Edit icon
 			echo '
-			<td><a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\');manualreload()" src="img/action.png"></a></td>
+			<td><a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
 			</tr> ';
 		}
 	}

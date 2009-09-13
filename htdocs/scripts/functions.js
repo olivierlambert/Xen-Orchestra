@@ -3,10 +3,6 @@ function manualreload() {
 	//this.blur();
 }
 
-function autoreload(sec) {
-	new Ajax.PeriodicalUpdater('main', 'naked.php', {frequency: sec, decay: 1.2});
-}
-
 var win = null;
 
 function disp_vm(id,domN,vm) {
@@ -62,7 +58,8 @@ function initPage(e) {
 		method:'get',
 		onComplete: function(transport) {
 			var response = transport.responseText || "20";
-			autoreload(response);
+			new Ajax.PeriodicalUpdater('main', 'naked.php',
+				{frequency: response, decay: 1.2});
 		},
 		onFailure: function() {
 			alert('Something went wrong...')
