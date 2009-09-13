@@ -30,7 +30,7 @@ class Dom0 {
 
 	
 	// CONSTR
-	public function __construct($domN,$address,$port,$user,$pass) {
+	public function __construct($domN, $address,$port,$user,$pass) {
 		
 		$this->domN = $domN;
 		$this->address = $address;
@@ -77,7 +77,7 @@ class Dom0 {
 	
 	public function create_object_vm() {
 		//Find already Migrated+Halted VM in order to NOT display them
-		$db = sqlite_factory("database/test");
+		$db = DB::get_instance();
 		//$dbresult = $db->query("SELECT name FROM migrated");
 		//$migrated_array = $dbresult->fetchAll();
 		//$migrated_array = $dbresult->fetchAll();
@@ -113,7 +113,7 @@ class Dom0 {
 	
 	public function vm_attached_number() {
 		// connect to the DB
-		$db = sqlite_factory("database/test");
+		$db = DB::get_instance();
 		$i = 0;
 		foreach ($this->vm_table as $vm) {
 			$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name'");
@@ -335,7 +335,7 @@ class Dom0 {
 	
 	public function display_row_vm($i) {
 		// connect to the DB
-		$db = sqlite_factory("database/test");
+		$db = DB::get_instance();
 		
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
@@ -390,7 +390,7 @@ class Dom0 {
 			</td>';
 			// add Edit icon
 			echo '
-			<td><a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.','.$this->domN.',\''.$title_window.'\');manualreload()" src="img/action.png"></a></td>
+			<td><a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\');manualreload()" src="img/action.png"></a></td>
 			</tr> ';
 		}
 	}
@@ -432,7 +432,4 @@ class Dom0 {
 		return $result;
 		}
 	}
-
-	
-
 }

@@ -4,10 +4,11 @@
 // create an SQLite Database
 class Db {
 
+/*
 	public $db_name;
 	
-	public function __construct($db_name) {
-		
+	public function __construct($db_name)
+	{
 		$this->db_name = "database/".$db_name;
 		
 		if ($db = @sqlite_open($this->db_name, 0666, $sqliteerror)) 
@@ -39,7 +40,6 @@ class Db {
 	}
 	
 	public function update_engine($dom01,$i) {
-		
 		$query = $db->query("SELECT object FROM dom0 WHERE id = $i");
 		$result = $query->fetchSingle();
 		$dom02 = unserialize($result);
@@ -52,6 +52,14 @@ class Db {
 			$db->query("INSERT INTO dom0 (id,object) VALUES ('$i','$domobject')");
 		}
 	}
+*/
 	
-	
+	public static function get_instance() {
+		if (self::$instance == null) {
+			self::$instance = sqlite_factory(ROOT_DIR . '/database.sqlite');
+		}
+		return self::$instance;
+	}
+
+	private static $instance = null;
 }

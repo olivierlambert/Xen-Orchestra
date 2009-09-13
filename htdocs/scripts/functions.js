@@ -1,12 +1,10 @@
 function manualreload() {
-	var url = 'main.php';
-	var myAjax = new Ajax.Updater('main',url);
+	new Ajax.Updater('main', 'naked.php');
 	//this.blur();
 }
 
 function autoreload(sec) {
-	var url = 'main.php';
-	var myAjax = new Ajax.PeriodicalUpdater('main',url,{frequency:sec,decay:1.2});
+	new Ajax.PeriodicalUpdater('main', 'naked.php', {frequency: sec, decay: 1.2});
 }
 
 var win = null;
@@ -15,16 +13,14 @@ function disp_vm(id,domN,vm) {
 	var url1 = 'vm.php?vm=';
 	var url2 = '&dom0=';
 	var urlfinal = url1+id+url2+domN;
-	win = new Window(
-	{
+	win = new Window({
 		title : vm,
 		url : urlfinal,
 		className:"alphacube",
 		width : 450,
 		height : 450
-	}
-)
-win.show();
+	});
+	win.show();
 }
 
 function disp_migrate(id,domN) {
@@ -64,13 +60,14 @@ function initPage(e) {
 	var req = new Ajax.Request(url,
 	{
 		method:'get',
-		onComplete: function(transport){
-		var response = transport.responseText || "20";
-		autoreload(response);
-	},
-	 onFailure: function(){ alert('Something went wrong...') }
+		onComplete: function(transport) {
+			var response = transport.responseText || "20";
+			autoreload(response);
+		},
+		onFailure: function() {
+			alert('Something went wrong...')
+		}
 	});
 } // initPage : add observers, refresh time etc.
 
-
-document.observe('dom:loaded',initPage);
+document.observe('dom:loaded', initPage);
