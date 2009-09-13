@@ -1,3 +1,3 @@
 <?php
 
-echo '</div><br/></body></html>';
+echo '<br/></body></html>';

@@ -7,7 +7,7 @@ class DomU {
 	public $auto_power_on,$suspend_vdi,$vcpu_max,$vcpus_at_startup,$actions_after_shutdown;
 	public $actions_after_crash,$actions_after_reboot,$pvargs;
 	public $vifs,$vbds,$consoles;
-	public $handle;
+	public $handle,$migrated;
 	
 	// AUTO GETTERS, call with e.g : obj->id 
 	public function __get($attr) {
@@ -50,25 +50,31 @@ class DomU {
 		$this->actions_after_shutdown 	= $this->record['actions_after_shutdown'];
 		$this->actions_after_reboot		= $this->record['actions_after_reboot'];
 		$this->actions_after_crash 		= $this->record['actions_after_crash'];
-		
 	}
 	
 	public function get_preview() {
 		
-		return "$this->xid,$this->name,$this->state,$this->kernel";
+		return array("xid" => $this->xid, 
+					"name" => $this->name, 
+					"state" => $this->state);
 	}
 	
 	public function get_all_infos() {
 
-		return "$this->xid,$this->name,$this->state,$this->kernel,
+		return array($this->xid,$this->name,$this->state,$this->kernel,
 		$this->weight,$this->cap,$this->s_max_ram,$this->s_min_ram,
 		$this->d_max_ram,$this->d_min_ram,$this->auto_power_on,
 		$this->suspend_vdi,$this->vcpu_max,$this->vcpus_at_startup,
 		$this->actions_after_shutdown,$this->actions_after_reboot,
 		$this->actions_after_crash,$this->template,$this->pvargs,
-		$this->vifs,$this->vbds";
+		$this->vifs,$this->vbds,$this->sid);
 	}
 	
+	
+	public function start($is_paused) {
+		$params = array($this->id,$is_paused);
+		$this->handle->send("VM.start",$params);
+	}
 	
 	public function pause() {
 		$this->handle->send("VM.pause",$this->id);
@@ -78,11 +84,36 @@ class DomU {
 		$this->handle->send("VM.unpause",$this->id);
 	}
 	
+	public function shutdown() {
+		$this->handle->send("VM.hard_shutdown",$this->id);
+	}
+	
+	public function destroy() {
+		$this->handle->send("VM.destroy",$this->id);
+	}
+	
+	public function suspend() {
+		$this->handle->send("VM.suspend",$this->id);
+	}
+	
+	public function resume() {
+		$this->handle->send("VM.resume",$this->id);
+	}
+	
+	public function reboot() {
+		$this->handle->send("VM.hard_reboot",$this->id);
+	}
+	
 	public function migrate($dest,$live) {
-		$debug1 = array("port" => 8002);
-		//$debug1 = "";
-		$params = array($this->id,$dest,$live,$debug1);
+		$this->migrated = true;
+		$port = array("port" => 8002);
+		$params = array($this->id,$dest,true,$port);
 		$this->handle->send("VM.migrate",$params);
+	}
+	
+	
+	public function set_migrated($bool) {
+		$this->migrated = $bool;
 	}
 
 	/*

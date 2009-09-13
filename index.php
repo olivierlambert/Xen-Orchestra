@@ -1,16 +1,20 @@
 <?php
 
-include "inc/header.php";
-include "inc/config.php";
+require_once "inc/header.php";
 
 
-for ($i=0;$i<count($domain);$i++)
-{
-	$dom0 = new Dom0($i,$domain[$i],$port[$i],$user[$i],$password[$i]);
-	$dom0->display_table_all_vm();
-	$_SESSION["'.$i.'"] = serialize($dom0);
-}
 
+// main is display for AJAX call
+include "main.php";
 
+// TODO : remove or do something else with these ugly buttons
+
+echo '
+<div class="buttons">
+<button id="btnReload" type="submit" class="positive">
+<img src="img/arrow_refresh.png" alt=""/>
+</button>
+</div>';
 include "inc/footer.php";
+
 ?>
