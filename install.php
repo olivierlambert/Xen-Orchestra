@@ -1,15 +1,25 @@
 <?php
+require_once dirname (__FILE__) . '/includes/prepend.php';
+$cfg = Config::get_instance();
 
-include "inc/header.php";
+$db = Db::get_instance();
+
+
+$db->query('DROP TABLE dom0');
+$db->query('DROP TABLE domU');
+//$db->query('DROP TABLE migrated');
+$db->query('CREATE TABLE dom0 (id varchar(128), object text)');
+$db->query('CREATE TABLE domU (vm_name varchar(128), state varchar(128))');
 
 
 echo '<p>Database Creation :</p>';
 
 
 try {
-	$db = sqlite_factory("database/test");
-	$db->query('DROP TABLE dom0');
-	$db->query('CREATE TABLE dom0 (id int, object text)');
+	//$db->query('DROP TABLE dom0');
+	//$db->query('DROP TABLE domU');
+	$db->query('CREATE TABLE dom0 (id varchar(128), object text)');
+	$db->query('CREATE TABLE domU (vm_name varchar(128), state varchar(128))');
 	$db->query('CREATE TABLE network (id int, object text)');
 	$db->query('CREATE TABLE vif (id int, object text)');
 	$db->query('CREATE TABLE vm (id int, object text)');
@@ -21,4 +31,5 @@ catch (Exception $e) {
 }
 
 echo "Database successfully generated <br/>";
-include "inc/footer.php";
+
+include 'includes/footer.php';

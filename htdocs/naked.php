@@ -12,12 +12,13 @@ $domN 		= isset ($_GET['dom0']) ? $_GET['dom0'] : false; 		// dom0 number
 $db = Db::get_instance();
 
 // TO DO : UPDATE OR INSERT, COMPARE OLD AND NEW DATA
+/*
 $db->query('DROP TABLE dom0');
 $db->query('DROP TABLE domU');
 //$db->query('DROP TABLE migrated');
 $db->query('CREATE TABLE dom0 (id varchar(128), object text)');
 $db->query('CREATE TABLE domU (vm_name varchar(128), state varchar(128))');
-
+*/
 
 $dbresult = $db->query("SELECT count(*) FROM dom0");
 
