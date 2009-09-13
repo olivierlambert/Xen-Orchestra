@@ -20,9 +20,9 @@ $db->query('CREATE TABLE dom0 (id varchar(128), object text)');
 $db->query('CREATE TABLE domU (vm_name varchar(128), state varchar(128))');
 */
 
-$dbresult = $db->query("SELECT count(*) FROM dom0");
+$dbresult = $db->query('SELECT count(*) FROM dom0');
 
-$db->query("DELETE FROM domU");
+$db->query('DELETE FROM domU');
 
 foreach ($cfg->domains as $id => $domain) {
 	list($address, $port) = explode(':', $id, 2);
@@ -32,13 +32,13 @@ foreach ($cfg->domains as $id => $domain) {
 	try {
 		// Create objects and put them into Database
 		$dom0 = new Dom0($id, $address, $port, $user, $password);
-		
+
 		// Compare and/or Update/Add/Remove if necessary
 		$query = $db->query('SELECT object FROM dom0 WHERE id = "'.sqlite_escape_string($id).'"');
 		$number = $query->numRows();
-		
+
 		$domobject = sqlite_escape_string(serialize($dom0));
-		
+
 		if ($number==1) {
 			$db->query('UPDATE dom0 SET object="'.$domobject
 				.'" WHERE id = "'.sqlite_escape_string($id).'"');
@@ -47,24 +47,31 @@ foreach ($cfg->domains as $id => $domain) {
 			$db->query('INSERT INTO dom0 (id, object) VALUES ("'
 				.$id.'","'.$domobject.'")');
 		}
-		
+
 		// Save object in a array to re-use it after
 		$dom0_table[$id] = $dom0;
 	}
 	catch (Exception $e) {
-		echo '<h3>Connection Error: ',  $e->getMessage(), "</h3>";
+		echo '<h3>Connection Error: ',  $e->getMessage(), '</h3>';
 		//echo '</div>';
 		//include 'includes/footer.php';
 		//exit;
 	}
-	// if we have GET value action "migrate" on corresponding Dom0
-	if ($vm !== false && $action=="migrate_vm" && $domN==$id) {
-		$dom0->migrate_vm($vm, $target, true);
-		$vm_name = $dom0->get_vm_name($vm);
-	}
-	// else if we have a GET other value action on corresponding Dom0
-	elseif ($vm !== false && $domN==$id) {
-		$dom0->$action($vm);
+
+	if (($vm !== false) && ($domN == $id)) {
+		switch ($action) {
+			case 'migrate_vm':
+				$dom0->migrate_vm($vm, $target, true);
+				$vm_name = $dom0->get_vm_name($vm);
+				break;
+			case 'destroy_vm':
+			case 'shutdown_vm':
+			case 'start_vm':
+			case 'pause_vm':
+			case 'unpause_vm':
+				$dom0->$action($vm);
+				break;
+		}
 	}
 }
 
@@ -72,3 +79,4 @@ foreach ($cfg->domains as $id => $domain) {
 foreach ($dom0_table as $dom0) {
 	$dom0->display_table_all_vm();
 }
+
