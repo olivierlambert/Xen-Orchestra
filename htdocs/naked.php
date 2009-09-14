@@ -53,9 +53,9 @@ foreach ($cfg->domains as $id => $domain) {
 	}
 	catch (Exception $e) {
 		echo '<h3>Connection Error: ',  $e->getMessage(), "</h3>";
-		echo '</div>';
-		include 'includes/footer.php';
-		exit;
+		//echo '</div>';
+		//include 'includes/footer.php';
+		//exit;
 	}
 	// if we have GET value action "migrate" on corresponding Dom0
 	if ($vm !== false && $action=="migrate_vm" && $domN==$id) {

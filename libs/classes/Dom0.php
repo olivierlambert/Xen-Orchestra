@@ -260,8 +260,9 @@ class Dom0 {
 			</tr>
 			';
 			if (count($other_domains)>0) {
-				foreach ($other_domains as $val) {
-					echo '<tr><td><a href="vm.php?vm='.$i.'&action=migrate_vm&dom0='.$this->domN.'&target='.$val.'">'.$val.'</a></tr></td>';
+				foreach (array_keys($other_domains) as $val) {
+					list($address, $port) = explode(':', $val, 2);
+					echo '<tr><td><a href="vm.php?vm='.$i.'&action=migrate_vm&dom0='.$this->domN.'&target='.$address.'">'.$address.'</a></tr></td>';
 				}
 			}
 			else {
