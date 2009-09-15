@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<title>Xen Orchestra</title>
-	
+
 	<script type="text/javascript" src="scripts/prototype.js"></script>
 	<script type="text/javascript" src="scripts/functions.js"></script>
 	<script type="text/javascript" src="scripts/windows_js_1.3/javascripts/window.js"></script>
@@ -38,7 +38,7 @@ $dom0->display_page_vm($vm,$other_domains);
 
 
 if (!$action=="") {
-	
+
 	if (!$target=="") {
 		$dom0->$action($vm,$target,true);
 		$vm_name = $dom0->get_vm_name($vm);
@@ -49,7 +49,8 @@ if (!$action=="") {
 		echo '<script type="text/javascript">close_reload();</script>';
 	}
 }
+?>
+</div>
+</body>
+</html>
 
-
-echo '</div>';
-include 'includes/footer.php';
