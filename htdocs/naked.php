@@ -48,8 +48,7 @@ foreach ($cfg->domains as $id => $domain) {
 				.$id.'","'.$domobject.'")');
 		}
 
-		// Save object in a array to re-use it after
-		$dom0_table[$id] = $dom0;
+        $dom0->display_table_all_vm();
 	}
 	catch (Exception $e) {
 		echo '<h3>Connection Error: ',  $e->getMessage(), '</h3>';
@@ -74,9 +73,3 @@ foreach ($cfg->domains as $id => $domain) {
 		}
 	}
 }
-
-// Now display our page
-foreach ($dom0_table as $dom0) {
-	$dom0->display_table_all_vm();
-}
-
