@@ -13,14 +13,12 @@ body
 	margin: 1em auto; /* haut-bas gauche-droite */
 	min-height: 240px;
 	-moz-border-radius : 5px;
-	//width: 750px;
 	width: 700px;
 }
 h1
 {
 	background: url(img/ban2.png) center top no-repeat;
 	color: transparent;
-/*	min-height: 90px;*/
 	height: 120px;
 	margin: 0px;
 	padding: 0;
@@ -216,15 +214,12 @@ caption {
 
 /* BUTTONS */
 .buttons a, .buttons button{
-/*	background: url(img/button1.gif) right top;*/
+
 	display: block;
 	text-align: center;
-	margin: auto;
 	margin-top: 1em;
-/*	background-color:#dddddd;*/
-/*	border:1px solid #333;*/
-/*	border-top:1px solid #999;*/
-/*	border-left:1px solid #777;*/
+	margin-bottom: 1em;
+	margin: auto;
 	font-family:arial, verdana, sans-serif;
 	font-size:100%;
 	line-height:130%;

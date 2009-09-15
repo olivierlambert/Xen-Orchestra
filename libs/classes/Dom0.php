@@ -15,20 +15,7 @@ class Dom0 {
 	//public $migrated; // table of name of migrated VM
 	private $user,$pass; // user and password for Xend API
 	
-	// AUTO GETTERS, call with e.g : obj->id 
-	/*
-	public function __get($attr) {
-		if(isset($this->$attr)) return $this->$attr;
-		else throw new Exception('Unknown attribute '.$attr);
-	}
-	
-	// AUTO SETTERS
-	public function __set($attr,$value) {
-		if(isset($this->$attr)) $this->$attr = $value;
-		else throw new Exception('Unknow attribute '.$attr);
-	}*/
 
-	
 	// CONSTR
 	public function __construct($domN, $address,$port,$user,$pass) {
 		
@@ -76,39 +63,13 @@ class Dom0 {
 	}
 	
 	public function create_object_vm() {
-		//Find already Migrated+Halted VM in order to NOT display them
 		$db = DB::get_instance();
-		//$dbresult = $db->query("SELECT name FROM migrated");
-		//$migrated_array = $dbresult->fetchAll();
-		//$migrated_array = $dbresult->fetchAll();
-		//print_r($migrated_array);
-		// first run : fill database with all VM names
-		
 		$this->vm_table = array ();
 		foreach ($this->list_id_vm as $val) {
 			$domU = new DomU($val,$this->handle);
 			$db->query("INSERT INTO domU (vm_name,state) VALUES ('$domU->name','$domU->state')");
 			$this->vm_table[] = $domU;
 		}
-		/*
-		// second run : display all vm except "duplicate and halted" VM (becaue it's equivalent to a migrated VM)
-		foreach ($this->list_id_vm as $val) {
-			$domU = new DomU($val,$this->handle);
-			//print_r($this->migrated);
-			//$not_display = array_search($domU->name,$migrated_array);
-			$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$domU->name'");
-			$duplicate = $dbresult->fetchAll();
-			print_r($duplicate);
-			
-			if ($not_display === false) {
-				 $this->vm_table[$i] = serialize($domU);
-			 }
-			elseif ($domU->state != "Halted") {
-				//$db->query("DELETE FROM migrated WHERE name='$domU->name'");
-				$this->vm_table[$i] = serialize($domU);
-			}
-			$i++;
-		}*/
 	}
 	
 	public function vm_attached_number() {
@@ -421,16 +382,5 @@ class Dom0 {
 		}
 	}
 	
-	public function ajax() {
-		return "TOTO";
-	}
-	
-	public function find_migrated_vm() {
-		for($i=1; $i<count($this->vm_table);$i++) {
-			if ($this->is_migrated($i)) {
-				array_push($result,$i);
-			}
-		return $result;
-		}
-	}
+
 }
