@@ -203,7 +203,11 @@ class Dom0 {
 		$domU = $this->vm_table[$i];
 		$array = $domU->get_all_infos();
 		$vifc = $this->get_vif_info($array[19]);
-		//print_r($array);
+		$domU->metrics_all($i);
+		$cpu_use = $domU->vcpu_use;
+		$cpu_number = $domU->vcpu_number;
+		$started = $domU->date->timestamp;
+		$modified = $domU->lastupdate->timestamp;
 		// Round operation for RAM count
 		for ($j=6;$j<10;$j++) {
 			if ($array[$j]>=1073741824) {$array[$j] = round($array[$j]/(1024*1024*1024))." Go"; }

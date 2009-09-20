@@ -8,6 +8,8 @@ class DomU {
 	public $actions_after_crash,$actions_after_reboot,$pvargs;
 	public $vifs,$vbds,$consoles;
 	public $handle,$migrated;
+	public $metricsid,$metrics;
+	public $vcpu_use,$vcpu_number,$date,$lastupdate;
 	
 	// AUTO GETTERS, call with e.g : obj->id 
 	public function __get($attr) {
@@ -26,7 +28,7 @@ class DomU {
 		$this->id = $id;
 		$this->handle = $handle;
 		$this->record = $this->handle->send("VM.get_record",$this->id);
-		
+
 		// build record
 		$this->sid 			= $this->record['uuid'];
 		$this->name 		= $this->record['name_description'];
@@ -46,6 +48,7 @@ class DomU {
 		$this->vifs			= $this->record['VIFs'];
 		$this->vbds			= $this->record['VBDs'];
 		$this->consoles		= $this->record['consoles'];
+		$this->metricsid	= $this->record['metrics'];
 		$this->vcpus_at_startup 		= $this->record['VCPUs_at_startup'];
 		$this->actions_after_shutdown 	= $this->record['actions_after_shutdown'];
 		$this->actions_after_reboot		= $this->record['actions_after_reboot'];
@@ -70,7 +73,14 @@ class DomU {
 		$this->vifs,$this->vbds,$this->sid);
 	}
 	
-	
+	public function metrics_all() {
+		$this->metrics = $this->handle->send("VM_metrics.get_record",$this->metricsid);
+		$this->vcpu_use = $this->metrics['VCPUs_utilisation'];
+		$this->vcpu_number = $this->metrics['VCPUs_number'];
+		$this->date = $this->metrics['start_time'];
+		$this->lastupdate = $this->metrics['last_updated'];
+	}
+
 	public function start($is_paused) {
 		$params = array($this->id,$is_paused);
 		$this->handle->send("VM.start",$params);

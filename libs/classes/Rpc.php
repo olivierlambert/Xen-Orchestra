@@ -34,7 +34,13 @@ class Rpc {
 		)));
 		$file = file_get_contents("http://".$this->address.":".$this->port, false, $context);
 		$response = xmlrpc_decode($file);
-		return $this->response = $response['Value'];
+
+		if ($response['Status'] == "Success") {
+			return $this->response = $response['Value'];
+		}
+		elseif ($response['Status'] == "Failure") {
+			return $this->response = $response['ErrorDescription'];
+		}
 	}
 	
 	public function __toString() {
