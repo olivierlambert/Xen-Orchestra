@@ -296,7 +296,7 @@ class Dom0 {
 		$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name'");
 		$duplicate = $dbresult->numRows();
 		$title_window = "<b>$vm->name</b> on $this->address";
-		if ($duplicate>1 and $vm->state=="Halted") {
+		if ($duplicate>1 && $vm->state=="Halted") {
 			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 		}
 		else {
@@ -349,7 +349,8 @@ class Dom0 {
 			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
 			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
 			
-			<td>';			
+			<td>';
+			// CPU counter			
 			foreach ($cpu_use as $cpu) {
 				$val = round($cpu*100,2);
 				if ($val < 25) {
