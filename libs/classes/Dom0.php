@@ -303,11 +303,13 @@ class Dom0 {
 		
 			$array = $vm->get_preview();
 			$vm->metrics_all($i);
+			
+			// extra infos
 			$cpu_use = $vm->vcpu_use;
 			$cpu_number = $vm->vcpu_number;
 			$started = $vm->date->timestamp;
 			$modified = $vm->lastupdate->timestamp;
-			// cpu display
+
 			// Display different icons depending of the state
 			if ($array['state']=="Running") {
 				$id = "pause";
