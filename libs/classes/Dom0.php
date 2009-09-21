@@ -86,22 +86,10 @@ class Dom0 {
 		// minus 1 because Dom0 count as a machine
 		return $i-1;
 	}
-		//return count($this->vm_table)-1;
-	
-	
-	public function put_in_database() {
-		
-		
-	}
-	
+
 	public function get_vif_info($id) {	
 		$this->vif_record = $this->handle->send("VIF.get_record",$id);
 		return $this->vif_record;
-	}
-	
-	public function get_vm_metrics() {	
-		$this->vm_metrics = $this->handle->send("host.get_record");
-		return $this->vm_metrics;
 	}
 	
 	public function get_uuid($i) {
@@ -308,12 +296,20 @@ class Dom0 {
 		$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name'");
 		$duplicate = $dbresult->numRows();
 		$title_window = "<b>$vm->name</b> on $this->address";
-		if ($duplicate>1 and $vm->state=="Halted") {
+		if ($duplicate>1 && $vm->state=="Halted") {
 			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 		}
 		else {
 		
 			$array = $vm->get_preview();
+			$vm->metrics_all($i);
+			
+			// extra infos
+			$cpu_use = $vm->vcpu_use;
+			$cpu_number = $vm->vcpu_number;
+			$started = $vm->date->timestamp;
+			$modified = $vm->lastupdate->timestamp;
+
 			// Display different icons depending of the state
 			if ($array['state']=="Running") {
 				$id = "pause";
@@ -353,11 +349,26 @@ class Dom0 {
 			<img border=0 title="'.$title1.'" src="img/'.$icon1.'"></a>
 			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->domN.'">
 			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
-			</td>';
-			// add Edit icon
-			echo '
-			<td><a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
-			</tr> ';
+			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
+			
+			<td>';
+			// CPU counter			
+			foreach ($cpu_use as $cpu) {
+				$val = round($cpu*100,2);
+				if ($val < 25) {
+					echo '<img border=0 title="'.$val.'" src="img/cgreen.png">';
+				}
+				elseif ($val < 50) {
+					echo '<img border=0 title="'.$val.'" src="img/cyellow.png">';
+				}
+				elseif ($val < 75) {
+					echo '<img border=0 title="'.$val.'" src="img/corange.png">';
+				}
+				else {
+					echo '<img border=0 title="'.$val.'" src="img/cred.png">';
+				}
+			}
+			echo '</td></tr>';
 		}
 	}
 	
@@ -374,7 +385,7 @@ class Dom0 {
 					<th>Name</th>
 					<th>State</th>
 					<th>Actions</th>
-					<th>Advanced</th>
+					<th>Load</th>
 				</tr>';
 			for($i=1; $i<count($this->vm_table);$i++) {
 				print_r($this->is_migrated($i));

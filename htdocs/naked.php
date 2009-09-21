@@ -48,7 +48,7 @@ foreach ($cfg->domains as $id => $domain) {
 				.$id.'","'.$domobject.'")');
 		}
 
-        $dom0->display_table_all_vm();
+		$dom0->display_table_all_vm();
 	}
 	catch (Exception $e) {
 		echo '<h3>Connection Error: ',  $e->getMessage(), '</h3>';

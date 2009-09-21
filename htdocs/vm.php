@@ -23,8 +23,7 @@ $domN 		= isset ($_GET['dom0']) ? $_GET['dom0'] : false; 		// dom0 number
 
 $db = Db::get_instance();
 
-$result = $db->query('SELECT object FROM dom0 WHERE id = "'
-	.sqlite_escape_string($domN).'"');
+$result = $db->query('SELECT object FROM dom0 WHERE id = "'.sqlite_escape_string($domN).'"');
 $object = $result->fetchSingle();
 
 $dom0 = unserialize($object);
