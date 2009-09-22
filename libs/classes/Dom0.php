@@ -100,9 +100,9 @@ class Dom0 {
 		//$this->handle->send("host.get_get_sched_policy",$this->id_dom0)
 		//$this->handle->send("host.get_supported_bootloaders",$this->id_dom0)
 		//$this->handle->send("host.get_metrics",$this->id_dom0)
-		//$this->handle->send("host.get_record",$this->id_dom0)
+		$this->handle->send("host.list_methods")
 		//$this->id_metrics_dom0
-		$this->handle->send("host.get_record",$this->id_metrics_dom0)
+		//$this->handle->send("host.get_record",$this->id_metrics_dom0)
 		//$this->handle->send("host.get_capabilities",$this->id_dom0)
 		);
 	}
@@ -165,7 +165,7 @@ class Dom0 {
 		$domU = $this->vm_table[$i];
 		$domU->migrate($dest,$live);
 	}
-	
+	/*
 	public function is_migrated($i) {
 		$domU = $this->vm_table[$i];
 		return $domU->migrated;
@@ -176,6 +176,11 @@ class Dom0 {
 		$domU->set_migrated($bool);
 	}
 	
+	public function clone_vm($i,$name) {
+		$domU = $this->vm_table[$i];
+		$domU->clonevm($name);
+	}
+	*/
 	// to String
 	
 	public function __toString() {
@@ -244,11 +249,12 @@ class Dom0 {
 			echo '</table><br/>';
 			
 		}
+		/* CLONE VM : doesn't work with API, cf DomU.php
 		if ($array[2]=="Halted") {
 			// test clone
 			$address = 'clone_'.$array[1];
-			echo '<a href="vm.php?vm='.$i.'&action=clone_vm&dom0='.$this->domN.'&target='.$address.'">'.$address.'</a>';
-		}
+			echo '<br/><a href="vm.php?vm='.$i.'&action=clone_vm&dom0='.$this->domN.'&target='.$address.'">'.$address.'</a><br/>';
+		}*/
 		//<h3>"'.$array[1].'" is '.$array[2].' (on '.$this->address.')</h3>
 		echo '
 				<p class="left"><img border=0 title="CPU" src="img/cpu.png"></p>
@@ -324,6 +330,7 @@ class Dom0 {
 			if ($result>1 && $vm->state=="Halted") {
 				// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 				// update state to migrated
+				//echo 'MIGREE : '.$vm->name.' !!';
 				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND domN="'.$this->domN.'"');
 			}
 		}

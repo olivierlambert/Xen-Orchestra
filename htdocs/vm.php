@@ -43,10 +43,6 @@ if (!$action=="") {
 		$vm_name = $dom0->get_vm_name($vm);
 		echo '<script type="text/javascript">close_reload();</script>';
 	}
-	elseif ($action=="clone_vm") {
-		$dom0->$acion($vm,$target);
-		echo '<script type="text/javascript">close_reload();</script>';
-	}
 	else {
 	$dom0->$action($vm);
 		echo '<script type="text/javascript">close_reload();</script>';

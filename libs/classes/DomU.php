@@ -87,10 +87,13 @@ class DomU {
 	}
 	
 	// test cloning 
+	// doesn't work : limited in API, to "EUNSUPPORTED Method Unsupported "
+	/*
 	public function clonevm($nameofclone) {
 		$params = array($this->id,$nameofclone);
-		$this->handle->send("VM.clone",$params);
+		$this->handle->send("VM.clone",$this->id);
 	}
+	*/
 	
 	public function pause() {
 		$this->handle->send("VM.pause",$this->id);
@@ -121,7 +124,6 @@ class DomU {
 	}
 	
 	public function migrate($dest,$live) {
-		$this->migrated = true;
 		$port = array("port" => 8002);
 		$params = array($this->id,$dest,true,$port);
 		$this->handle->send("VM.migrate",$params);
