@@ -104,7 +104,7 @@ class DomU {
 	}
 	
 	public function shutdown() {
-		$this->handle->send("VM.hard_shutdown",$this->id);
+		$this->handle->send("VM.clean_shutdown",$this->id);
 	}
 	
 	public function destroy() {
