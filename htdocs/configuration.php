@@ -4,7 +4,7 @@ $cfg = Config::get_instance();
 $db = Db::get_instance();
 require 'includes/header.php';
 echo '<div id="main">
-<h3>Avalaible API method on Dom0\'s (debug purpose)</h3>';
+<h3>Available API method on Dom0\'s (debug purpose)</h3>';
 
 foreach ($cfg->domains as $id => $domain) {
 	list($address, $port) = explode(':', $id, 2);
