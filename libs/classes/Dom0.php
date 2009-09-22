@@ -14,7 +14,7 @@ class Dom0 {
 	public $database;
 	//public $migrated; // table of name of migrated VM
 	private $user,$pass; // user and password for Xend API
-	
+	public $id_dom0,$id_metrics_dom0;
 
 	// CONSTR
 	public function __construct($domN, $address,$port,$user,$pass) {
@@ -67,7 +67,7 @@ class Dom0 {
 		$this->vm_table = array ();
 		foreach ($this->list_id_vm as $val) {
 			$domU = new DomU($val,$this->handle);
-			$db->query("INSERT INTO domU (vm_name,state) VALUES ('$domU->name','$domU->state')");
+			$db->query("INSERT INTO domU (vm_name,state,domN) VALUES ('$domU->name','$domU->state','$this->domN')");
 			$this->vm_table[] = $domU;
 		}
 	}
@@ -77,7 +77,7 @@ class Dom0 {
 		$db = DB::get_instance();
 		$i = 0;
 		foreach ($this->vm_table as $vm) {
-			$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name'");
+			$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
 			$duplicate = $dbresult->numRows();
 			if (!($duplicate>1 and $vm->state=="Halted")) {
 				$i++; // THIS IS NOT A MIGRATED VM: COUNT IT!!
@@ -85,6 +85,26 @@ class Dom0 {
 		}
 		// minus 1 because Dom0 count as a machine
 		return $i-1;
+	}
+
+	public function host_infos() {
+		$this->id_dom0 = $this->handle->send("host.get_all");
+		$this->id_metrics_dom0 = $this->handle->send("host_metrics.get_all");
+		$this->id_metrics_dom0 = $this->id_metrics_dom0[0];
+	}
+	
+	public function host_record() {
+		$this->host_infos();
+		return (
+		//$this->handle->send("host.get_cpu_configuration",$this->id_dom0),
+		//$this->handle->send("host.get_get_sched_policy",$this->id_dom0)
+		//$this->handle->send("host.get_supported_bootloaders",$this->id_dom0)
+		//$this->handle->send("host.get_metrics",$this->id_dom0)
+		$this->handle->send("host.list_methods")
+		//$this->id_metrics_dom0
+		//$this->handle->send("host.get_record",$this->id_metrics_dom0)
+		//$this->handle->send("host.get_capabilities",$this->id_dom0)
+		);
 	}
 
 	public function get_vif_info($id) {	
@@ -145,7 +165,7 @@ class Dom0 {
 		$domU = $this->vm_table[$i];
 		$domU->migrate($dest,$live);
 	}
-	
+	/*
 	public function is_migrated($i) {
 		$domU = $this->vm_table[$i];
 		return $domU->migrated;
@@ -156,6 +176,11 @@ class Dom0 {
 		$domU->set_migrated($bool);
 	}
 	
+	public function clone_vm($i,$name) {
+		$domU = $this->vm_table[$i];
+		$domU->clonevm($name);
+	}
+	*/
 	// to String
 	
 	public function __toString() {
@@ -222,7 +247,14 @@ class Dom0 {
 				echo '<tr><td>No other Dom0\'s found !</tr></td>';
 			}
 			echo '</table><br/>';
+			
 		}
+		/* CLONE VM : doesn't work with API, cf DomU.php
+		if ($array[2]=="Halted") {
+			// test clone
+			$address = 'clone_'.$array[1];
+			echo '<br/><a href="vm.php?vm='.$i.'&action=clone_vm&dom0='.$this->domN.'&target='.$address.'">'.$address.'</a><br/>';
+		}*/
 		//<h3>"'.$array[1].'" is '.$array[2].' (on '.$this->address.')</h3>
 		echo '
 				<p class="left"><img border=0 title="CPU" src="img/cpu.png"></p>
@@ -286,6 +318,23 @@ class Dom0 {
 		</table>
 		';
 	}
+	public function detect_migrated() {
+		// connect to the DB
+		$db = DB::get_instance();
+		for($i=1; $i<count($this->vm_table);$i++) {
+			// displays rows for each VM
+			$vm = $this->vm_table[$i];
+			$dbresult = $db->query("SELECT COUNT (vm_name) FROM domU WHERE vm_name='$vm->name'");
+			$result = $dbresult->fetchSingle();
+
+			if ($result>1 && $vm->state=="Halted") {
+				// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
+				// update state to migrated
+				//echo 'MIGREE : '.$vm->name.' !!';
+				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND domN="'.$this->domN.'"');
+			}
+		}
+	}
 	
 	public function display_row_vm($i) {
 		// connect to the DB
@@ -293,14 +342,13 @@ class Dom0 {
 		
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name'");
-		$duplicate = $dbresult->numRows();
+		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
+		$state = $dbresult->fetchSingle();
 		$title_window = "<b>$vm->name</b> on $this->address";
-		if ($duplicate>1 && $vm->state=="Halted") {
+		if ($state=="Migrated") {
 			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 		}
 		else {
-		
 			$array = $vm->get_preview();
 			$vm->metrics_all($i);
 			
@@ -387,11 +435,9 @@ class Dom0 {
 					<th>Actions</th>
 					<th>Load</th>
 				</tr>';
+			$this->detect_migrated();
 			for($i=1; $i<count($this->vm_table);$i++) {
-				print_r($this->is_migrated($i));
-				if (!$this->is_migrated($i)) {
 					$this->display_row_vm($i);
-				}
 			}
 			echo '</table><br/>';
 		}
