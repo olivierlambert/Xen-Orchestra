@@ -86,6 +86,12 @@ class DomU {
 		$this->handle->send("VM.start",$params);
 	}
 	
+	// test cloning 
+	public function clonevm($nameofclone) {
+		$params = array($this->id,$nameofclone);
+		$this->handle->send("VM.clone",$params);
+	}
+	
 	public function pause() {
 		$this->handle->send("VM.pause",$this->id);
 	}

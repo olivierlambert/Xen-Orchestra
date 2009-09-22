@@ -31,6 +31,6 @@ if ($footer !== false)
 	</h1>
 	<ul class="menu1">
 		<li><a href="index.php"><b><img src="img/house.png" alt=""/>HOME</b></a></li>
-		<li><a href="index.php"><b><img src="img/conf.png" alt=""/>CONFIGURATION</b></a></li>
+		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>CONFIGURATION</b></a></li>
 		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM MANAGEMENT</b></a></li>
 	</ul>

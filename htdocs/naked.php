@@ -47,14 +47,10 @@ foreach ($cfg->domains as $id => $domain) {
 			$db->query('INSERT INTO dom0 (id, object) VALUES ("'
 				.$id.'","'.$domobject.'")');
 		}
-
-		$dom0->display_table_all_vm();
+		//$dom0->display_table_all_vm();
 	}
 	catch (Exception $e) {
 		echo '<h3>Connection Error: ',  $e->getMessage(), '</h3>';
-		//echo '</div>';
-		//include 'includes/footer.php';
-		//exit;
 	}
 
 	if (($vm !== false) && ($domN == $id)) {
@@ -72,4 +68,11 @@ foreach ($cfg->domains as $id => $domain) {
 				break;
 		}
 	}
+}
+// now that the database if filled, we display
+$query = $db->query('SELECT object FROM dom0');
+$result = $query->fetchAll();
+foreach ($result as $dom0) {
+	$dom0 = unserialize($dom0[0]);
+	$dom0->display_table_all_vm();
 }
