@@ -5,10 +5,12 @@ Server Requirements:
 
 1) Untar the tarball in your /var/www/ folder.
 
-2) edit your config file named "xen-orchestra.conf", see the comments
+2) RENAME "xen-orchestra.conf.dist" TO ""xen-orchestra.conf" : Otherwise, it doesn't work !
 
-3) run the installer (it will only create a small database):
+3)edit your config file named "xen-orchestra.conf", see the comments
+
+4) run the installer (it will only create a small database):
 http://your-server-address/xen/install.php
 
-4) Then, open:
+5) Then, open:
 http://your-server-address/xen/htdocs/
