@@ -10,6 +10,10 @@ To report bug, download latest version etc.
 
 Thanks for testing and maybe contributing.
 
+### HOW TO OBTAIN FULL EXPERIENCE FROM THIS SOFTWARE ###
+Please use "xm new domU.cfg" when you add a DomU, beside "xm create domU.cfg".
+Reasons on http://xen-orchestra.com/?p=96
+
 ### HOW TO CONFIGURE XEN DOM0 FOR CALL THE API ###
 # Ultra small documentation, please read the comment in 
 # xen configuration file

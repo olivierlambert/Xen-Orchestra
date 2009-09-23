@@ -435,7 +435,7 @@ class Dom0 {
 					<th>Actions</th>
 					<th>Load</th>
 				</tr>';
-			$this->detect_migrated();
+			//$this->detect_migrated();
 			for($i=1; $i<count($this->vm_table);$i++) {
 					$this->display_row_vm($i);
 			}

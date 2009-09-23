@@ -74,5 +74,6 @@ $query = $db->query('SELECT object FROM dom0');
 $result = $query->fetchAll();
 foreach ($result as $dom0) {
 	$dom0 = unserialize($dom0[0]);
+	$dom0->detect_migrated();
 	$dom0->display_table_all_vm();
 }
