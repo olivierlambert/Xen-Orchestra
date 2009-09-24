@@ -18,6 +18,8 @@ if ($footer !== false)
 	<script type="text/javascript" src="scripts/functions.js"></script>
 	<script type="text/javascript" src="scripts/windows_js_1.3/javascripts/window.js"></script>
 	<script type="text/javascript" src="scripts/windows_js_1.3/javascripts/tooltip.js"></script>
+	<script type="text/javascript" src="scripts/portal.js"></script>
+
 
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/style.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/alphacube.css" />

@@ -77,3 +77,7 @@ foreach ($result as $dom0) {
 	$dom0->detect_migrated();
 	$dom0->display_table_all_vm();
 }
+echo '
+<script>var portal = new Xilinus.Portal("#main");
+portal.add(new Xilinus.Widget().setTitle("Widget Title").setContent("bla bla bla"), 1);
+</script>';
