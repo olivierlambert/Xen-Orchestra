@@ -211,6 +211,18 @@ caption {
 	padding: 0.2em;
 	max-width:500px;
 }
+/* COLUMNS */
+#widget_col_0 { 
+float:left;
+width: 30%;
+}
+
+#widget_col_1 {
+width: 50%;
+float:left;
+}
+
+
 
 /* BUTTONS */
 .buttons a, .buttons button{
