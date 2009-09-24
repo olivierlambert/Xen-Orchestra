@@ -8,10 +8,10 @@ html
 
 body
 {
-	background: #fff;
+	background: #ddd;
 	border: 0px solid #bbb;
 	margin: 1em auto; /* haut-bas gauche-droite */
-	min-height: 240px;
+	min-height: 400px;
 	-moz-border-radius : 5px;
 	width: 700px;
 }
@@ -211,10 +211,10 @@ caption {
 	padding: 0.2em;
 	max-width:500px;
 }
-/* COLUMNS */
+/* COLUMNS NETVIBES LIKE */
 #widget_col_0 { 
 float:left;
-width: 30%;
+width: 50%;
 }
 
 #widget_col_1 {
@@ -222,7 +222,64 @@ width: 50%;
 float:left;
 }
 
+/* Sliding doors technique */
+.widget_nw {
+	background:transparent url(alphacube/top_left.gif) no-repeat;
+	height:30px;
+}
 
+.widget_w {
+	border-left:1px solid #B9B9B9;
+	margin-left:5px;
+}
+
+.widget_sw {
+	background:transparent url(alphacube/bottom_left.gif) no-repeat;
+	height:15px;
+}
+
+.widget_title {
+	background:  url(alphacube/top_right.gif) repeat-x right top;
+	color:#123456;
+	font:bold 14px/25px Tahoma, Arial, sans-serif;
+	height:26px;
+	margin:0 0 0 15px;
+	padding:5px 0 0 0 ;
+	text-align:center;
+	margin-left:15px;
+}
+
+.widget_content {
+	background-color:#FDFDFD;
+	color:#71777A;
+	font:normal 12px/1em Tahoma, Arial, sans-serif;
+	overflow:hidden;
+	padding:5px;
+	border-right:1px solid #B9B9B9;
+	margin-right:5px;
+}
+
+.widget_statusbar {
+	background:transparent url(alphacube/bottom_right.gif) repeat-x right top;
+	font-size:8px;
+	height:15px;
+	margin-left:11px;
+}
+
+.widget_draggable {
+	cursor:move;
+}
+
+/* Ghost */
+.widget_ghost {
+	background:#FFF;
+	opacity: 0.5;
+	filter:alpha(opacity=50);
+	position:relative;
+	border: 3px dashed #000;
+	margin:0px;
+	padding:0;
+}
 
 /* BUTTONS */
 .buttons a, .buttons button{

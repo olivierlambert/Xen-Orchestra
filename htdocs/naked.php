@@ -11,14 +11,7 @@ $domN 		= isset ($_GET['dom0']) ? $_GET['dom0'] : false; 		// dom0 number
 // create object in order to play with SQLite database
 $db = Db::get_instance();
 
-// TO DO : UPDATE OR INSERT, COMPARE OLD AND NEW DATA
-/*
-$db->query('DROP TABLE dom0');
-$db->query('DROP TABLE domU');
-//$db->query('DROP TABLE migrated');
-$db->query('CREATE TABLE dom0 (id varchar(128), object text)');
-$db->query('CREATE TABLE domU (vm_name varchar(128), state varchar(128))');
-*/
+
 
 $dbresult = $db->query('SELECT count(*) FROM dom0');
 
@@ -47,7 +40,6 @@ foreach ($cfg->domains as $id => $domain) {
 			$db->query('INSERT INTO dom0 (id, object) VALUES ("'
 				.$id.'","'.$domobject.'")');
 		}
-		//$dom0->display_table_all_vm();
 	}
 	catch (Exception $e) {
 		echo '<h3>Connection Error: ',  $e->getMessage(), '</h3>';
@@ -77,7 +69,4 @@ foreach ($result as $dom0) {
 	$dom0->detect_migrated();
 	$dom0->display_table_all_vm();
 }
-echo '
-<script>var portal = new Xilinus.Portal("#main");
-portal.add(new Xilinus.Widget().setTitle("Widget Title").setContent("bla bla bla"), 1);
-</script>';
+

@@ -4,7 +4,7 @@ require 'includes/header.php';
 echo '<div id="main">';
 require 'naked.php';
 ?>
-var  portal = new Xilinus.Portal("#page div")
+
 
 <div id="widget_col_0"></div>
 <div id="widget_col_1"></div>
