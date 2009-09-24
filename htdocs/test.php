@@ -11,6 +11,8 @@ $db = Db::get_instance();
 // now that the database if filled, we display
 $query = $db->query('SELECT object FROM dom0');
 $result = $query->fetchAll();
+$row = 0;
+$i = 0;
 foreach ($result as $dom0) {
 	$dom0 = unserialize($dom0[0]);
 	$dom0->detect_migrated();
