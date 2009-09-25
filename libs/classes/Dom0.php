@@ -75,16 +75,10 @@ class Dom0 {
 	public function vm_attached_number() {
 		// connect to the DB
 		$db = DB::get_instance();
-		$i = 0;
-		foreach ($this->vm_table as $vm) {
-			$dbresult = $db->query("SELECT vm_name FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
-			$duplicate = $dbresult->numRows();
-			if (!($duplicate>1 and $vm->state=="Halted")) {
-				$i++; // THIS IS NOT A MIGRATED VM: COUNT IT!!
-			}
-		}
-		// minus 1 because Dom0 count as a machine
-		return $i-1;
+		$dbresult = $db->query('SELECT COUNT(*) FROM domU WHERE domN="'.$this->domN.'" AND state!="Migrated"');
+		$count = $dbresult->fetchSingle();
+
+		return $count-1;
 	}
 
 	public function host_infos() {
@@ -543,7 +537,7 @@ class Dom0 {
 			for($i=1; $i<count($this->vm_table);$i++) {
 					$return .= $this->display_frame_vm($i);
 			}
-			//echo '</table>';
+			$return .= '</table>';
 		}
 			return $return;
 	}

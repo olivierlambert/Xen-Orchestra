@@ -165,9 +165,39 @@ caption {
 	border-color:#444;
 	border-collapse:collapse;
 	width:100%;
+
+}
+#page th {
+	margin : 5 5 5 5 px;
+	padding : 8px 8px;
+	text-align : center;
+	color: black;
 }
 
-th {
+#page td {
+	/*margin : 5 5 5 5 px;*/
+	padding : 5px 5px;
+	text-align : center;
+	color: #555;
+}
+
+
+#page tr {
+	/*background-color: #eee;*/
+}
+
+#page tr:hover {
+	background-color: #eee;
+}
+
+#page img
+{
+	margin-bottom: -3px;
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+#main th {
 	border:1px thin black;
 	padding:5px;
 	color: #fff;

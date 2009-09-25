@@ -15,6 +15,6 @@ $nb = $dom0->vm_attached_number();
 $content = $dom0->display_frame_all_vm();
 
 
-$title = $address.' ('.$nb.')';
+$title = $address.' ('.$nb.' vm)';
 
 echo json_encode(array(title => $title, content => $content));

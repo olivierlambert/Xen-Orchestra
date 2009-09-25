@@ -19,7 +19,6 @@ foreach ($result as $obj) {
 	$row = $i % 2;
 	echo '<script>display_dom0(portal,'.$row.',"'.$dom0.'");</script>';
 	$i++;
-	
 }
 	
 ?>
