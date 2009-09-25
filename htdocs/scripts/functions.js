@@ -67,9 +67,8 @@ function initPage(e) {
 	});
 } // initPage : add observers, refresh time etc.
 
-<<<<<<< HEAD:htdocs/scripts/functions.js
-function display_dom0(dom0) {
-	var url = 'display_dom0.php?dom0='+dom0;
+function display_dom0(dom0,row,id) {
+	var url = 'display_dom0.php';
 
 	var req = new Ajax.Request(url,
 	{
@@ -79,7 +78,6 @@ function display_dom0(dom0) {
 		var response = transport.responseText;
 		var json = response.evalJSON();
 		portal.add(new Xilinus.Widget().setTitle(json.title).setContent(json.content), row);
-
 		},
 		onFailure: function() {
 			alert('Something went wrong...')
