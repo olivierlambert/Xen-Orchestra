@@ -12,6 +12,8 @@ body
 	border: 0px solid #bbb;
 	margin: 1em auto; /* haut-bas gauche-droite */
 	min-height: 400px;
+	height: auto;
+	_height: 400px;
 	-moz-border-radius : 5px;
 	width: 700px;
 }
@@ -154,6 +156,15 @@ caption {
 	border-collapse:collapse;
 	/*width:480px;*/
 	max-width:1000px;
+}
+
+#page table {
+	margin : auto;
+	border-width:3px;
+	border-style:medium solid;
+	border-color:#444;
+	border-collapse:collapse;
+	width:100%;
 }
 
 th {
