@@ -11,6 +11,7 @@ $db = Db::get_instance();
 // now that the database if filled, we display
 $query = $db->query('SELECT object FROM dom0');
 $result = $query->fetchAll();
+
 $row = 0;
 $i = 0;
 foreach ($result as $dom0) {
@@ -21,7 +22,7 @@ foreach ($result as $dom0) {
 	$i++;
 	
 }
-	echo '<script>display_dom0(4);</script>';
+	echo '<script>display_dom0($dom0);</script>';
 ?>
 </div>
 

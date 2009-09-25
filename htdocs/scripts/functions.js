@@ -67,8 +67,8 @@ function initPage(e) {
 	});
 } // initPage : add observers, refresh time etc.
 
-function display_dom0(number) {
-	var url = 'display_dom0.php';
+function display_dom0(dom0) {
+	var url = 'display_dom0.php?dom0='+dom0;
 	var req = new Ajax.Request(url,
 	{
 		method:'get',
@@ -76,10 +76,10 @@ function display_dom0(number) {
 		var response = transport.responseText;
 		var json = response.evalJSON();
 		var portal = new Xilinus.Portal("#page div");
-		for (i=0; i<number; i++) {
-			var row = i % 2;
-			portal.add(new Xilinus.Widget().setTitle(json.title).setContent(json.content), row);
-		}
+		//for (i=0; i<number; i++) {
+		//	var row = i % 2;
+			portal.add(new Xilinus.Widget().setTitle(json.title).setContent(json.content), 1);
+		//}
 		},
 		onFailure: function() {
 			alert('Something went wrong...')
