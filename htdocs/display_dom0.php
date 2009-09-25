@@ -2,7 +2,7 @@
 require_once dirname (__FILE__) . '/../includes/prepend.php';
 $db = Db::get_instance();
 $id = isset($_POST['id']) ? $_POST['id'] : false;
-$id = 'dls.homelinux.net:9363';
+//$id = 'dls.homelinux.net:9363';
 
 list($address, $port) = explode(':', $id, 2);
 $query = $db->query('SELECT object FROM dom0 WHERE id = "'.sqlite_escape_string($id).'"');
