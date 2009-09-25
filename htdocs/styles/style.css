@@ -1,6 +1,7 @@
 html
 {
-	background-color: #1a1a1a;
+	/*background-color: #1a1a1a;*/
+	background-color: #fff;
 	font-family:arial, verdana, sans-serif;
 	font-size: 10pt;
 
@@ -8,14 +9,15 @@ html
 
 body
 {
-	background: #ddd;
+	/*background: #fff;*/
 	border: 0px solid #bbb;
-	margin: 1em auto; /* haut-bas gauche-droite */
-	min-height: 400px;
+	/*margin: 0 0 0 0 px;*/
+	margin: 0em auto; /* haut-bas gauche-droite */
+	/*min-height: 700px;
 	height: auto;
 	_height: 400px;
 	-moz-border-radius : 5px;
-	width: 700px;
+	width: 700px;*/
 }
 h1
 {
@@ -70,7 +72,8 @@ h5
 
 #main
 {
-	color: #000;
+	color: #111;
+	margin: 0 0 0 0 px;
 /*	margin: 0 0 .5em .5em;*/ /* haut-bas gauche-droite */
 /*	padding: .5em .5em;*/
 	text-align: center;
@@ -158,6 +161,10 @@ caption {
 	max-width:1000px;
 }
 
+#page {
+	background-color: #111;
+}
+
 #page table {
 	margin : auto;
 	border-width:3px;
@@ -171,14 +178,14 @@ caption {
 	margin : 5 5 5 5 px;
 	padding : 8px 8px;
 	text-align : center;
-	color: black;
+	color: #eee;
 }
 
 #page td {
 	/*margin : 5 5 5 5 px;*/
 	padding : 5px 5px;
 	text-align : center;
-	color: #555;
+	color: #eee;
 }
 
 
@@ -187,7 +194,7 @@ caption {
 }
 
 #page tr:hover {
-	background-color: #eee;
+	background-color: #000;
 }
 
 #page img
@@ -263,6 +270,9 @@ width: 50%;
 float:left;
 }
 
+.center {
+	text-align : center;
+}
 /* Sliding doors technique */
 .widget_nw {
 	background:transparent url(alphacube/top_left.gif) no-repeat;
@@ -281,7 +291,7 @@ float:left;
 
 .widget_title {
 	background:  url(alphacube/top_right.gif) repeat-x right top;
-	color:#123456;
+	color:#eee;
 	font:bold 14px/25px Tahoma, Arial, sans-serif;
 	height:26px;
 	margin:0 0 0 15px;
@@ -291,8 +301,9 @@ float:left;
 }
 
 .widget_content {
-	background-color:#FDFDFD;
-	color:#71777A;
+	/*background-color:#FDFDFD;*/
+	background-color:#1a1a1a;
+	color:#eee;
 	font:normal 12px/1em Tahoma, Arial, sans-serif;
 	overflow:hidden;
 	padding:5px;
@@ -393,8 +404,8 @@ button.positive, .buttons a.positive{
 
 
 .menu1 {
-	padding:0 0 0 170px;
-	margin:0;
+	padding:0 0 0 0px;
+	margin: auto;
 	list-style:none;
 	height:35px;
 	background:#fff url(img/button1.gif);
@@ -404,7 +415,9 @@ button.positive, .buttons a.positive{
 	border-bottom:1px solid #444;
 }
 .menu1 li {
-	float:left;
+	/*float:right;*/
+	margin: auto;
+	text-align: center;
 }
 .menu1 li a {
 	display:block;

@@ -523,7 +523,7 @@ class Dom0 {
 	public function display_frame_all_vm() {
 		// if there is no DomU attached
 		if ($this->vm_attached_number()<1) {
-			$return = 'No DomU detected on '.$this->address.'';
+			$return = '<p class="center">No DomU detected on '.$this->address.' !</p>';
 		}
 		else {
 			$return = '<table>
