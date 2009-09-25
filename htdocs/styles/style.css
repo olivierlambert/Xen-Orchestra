@@ -1,7 +1,7 @@
 html
 {
 	/*background-color: #1a1a1a;*/
-	background-color: #fff;
+	background-color: #000;
 	font-family:arial, verdana, sans-serif;
 	font-size: 10pt;
 
@@ -21,7 +21,7 @@ body
 }
 h1
 {
-	background: url(img/ban2.png) center top no-repeat;
+	background: url(img/ban3.png) center top no-repeat;
 	color: transparent;
 	height: 120px;
 	margin: 0px;
@@ -178,14 +178,14 @@ caption {
 	margin : 5 5 5 5 px;
 	padding : 8px 8px;
 	text-align : center;
-	color: #eee;
+	color: #111;
 }
 
 #page td {
 	/*margin : 5 5 5 5 px;*/
 	padding : 5px 5px;
 	text-align : center;
-	color: #eee;
+	color: #111;
 }
 
 
@@ -194,7 +194,7 @@ caption {
 }
 
 #page tr:hover {
-	background-color: #000;
+	background-color: #ccc;
 }
 
 #page img
@@ -207,7 +207,7 @@ caption {
 #main th {
 	border:1px thin black;
 	padding:5px;
-	color: #fff;
+	color: #111;
 	background:#fff url(img/button1.gif);
 	height:30px;
 	border-left: 1px solid #666;
@@ -227,7 +227,7 @@ caption {
 #main td {
 	border-width:1px;
 	border-style:solid;
-	border-color:#ccc;
+	border-color:#111;
 	min-width: 80px;
 /*	max-width:600px;*/
 	margin : 5 5 5 5 px;
@@ -291,7 +291,7 @@ float:left;
 
 .widget_title {
 	background:  url(alphacube/top_right.gif) repeat-x right top;
-	color:#eee;
+	color:#111;
 	font:bold 14px/25px Tahoma, Arial, sans-serif;
 	height:26px;
 	margin:0 0 0 15px;
@@ -301,9 +301,8 @@ float:left;
 }
 
 .widget_content {
-	/*background-color:#FDFDFD;*/
-	background-color:#1a1a1a;
-	color:#eee;
+	background-color:#FDFDFD;
+	color:#111;
 	font:normal 12px/1em Tahoma, Arial, sans-serif;
 	overflow:hidden;
 	padding:5px;
