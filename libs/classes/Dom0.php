@@ -2,7 +2,7 @@
 
 class Dom0 {
 	
-	public $domN; // Dom0 number : is it dom0 "1" or dom0 "2" ? etc.
+	public $domN; // Dom0 id : IP address + port (it's unique !)
 	public $address; // IP address or DNS name
 	public $port; // Port for Xend daemon
 	public
@@ -184,8 +184,7 @@ class Dom0 {
 	// to String
 	
 	public function __toString() {
-		
-		return $this->address.' avec l\'ID : '.$this->handle->id;
+		return $this->domN;
 	}
 	
 ////////////////////// DISPLAY PART OF CLASS /////////////////////////
@@ -420,6 +419,91 @@ class Dom0 {
 		}
 	}
 	
+	public function display_frame_vm($i) {
+		// connect to the DB
+		$db = DB::get_instance();
+		
+		// displays rows for each VM
+		$vm = $this->vm_table[$i];
+		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
+		$state = $dbresult->fetchSingle();
+		$title_window = "<b>$vm->name</b> on $this->address";
+		if ($state=="Migrated") {
+			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
+		}
+		else {
+			$array = $vm->get_preview();
+			$vm->metrics_all($i);
+			
+			// extra infos
+			$cpu_use = $vm->vcpu_use;
+			$cpu_number = $vm->vcpu_number;
+			$started = $vm->date->timestamp;
+			$modified = $vm->lastupdate->timestamp;
+
+			// Display different icons depending of the state
+			if ($array['state']=="Running") {
+				$id = "pause";
+				$action1 = "pause_vm";
+				$icon1 = "pause.png";
+				$title1 = "Pause this DomU";
+				$action2 = "shutdown_vm";
+				$icon2 = "stop.png";
+				$title2 = "Halt this DomU";
+			}
+			elseif ($array['state']=="Paused") {
+				$id = "unpause";
+				$action1 = "unpause_vm";
+				$icon1 = "play.png";
+				$title1 = "Unpause this DomU";
+				$action2 = "shutdown_vm";
+				$icon2 = "stop.png";
+				$title2 = "Halt this DomU";
+			}
+			elseif ($array['state']=="Halted") {
+				$id = "start";
+				$action1 = "start_vm";
+				$icon1 = "start.png";
+				$title1 = "Start this DomU";
+				$action2 = "destroy_vm";
+				$icon2 = "destroy.png";
+				$title2 = "Remove this DomU from Xen Management";
+			}
+			// fill the line with each value
+			$return = '<tr>';
+			foreach ($array as $val) {			
+				$return .= '<td>'.$val.'</td>';
+			}
+			// add action icons
+			$return .= '
+			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->domN.'">
+			<img border=0 title="'.$title1.'" src="img/'.$icon1.'"></a>
+			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->domN.'">
+			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
+			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
+			
+			<td>';
+			// CPU counter			
+			foreach ($cpu_use as $cpu) {
+				$val = round($cpu*100,2);
+				if ($val < 25) {
+					$return .= '<img border=0 title="'.$val.'" src="img/cgreen.png">';
+				}
+				elseif ($val < 50) {
+					$return .= '<img border=0 title="'.$val.'" src="img/cyellow.png">';
+				}
+				elseif ($val < 75) {
+					$return .= '<img border=0 title="'.$val.'" src="img/corange.png">';
+				}
+				else {
+					$return .= '<img border=0 title="'.$val.'" src="img/cred.png">';
+				}
+			}
+			$return .= '</td></tr>';
+		}
+	return $return;
+	}
+	
 	public function display_table_all_vm() {
 		// if there is no DomU attached
 		if ($this->vm_attached_number()<1) {
@@ -429,7 +513,6 @@ class Dom0 {
 			echo '<br/><table>
 				<caption>Dom0 '.$this->address.'</caption>
 				<tr>
-					<th>ID</th>
 					<th>Name</th>
 					<th>State</th>
 					<th>Actions</th>
@@ -442,6 +525,29 @@ class Dom0 {
 			echo '</table><br/>';
 		}
 	}
+	
+	public function display_frame_all_vm() {
+		// if there is no DomU attached
+		if ($this->vm_attached_number()<1) {
+			$return = 'No DomU detected on '.$this->address.'';
+		}
+		else {
+			$return = '<table>
+				<tr>
+					<th>Name</th>
+					<th>State</th>
+					<th>Actions</th>
+					<th>Load</th>
+				</tr>';
+			
+			for($i=1; $i<count($this->vm_table);$i++) {
+					$return .= $this->display_frame_vm($i);
+			}
+			//echo '</table>';
+		}
+			return $return;
+	}
+
 	
 
 }

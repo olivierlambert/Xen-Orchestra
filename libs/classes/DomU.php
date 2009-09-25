@@ -57,7 +57,7 @@ class DomU {
 	
 	public function get_preview() {
 		
-		return array("xid" => $this->xid, 
+		return array(
 					"name" => $this->name, 
 					"state" => $this->state);
 	}

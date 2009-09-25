@@ -67,19 +67,16 @@ function initPage(e) {
 	});
 } // initPage : add observers, refresh time etc.
 
-function display_dom0(number) {
+function display_dom0(portal,row,id) {
 	var url = 'display_dom0.php';
 	var req = new Ajax.Request(url,
 	{
-		method:'get',
+		method:'post',
+		postBody:'id='+id,
 		onComplete: function(transport) {
 		var response = transport.responseText;
 		var json = response.evalJSON();
-		var portal = new Xilinus.Portal("#page div");
-		for (i=0; i<number; i++) {
-			var row = i % 2;
-			portal.add(new Xilinus.Widget().setTitle(json.title).setContent(json.content), row);
-		}
+		portal.add(new Xilinus.Widget().setTitle(json.title).setContent(json.content), row);
 		},
 		onFailure: function() {
 			alert('Something went wrong...')
