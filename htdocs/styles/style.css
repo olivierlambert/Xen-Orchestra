@@ -1,7 +1,7 @@
 html
 {
 	/*background-color: #1a1a1a;*/
-	background-color: #000;
+	background-color: #ccc;
 	font-family:arial, verdana, sans-serif;
 	font-size: 10pt;
 
@@ -21,7 +21,7 @@ body
 }
 h1
 {
-	background: url(img/ban3.png) center top no-repeat;
+	background: url(img/ban2.png) center top no-repeat;
 	color: transparent;
 	height: 120px;
 	margin: 0px;
