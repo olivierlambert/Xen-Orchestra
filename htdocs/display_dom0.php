@@ -1,5 +1,26 @@
 <?php
 require_once dirname (__FILE__) . '/../includes/prepend.php';
+<<<<<<< HEAD:htdocs/display_dom0.php
 $dom0	= isset ($_GET['dom0']) ? $_GET['dom0'] : false;
 echo $dom0;
 //echo json_encode(array('title' => 'Dom0', 'content' => 'Lorem Ipsum Dolor'));
+=======
+$db = Db::get_instance();
+
+$id = ($_POST['id']) ? $_POST['id'] : false;
+//$id = "xena1:9363";
+list($address, $port) = explode(':', $id, 2);
+
+$query = $db->query('SELECT object FROM dom0 WHERE id = "'.sqlite_escape_string($id).'"');
+
+$result = $query->fetchSingle();
+$dom0 = unserialize($result);
+
+$nb = $dom0->vm_attached_number();
+$content = $dom0->display_frame_all_vm();
+
+
+$title = $address.' ('.$nb.' vm)';
+
+echo json_encode(array(title => $title, content => $content));
+>>>>>>> edfc6aecb9770f7331a16c20513c9ba66d9b71b5:htdocs/display_dom0.php
