@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 class DomU {
-	
+
 	public $name,$sid,$id,$xid,$state,$kernel,$weight,$cap,$record;
 	public $s_max_ram,$s_min_ram,$d_max_ram,$d_min_ram,$template;
 	public $auto_power_on,$suspend_vdi,$vcpu_max,$vcpus_at_startup,$actions_after_shutdown;
@@ -10,21 +10,8 @@ class DomU {
 	public $handle,$migrated;
 	public $metricsid,$metrics;
 	public $vcpu_use,$vcpu_number,$date,$lastupdate;
-	
-	// AUTO GETTERS, call with e.g : obj->id 
-	public function __get($attr) {
-		if(isset($this->$attr)) return $this->$attr;
-		else throw new Exception('Unknown attribute '.$attr);
-	}
-	
-	// AUTO SETTERS
-	public function __set($attr,$value) {
-		if(isset($this->$attr)) $this->$attr = $value;
-		else throw new Exception('Unknow attribute '.$attr);
-	}
-	
+
 	public function __construct($id,$handle) {
-		
 		$this->id = $id;
 		$this->handle = $handle;
 		$this->record = $this->handle->send("VM.get_record",$this->id);
@@ -54,14 +41,72 @@ class DomU {
 		$this->actions_after_reboot		= $this->record['actions_after_reboot'];
 		$this->actions_after_crash 		= $this->record['actions_after_crash'];
 	}
-	
-	public function get_preview() {
-		
-		return array(
-					"name" => $this->name, 
-					"state" => $this->state);
+
+	public function __call($name, $arguments)
+	{
+		switch ($name)
+		{
+			case 'destroy':
+			case 'pause':
+			case 'resume':
+			case 'suspend':
+			case 'unpause':
+				$this->handle->send ('VM.' . $name, $this->id);
+				break;
+			case 'reboot':
+				$this->handle->send("VM.hard_reboot", $this->id);
+				break;
+			case 'shutdown':
+				//* TODO: decide wether we use hard or clean shutdown.
+				$this->handle->send("VM.hard_shutdown", $this->id);
+				/*/
+				$this->handle->send("VM.clean_shutdown",$this->id);
+				//*/
+				break;
+			default:
+				throw new Exception('No such method: ' . __CLASS__ . '::' . $name);
+		}
 	}
-	
+
+	public function __get($name)
+	{
+		switch ($name)
+		{
+		}
+		if (isset ($this->$name))
+		{
+			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
+		}
+		else
+		{
+			throw new Exception('No such property: ' . __CLASS__ . '::' . $name);
+		}
+	}
+
+	public function __set ($name, $value)
+	{
+		switch ($name)
+		{
+		}
+		if (isset ($this->$name))
+		{
+			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not writable');
+		}
+		else
+		{
+			throw new Exception('No such property: ' . __CLASS__ . '::' . $name);
+		}
+	}
+
+	public function get_preview()
+	{
+		return array(
+			'name' => $this->name,
+			'state' => $this->state
+		);
+	}
+
+
 	public function get_all_infos() {
 
 		return array($this->xid,$this->name,$this->state,$this->kernel,
@@ -72,7 +117,7 @@ class DomU {
 		$this->actions_after_crash,$this->template,$this->pvargs,
 		$this->vifs,$this->vbds,$this->sid);
 	}
-	
+
 	public function metrics_all() {
 		$this->metrics = $this->handle->send("VM_metrics.get_record",$this->metricsid);
 		$this->vcpu_use = $this->metrics['VCPUs_utilisation'];
@@ -81,12 +126,7 @@ class DomU {
 		$this->lastupdate = $this->metrics['last_updated'];
 	}
 
-	public function start($is_paused) {
-		$params = array($this->id,$is_paused);
-		$this->handle->send("VM.start",$params);
-	}
-	
-	// test cloning 
+	// test cloning
 	// doesn't work : limited in API, to "EUNSUPPORTED Method Unsupported "
 	/*
 	public function clonevm($nameofclone) {
@@ -94,51 +134,21 @@ class DomU {
 		$this->handle->send("VM.clone",$this->id);
 	}
 	*/
-	
-	public function pause() {
-		$this->handle->send("VM.pause",$this->id);
-	}
-	
-	public function unpause() {
-		$this->handle->send("VM.unpause",$this->id);
-	}
-	
-	public function shutdown() {
-		$this->handle->send("VM.hard_shutdown",$this->id);
-		//$this->handle->send("VM.clean_shutdown",$this->id); Hard or clean ? need to choose !
-	}
-	
-	public function destroy() {
-		$this->handle->send("VM.destroy",$this->id);
-	}
-	
-	public function suspend() {
-		$this->handle->send("VM.suspend",$this->id);
-	}
-	
-	public function resume() {
-		$this->handle->send("VM.resume",$this->id);
-	}
-	
-	public function reboot() {
-		$this->handle->send("VM.hard_reboot",$this->id);
-	}
-	
+
 	public function migrate($dest,$live) {
 		$port = array("port" => 8002);
 		$params = array($this->id,$dest,true,$port);
 		$this->handle->send("VM.migrate",$params);
 	}
-	
-	
+
+
 	public function set_migrated($bool) {
 		$this->migrated = $bool;
 	}
 
-	/*
-	public function __toString() {
-		
-		return "$this->xid,$this->name,$this->state,$this->kernel";
-	}*/
-
+	public function start($is_paused){
+		$params = array($this->id,$is_paused);
+		$this->handle->send("VM.start",$params);
+	}
 }
+

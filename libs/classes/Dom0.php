@@ -1,64 +1,74 @@
 <?php
 
-class Dom0 {
-
-	public $id; // Dom0 id : IP address + port (it's unique !)
-	public $address; // IP address or DNS name
-	public $port; // Port for Xend daemon
+class Dom0
+{
 	public
 		$list_id_vm,
 		$vm_table,
 		$vif_record,
-		$vm_metrics;
-	public $handle,$idvm;
-	public $database;
+		$handle;
+
 	//public $migrated; // table of name of migrated VM
-	private $user,$pass; // user and password for Xend API
 	public $id_dom0,$id_metrics_dom0;
 
-	// CONSTR
-	public function __construct($id, $user,$pass) {
-
-		$this->id = $id;
-		list ($this->address, $this->port) = explode (':', $id);
+	/**
+	 * Create a new Dom0 object.
+	 *
+	 * @param address  ...
+	 * @param port     ...
+	 * @param user     ...
+	 * @param password ...
+	 *
+	 * @TODO Write proper doc, check arguments.
+	 */
+	public function __construct($address, $port, $user, $password)
+	{
+		$this->id = $address . ':' . $port;
+		$this->address = $address;
+		$this->port = $port;
 		$this->user = $user;
-		$this->pass = $pass;
+		$this->password = $password;
+
 		$this->connect();
-		$this->all_id_vm();
+
+		$this->list_id_vm = $this->handle->send("VM.get_all");
+
 		$this->create_object_vm();
 	}
 
-	private function connect() {
-
-		$method = "session.login_with_password";
-		$params = array ($this->user,$this->pass);
-		$request = xmlrpc_encode_request($method,$params);
-		$context = stream_context_create(array('http' => array(
-			'method' => "POST",
-			'header' => "Content-Type: text/xml",
-			'content' => $request
-		)));
-
-		$file = file_get_contents("http://".$this->address.":".$this->port, false, $context);
-		if (!$file) {throw new Exception("Can't connect to $this->address");}
-
-		$response = xmlrpc_decode($file);
-		if (xmlrpc_is_fault($response))
+	public function __get ($name)
+	{
+		switch ($name)
 		{
-			trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
+			case 'address':
+			case 'id':
+			case 'port':
+			case 'user':
+				return $this->$name;
+		}
+		if (isset ($this->$name))
+		{
+			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
 		}
 		else
 		{
-			$id = $response['Value'];
-			$this->handle = new Rpc($this->address,$this->port,$id);
+			throw new Exception('No such property: ' . __CLASS__ . '::' . $name);
 		}
 	}
 
-	// TO DO : mettre dans le constructeur
-	public function all_id_vm() {
-
-	// display all detailed info of attached VM to this Dom0
-		$this->list_id_vm = $this->handle->send("VM.get_all");
+	public function __set ($name, $value)
+	{
+		switch ($name)
+		{
+		}
+		if (isset ($this->$name))
+		{
+			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not writable');
+		}
+		else
+		{
+			throw new Exception('No such property: ' . __CLASS__ . '::' . $name);
+		}
 	}
 
 	public function create_object_vm() {
@@ -66,7 +76,7 @@ class Dom0 {
 		$this->vm_table = array ();
 		foreach ($this->list_id_vm as $val) {
 			$domU = new DomU($val,$this->handle);
-			$db->query("INSERT INTO domU (vm_name,state,id) VALUES ('$domU->name','$domU->state','$this->domN')");
+			$db->query("INSERT INTO domU (vm_name,state,id) VALUES ('$domU->name','$domU->state','$this->id')");
 			$this->vm_table[] = $domU;
 		}
 	}
@@ -74,7 +84,7 @@ class Dom0 {
 	public function vm_attached_number() {
 		// connect to the DB
 		$db = DB::get_instance();
-		$dbresult = $db->query('SELECT COUNT(*) FROM domU WHERE domN="'.$this->domN.'" AND state!="Migrated"');
+		$dbresult = $db->query('SELECT COUNT(*) FROM domU WHERE domN="'.$this->id.'" AND state!="Migrated"');
 		$count = $dbresult->fetchSingle();
 
 		return $count-1;
@@ -177,7 +187,7 @@ class Dom0 {
 	// to String
 
 	public function __toString() {
-		return $this->domN;
+		return $this->id;
 	}
 
 ////////////////////// DISPLAY PART OF CLASS /////////////////////////
@@ -195,7 +205,7 @@ class Dom0 {
 		';
 		if (count($other_domains)>0) {
 			foreach ($other_domains as $val) {
-				echo '<tr><td><a href="vm.php?vm='.$i.'&action=migrate_vm&dom0='.$this->domN.'&target='.$val.'">'.$val.'</a></tr></td>';
+				echo '<tr><td><a href="vm.php?vm='.$i.'&action=migrate_vm&dom0='.$this->id.'&target='.$val.'">'.$val.'</a></tr></td>';
 			}
 		}
 		else {
@@ -232,7 +242,7 @@ class Dom0 {
 			if (count($other_domains)>0) {
 				foreach (array_keys($other_domains) as $val) {
 					list($address, $port) = explode(':', $val, 2);
-					echo '<tr><td><a href="vm.php?vm='.$i.'&action=migrate_vm&dom0='.$this->domN.'&target='.$address.'">'.$address.'</a></tr></td>';
+					echo '<tr><td><a href="vm.php?vm='.$i.'&action=migrate_vm&dom0='.$this->id.'&target='.$address.'">'.$address.'</a></tr></td>';
 				}
 			}
 			else {
@@ -323,7 +333,7 @@ class Dom0 {
 				// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 				// update state to migrated
 				//echo 'MIGREE : '.$vm->name.' !!';
-				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND domN="'.$this->domN.'"');
+				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND domN="'.$this->id.'"');
 			}
 		}
 	}
@@ -334,7 +344,7 @@ class Dom0 {
 
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
+		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->id'");
 		$state = $dbresult->fetchSingle();
 		$title_window = "<b>$vm->name</b> on $this->address";
 		if ($state=="Migrated") {
@@ -385,11 +395,11 @@ class Dom0 {
 			}
 			// add action icons
 			echo '
-			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->domN.'">
+			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->id.'">
 			<img border=0 title="'.$title1.'" src="img/'.$icon1.'"></a>
-			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->domN.'">
+			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->id.'">
 			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
-			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
+			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->id.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
 
 			<td>';
 			// CPU counter
@@ -418,7 +428,7 @@ class Dom0 {
 
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
+		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->id'");
 		$state = $dbresult->fetchSingle();
 		$title_window = "<b>$vm->name</b> on $this->address";
 		if ($state=="Migrated") {
@@ -469,11 +479,11 @@ class Dom0 {
 			}
 			// add action icons
 			$return .= '
-			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->domN.'">
+			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->id.'">
 			<img border=0 title="'.$title1.'" src="img/'.$icon1.'"></a>
-			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->domN.'">
+			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->id.'">
 			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
-			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
+			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->id.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
 
 			<td>';
 			// CPU counter
@@ -541,6 +551,62 @@ class Dom0 {
 			return $return;
 	}
 
+	/**
+	 * Server address: IP or name.
+	 *
+	 * @var string
+	 */
+	private $address;
 
+	/**
+	 * Unique identifier for the dom0 : adress + ":" + port.
+	 *
+	 * @var string
+	 */
+	private $id;
 
+	/**
+	 * Password used for the connection to the Xen daemon.
+	 * @var string
+	 */
+	private $password;
+
+	/**
+	 * Xen daemon's port.
+	 * @var int
+	 */
+	private $port;
+
+	/**
+	 * User used for the connection to the Xen daemon.
+	 *
+	 * @var string
+	 */
+	private $user;
+
+	private function connect() {
+
+		$method = "session.login_with_password";
+		$params = array ($this->user,$this->password);
+		$request = xmlrpc_encode_request($method,$params);
+		$context = stream_context_create(array('http' => array(
+			'method' => "POST",
+			'header' => "Content-Type: text/xml",
+			'content' => $request
+		)));
+
+		$file = file_get_contents("http://".$this->address.":".$this->port, false, $context);
+		if (!$file) {throw new Exception("Can't connect to $this->address");}
+
+		$response = xmlrpc_decode($file);
+		if (xmlrpc_is_fault($response))
+		{
+			trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
+		}
+		else
+		{
+			$id = $response['Value'];
+			$this->handle = new Rpc($this->address,$this->port,$id);
+		}
+	}
 }
