@@ -5,23 +5,15 @@ require 'includes/header.php';
 <div id="page">
 <div id="widget_col_0"></div>
 <div id="widget_col_1"></div>
-<script>var portal = new Xilinus.Portal("#page div");</script>
+<script type="text/javascript">var portal = new Xilinus.Portal("#page div");</script>
 
 <?php
-$db = Db::get_instance();
-// now that the database if filled, we display
-$query = $db->query('SELECT object FROM dom0');
-$result = $query->fetchAll();
-
 
 $row = 0;
 $i = 0;
-foreach ($result as $dom0) {
-	$dom0 = unserialize($dom0[0]);
-	$dom0->detect_migrated();
-	//$dom0->display_table_all_vm();
+foreach (Dom0::get_all() as $dom0) {
 	$row = $i % 2;
-	echo '<script>display_dom0(portal,'.$row.',"'.$dom0.'");</script>';
+	echo '<script type="text/javascript">display_dom0(portal,'.$row.',"'.$dom0.'");</script>';
 	$i++;
 }
 

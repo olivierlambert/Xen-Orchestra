@@ -1,8 +1,8 @@
 <?php
 
 class Dom0 {
-	
-	public $domN; // Dom0 id : IP address + port (it's unique !)
+
+	public $id; // Dom0 id : IP address + port (it's unique !)
 	public $address; // IP address or DNS name
 	public $port; // Port for Xend daemon
 	public
@@ -17,20 +17,19 @@ class Dom0 {
 	public $id_dom0,$id_metrics_dom0;
 
 	// CONSTR
-	public function __construct($domN, $address,$port,$user,$pass) {
-		
-		$this->domN = $domN;
-		$this->address = $address;
-		$this->port = $port;
+	public function __construct($id, $user,$pass) {
+
+		$this->id = $id;
+		list ($this->address, $this->port) = explode (':', $id);
 		$this->user = $user;
 		$this->pass = $pass;
 		$this->connect();
 		$this->all_id_vm();
 		$this->create_object_vm();
 	}
-	
+
 	private function connect() {
-		
+
 		$method = "session.login_with_password";
 		$params = array ($this->user,$this->pass);
 		$request = xmlrpc_encode_request($method,$params);
@@ -39,39 +38,39 @@ class Dom0 {
 			'header' => "Content-Type: text/xml",
 			'content' => $request
 		)));
-		
+
 		$file = file_get_contents("http://".$this->address.":".$this->port, false, $context);
 		if (!$file) {throw new Exception("Can't connect to $this->address");}
-		
+
 		$response = xmlrpc_decode($file);
-		if (xmlrpc_is_fault($response)) 
+		if (xmlrpc_is_fault($response))
 		{
 			trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
-		} 
-		else 
+		}
+		else
 		{
 			$id = $response['Value'];
 			$this->handle = new Rpc($this->address,$this->port,$id);
 		}
 	}
-	
+
 	// TO DO : mettre dans le constructeur
 	public function all_id_vm() {
-	
+
 	// display all detailed info of attached VM to this Dom0
 		$this->list_id_vm = $this->handle->send("VM.get_all");
 	}
-	
+
 	public function create_object_vm() {
 		$db = DB::get_instance();
 		$this->vm_table = array ();
 		foreach ($this->list_id_vm as $val) {
 			$domU = new DomU($val,$this->handle);
-			$db->query("INSERT INTO domU (vm_name,state,domN) VALUES ('$domU->name','$domU->state','$this->domN')");
+			$db->query("INSERT INTO domU (vm_name,state,id) VALUES ('$domU->name','$domU->state','$this->domN')");
 			$this->vm_table[] = $domU;
 		}
 	}
-	
+
 	public function vm_attached_number() {
 		// connect to the DB
 		$db = DB::get_instance();
@@ -86,7 +85,7 @@ class Dom0 {
 		$this->id_metrics_dom0 = $this->handle->send("host_metrics.get_all");
 		$this->id_metrics_dom0 = $this->id_metrics_dom0[0];
 	}
-	
+
 	public function host_record() {
 		$this->host_infos();
 		return (
@@ -101,60 +100,60 @@ class Dom0 {
 		);
 	}
 
-	public function get_vif_info($id) {	
+	public function get_vif_info($id) {
 		$this->vif_record = $this->handle->send("VIF.get_record",$id);
 		return $this->vif_record;
 	}
-	
+
 	public function get_uuid($i) {
 		$domU = $this->vm_table[$i];
 		$string = $domU->sid;
 		return $string;
 	}
-	
+
 	public function get_state($i) {
 		$domU = $this->vm_table[$i];
 		$string = $domU->state;
 		return $string;
 	}
-	
+
 	public function get_record($i) {
 		$domU = $this->vm_table[$i];
 		$string = $domU->record;
 		return $string;
 	}
-	
+
 	public function destroy_vm($i) {
 		$domU = $this->vm_table[$i];
 		$domU->destroy();
 	}
-	
+
 	public function shutdown_vm($i) {
 		$domU = $this->vm_table[$i];
 		$domU->shutdown();
 	}
-	
+
 	public function start_vm($i) {
 		$is_paused = false;
 		$domU = $this->vm_table[$i];
 		$domU->start($is_paused);
 	}
-	
+
 	public function pause_vm($i) {
 		$domU = $this->vm_table[$i];
 		$domU->pause();
 	}
-	
+
 	public function unpause_vm($i) {
 		$domU = $this->vm_table[$i];
 		$domU->unpause();
 	}
-	
+
 	public function get_vm_name($i) {
 		$domU = $this->vm_table[$i];
 		return $domU->name;
 	}
-	
+
 	public function migrate_vm($i,$dest,$live) {
 		$domU = $this->vm_table[$i];
 		$domU->migrate($dest,$live);
@@ -169,18 +168,18 @@ class Dom0 {
 		$domU = $this->vm_table[$i];
 		$domU->set_migrated($bool);
 	}
-	
+
 	public function clone_vm($i,$name) {
 		$domU = $this->vm_table[$i];
 		$domU->clonevm($name);
 	}
 	*/
 	// to String
-	
+
 	public function __toString() {
 		return $this->domN;
 	}
-	
+
 ////////////////////// DISPLAY PART OF CLASS /////////////////////////
 /////////// TODO : Put this stuff in another class ? /////////////////
 //////////////////////////////////////////////////////////////////////
@@ -203,9 +202,9 @@ class Dom0 {
 			echo '<tr><td>No other Dom0\'s found !</tr></td></table>';
 		}
 	}
-	
+
 	public function display_page_vm($i,$other_domains) {
-		
+
 		$domU = $this->vm_table[$i];
 		$array = $domU->get_all_infos();
 		$vifc = $this->get_vif_info($array[19]);
@@ -220,7 +219,7 @@ class Dom0 {
 			else { $array[$j] = round($array[$j]/(1024*1024)) ." Mo"; }
 		}
 		//<div id="left">
-		
+
 		echo '<h2>"'.$array[1].'" is '.$array[2].'</h2>';
 		if ($array[2]=="Running") {
 				echo '
@@ -240,7 +239,7 @@ class Dom0 {
 				echo '<tr><td>No other Dom0\'s found !</tr></td>';
 			}
 			echo '</table><br/>';
-			
+
 		}
 		/* CLONE VM : doesn't work with API, cf DomU.php
 		if ($array[2]=="Halted") {
@@ -328,11 +327,11 @@ class Dom0 {
 			}
 		}
 	}
-	
+
 	public function display_row_vm($i) {
 		// connect to the DB
 		$db = DB::get_instance();
-		
+
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
 		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
@@ -344,7 +343,7 @@ class Dom0 {
 		else {
 			$array = $vm->get_preview();
 			$vm->metrics_all($i);
-			
+
 			// extra infos
 			$cpu_use = $vm->vcpu_use;
 			$cpu_number = $vm->vcpu_number;
@@ -381,7 +380,7 @@ class Dom0 {
 			}
 			// fill the line with each value
 			echo '<tr>';
-			foreach ($array as $val) {			
+			foreach ($array as $val) {
 				echo '<td>'.$val.'</td>';
 			}
 			// add action icons
@@ -391,9 +390,9 @@ class Dom0 {
 			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->domN.'">
 			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
 			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
-			
+
 			<td>';
-			// CPU counter			
+			// CPU counter
 			foreach ($cpu_use as $cpu) {
 				$val = round($cpu*100,2);
 				if ($val < 25) {
@@ -412,11 +411,11 @@ class Dom0 {
 			echo '</td></tr>';
 		}
 	}
-	
+
 	public function display_frame_vm($i) {
 		// connect to the DB
 		$db = DB::get_instance();
-		
+
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
 		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->domN'");
@@ -428,7 +427,7 @@ class Dom0 {
 		else {
 			$array = $vm->get_preview();
 			$vm->metrics_all($i);
-			
+
 			// extra infos
 			$cpu_use = $vm->vcpu_use;
 			$cpu_number = $vm->vcpu_number;
@@ -437,7 +436,6 @@ class Dom0 {
 
 			// Display different icons depending of the state
 			if ($array['state']=="Running") {
-				$id = "pause";
 				$action1 = "pause_vm";
 				$icon1 = "pause.png";
 				$title1 = "Pause this DomU";
@@ -446,7 +444,6 @@ class Dom0 {
 				$title2 = "Halt this DomU";
 			}
 			elseif ($array['state']=="Paused") {
-				$id = "unpause";
 				$action1 = "unpause_vm";
 				$icon1 = "play.png";
 				$title1 = "Unpause this DomU";
@@ -455,7 +452,6 @@ class Dom0 {
 				$title2 = "Halt this DomU";
 			}
 			elseif ($array['state']=="Halted") {
-				$id = "start";
 				$action1 = "start_vm";
 				$icon1 = "start.png";
 				$title1 = "Start this DomU";
@@ -463,9 +459,12 @@ class Dom0 {
 				$icon2 = "destroy.png";
 				$title2 = "Remove this DomU from Xen Management";
 			}
+			else {
+				// Crashed, TODO.
+			}
 			// fill the line with each value
 			$return = '<tr>';
-			foreach ($array as $val) {			
+			foreach ($array as $val) {
 				$return .= '<td>'.$val.'</td>';
 			}
 			// add action icons
@@ -475,9 +474,9 @@ class Dom0 {
 			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->domN.'">
 			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
 			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->domN.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
-			
+
 			<td>';
-			// CPU counter			
+			// CPU counter
 			foreach ($cpu_use as $cpu) {
 				$val = round($cpu*100,2);
 				if ($val < 25) {
@@ -497,7 +496,7 @@ class Dom0 {
 		}
 	return $return;
 	}
-	
+
 	public function display_table_all_vm() {
 		// if there is no DomU attached
 		if ($this->vm_attached_number()<1) {
@@ -519,7 +518,7 @@ class Dom0 {
 			echo '</table><br/>';
 		}
 	}
-	
+
 	public function display_frame_all_vm() {
 		// if there is no DomU attached
 		if ($this->vm_attached_number()<1) {
@@ -533,7 +532,7 @@ class Dom0 {
 					<th>Actions</th>
 					<th>Load</th>
 				</tr>';
-			
+
 			for($i=1; $i<count($this->vm_table);$i++) {
 					$return .= $this->display_frame_vm($i);
 			}
@@ -542,6 +541,6 @@ class Dom0 {
 			return $return;
 	}
 
-	
+
 
 }

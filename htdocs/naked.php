@@ -18,13 +18,18 @@ $dbresult = $db->query('SELECT count(*) FROM dom0');
 $db->query('DELETE FROM domU');
 
 foreach ($cfg->domains as $id => $domain) {
-	list($address, $port) = explode(':', $id, 2);
 	$user = isset($domain['user']) ? $domain['user'] : 'none';
 	$password = isset($domain['password']) ? $domain['password'] : 'none';
 
 	try {
 		// Create objects and put them into Database
-		$dom0 = new Dom0($id, $address, $port, $user, $password);
+		$dom0 = new Dom0($id, $user, $password);
+
+		if (Model::get_dom0($id) === null) {
+			Model::insert_dom0($dom0);
+		}
+		else {
+
 
 		// Compare and/or Update/Add/Remove if necessary
 		$query = $db->query('SELECT object FROM dom0 WHERE id = "'.sqlite_escape_string($id).'"');
