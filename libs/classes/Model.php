@@ -65,7 +65,26 @@ class Model
 			. 'VALUES ("' . sqlite_escape_string ($dom0->id) . '","'
 			. sqlite_escape_string (serialize ($dom0)) . '")');
 	}
+	
+	public static function get_domU($name, $state, $id)
+	{
+		//static $dom0s = array ();
 
+		$result = Db::get_instance()->query('SELECT name FROM domU WHERE '
+		. 'id = "' . sqlite_escape_string($id) . '" AND '
+		. 'state = "' . $state . '" AND '
+		. 'name = "' . $name . '"');
+		
+		$compare = $result->fetchSingle();
+		//var_dump($compare);
+		
+	if ($compare === false)
+	{
+		return null;
+	}
+		
+		return $name; 
+	}
 	private function __construct()
 	{}
 }

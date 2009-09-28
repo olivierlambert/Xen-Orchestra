@@ -31,7 +31,7 @@ class Dom0
 
 		$this->connect();
 
-		$this->list_id_vm = $this->handle->send("VM.get_all");
+		$this->list_id_vm = $this->handle->send('VM.get_all');
 
 		$this->create_object_vm();
 	}
@@ -76,7 +76,10 @@ class Dom0
 		$this->vm_table = array ();
 		foreach ($this->list_id_vm as $val) {
 			$domU = new DomU($val,$this->handle);
-			$db->query("INSERT INTO domU (vm_name,state,id) VALUES ('$domU->name','$domU->state','$this->id')");
+			if (Model::get_domU($domU->name,$domU->state,$this->id) === null) {
+				$db->query('INSERT INTO domU (name,state,id) VALUES ("'.$domU->name.'","'.$domU->state.'","'.$this->id.'")');
+				
+			}
 			$this->vm_table[] = $domU;
 		}
 	}
@@ -91,8 +94,8 @@ class Dom0
 	}
 
 	public function host_infos() {
-		$this->id_dom0 = $this->handle->send("host.get_all");
-		$this->id_metrics_dom0 = $this->handle->send("host_metrics.get_all");
+		$this->id_dom0 = $this->handle->send('host.get_all');
+		$this->id_metrics_dom0 = $this->handle->send('host_metrics.get_all');
 		$this->id_metrics_dom0 = $this->id_metrics_dom0[0];
 	}
 
@@ -103,7 +106,7 @@ class Dom0
 		//$this->handle->send("host.get_get_sched_policy",$this->id_dom0)
 		//$this->handle->send("host.get_supported_bootloaders",$this->id_dom0)
 		//$this->handle->send("host.get_metrics",$this->id_dom0)
-		$this->handle->send("host.list_methods")
+		$this->handle->send('host.list_methods')
 		//$this->id_metrics_dom0
 		//$this->handle->send("host.get_record",$this->id_metrics_dom0)
 		//$this->handle->send("host.get_capabilities",$this->id_dom0)
@@ -111,7 +114,7 @@ class Dom0
 	}
 
 	public function get_vif_info($id) {
-		$this->vif_record = $this->handle->send("VIF.get_record",$id);
+		$this->vif_record = $this->handle->send('VIF.get_record',$id);
 		return $this->vif_record;
 	}
 
@@ -159,7 +162,7 @@ class Dom0
 		$domU->unpause();
 	}
 
-	public function get_vm_name($i) {
+	public function get_name($i) {
 		$domU = $this->vm_table[$i];
 		return $domU->name;
 	}
@@ -225,8 +228,8 @@ class Dom0
 		$modified = $domU->lastupdate->timestamp;
 		// Round operation for RAM count
 		for ($j=6;$j<10;$j++) {
-			if ($array[$j]>=1073741824) {$array[$j] = round($array[$j]/(1024*1024*1024))." Go"; }
-			else { $array[$j] = round($array[$j]/(1024*1024)) ." Mo"; }
+			if ($array[$j]>=1073741824) {$array[$j] = round($array[$j]/(1024*1024*1024)).' Go'; }
+			else { $array[$j] = round($array[$j]/(1024*1024)) .' Mo'; }
 		}
 		//<div id="left">
 
@@ -326,14 +329,14 @@ class Dom0
 		for($i=1; $i<count($this->vm_table);$i++) {
 			// displays rows for each VM
 			$vm = $this->vm_table[$i];
-			$dbresult = $db->query("SELECT COUNT (vm_name) FROM domU WHERE vm_name='$vm->name'");
+			$dbresult = $db->query('SELECT COUNT (name) FROM domU WHERE name="'.$vm->name.'"');
 			$result = $dbresult->fetchSingle();
 
-			if ($result>1 && $vm->state=="Halted") {
+			if ($result>1 && $vm->state=='Halted') {
 				// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 				// update state to migrated
 				//echo 'MIGREE : '.$vm->name.' !!';
-				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND id="'.$this->id.'"');
+				$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
 			}
 		}
 	}
@@ -344,10 +347,10 @@ class Dom0
 
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND id='$this->id'");
+		$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
 		$state = $dbresult->fetchSingle();
-		$title_window = "<b>$vm->name</b> on $this->address";
-		if ($state=="Migrated") {
+		$title_window = '<b>'.$vm->name.'</b> on '.$this->address.'';
+		if ($state=='Migrated') {
 			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 		}
 		else {
@@ -361,7 +364,7 @@ class Dom0
 			$modified = $vm->lastupdate->timestamp;
 
 			// Display different icons depending of the state
-			if ($array['state']=="Running") {
+			if ($array['state']=='Running') {
 				$id = "pause";
 				$action1 = "pause_vm";
 				$icon1 = "pause.png";
@@ -370,7 +373,7 @@ class Dom0
 				$icon2 = "stop.png";
 				$title2 = "Halt this DomU";
 			}
-			elseif ($array['state']=="Paused") {
+			elseif ($array['state']=='Paused') {
 				$id = "unpause";
 				$action1 = "unpause_vm";
 				$icon1 = "play.png";
@@ -379,7 +382,7 @@ class Dom0
 				$icon2 = "stop.png";
 				$title2 = "Halt this DomU";
 			}
-			elseif ($array['state']=="Halted") {
+			elseif ($array['state']=='Halted') {
 				$id = "start";
 				$action1 = "start_vm";
 				$icon1 = "start.png";
@@ -428,7 +431,7 @@ class Dom0
 
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->id'");
+		$dbresult = $db->query("SELECT state FROM domU WHERE name='$vm->name' AND domN='$this->id'");
 		$state = $dbresult->fetchSingle();
 		$title_window = "<b>$vm->name</b> on $this->address";
 		if ($state=="Migrated") {

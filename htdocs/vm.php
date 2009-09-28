@@ -40,7 +40,7 @@ if (!$action=="") {
 
 	if ($action=="migrate_vm") {
 		$dom0->$action($vm,$target,true);
-		$vm_name = $dom0->get_vm_name($vm);
+		$vm = $dom0->get_vm_name($vm);
 		echo '<script type="text/javascript">close_reload();</script>';
 	}
 	else {

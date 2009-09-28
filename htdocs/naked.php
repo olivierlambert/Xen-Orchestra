@@ -32,7 +32,7 @@ foreach ($cfg->domains as $id => $domain)
 		{
 			case 'migrate_vm':
 				$dom0->migrate_vm($vm, $target, true);
-				$vm_name = $dom0->get_vm_name($vm);
+				$name = $dom0->get_name($vm);
 				break;
 			case 'destroy_vm':
 			case 'shutdown_vm':
