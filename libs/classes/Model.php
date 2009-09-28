@@ -18,7 +18,10 @@ class Model
 		{
 			$result = Db::get_instance()->query('SELECT object FROM dom0 WHERE '
 				. 'id = "' . sqlite_escape_string($id) . '"');
-			if (sqlite_num_rows ($result) === 0)
+				
+			$compare = $result->fetchSingle();
+			
+			if ($compare === false)
 			{
 				return null;
 			}
@@ -55,6 +58,26 @@ class Model
 		}
 		return $dom0s;
 	}
+	
+	public static function get_dom0s_number($force_refresh = false)
+	{
+		static $dom0s = null;
+		$i = 0;
+		if ($force_refresh || ($dom0s === null))
+		{
+			$result = Db::get_instance()->query('SELECT object FROM dom0');
+			if ($result === false)
+			{
+				return array();
+			}
+			$dom0s = array();
+			foreach ($result->fetchAll() as $dom0)
+			{
+				$i++;
+			}
+		}
+		return $i;
+	}
 
 	/**
 	 * TODO: write doc.
@@ -85,6 +108,8 @@ class Model
 		
 		return $name; 
 	}
+	
+	
 	private function __construct()
 	{}
 }

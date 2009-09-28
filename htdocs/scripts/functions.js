@@ -67,7 +67,21 @@ function initPage(e) {
 	});
 } // initPage : add observers, refresh time etc.
 
-function display_dom0(dom0,row,id) {
+function content_dom0(domUs,number) {
+	//for (domU in domUs) {
+	//	var txt = domU.name;
+	//	alert(txt);
+	//}
+	//var key = Object.keys(domUs);
+	//return key;
+	//alert(key);
+	for (i=0;i<number;i++) {
+		var name = domUs[i].name;
+	}
+	return name;
+}
+
+function display_dom0(dom0,row,id,number) {
 	var url = 'display_dom0.php';
 
 	var req = new Ajax.Request(url,
@@ -75,9 +89,12 @@ function display_dom0(dom0,row,id) {
 		method:'post',
 		postBody:'id='+id,
 		onComplete: function(transport) {
-		var response = transport.responseText;
-		var json = response.evalJSON();
-		portal.add(new Xilinus.Widget().setTitle(json.title).setContent(json.content), row);
+		var json = transport.responseText.evalJSON();
+		var content = content_dom0(json.domUs,json.vm_number);
+		//var test = json.domUs;
+		//var content = json.domUs[0].name;
+		//alert(isArray(test));
+		portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), row);
 		},
 		onFailure: function() {
 			alert('Something went wrong...')

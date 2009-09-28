@@ -431,7 +431,7 @@ class Dom0
 
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE name='$vm->name' AND domN='$this->id'");
+		$dbresult = $db->query("SELECT state FROM domU WHERE name='$vm->name' AND id='$this->id'");
 		$state = $dbresult->fetchSingle();
 		$title_window = "<b>$vm->name</b> on $this->address";
 		if ($state=="Migrated") {
@@ -532,26 +532,54 @@ class Dom0
 		}
 	}
 
+	public function vm_json($i) {
+	// connect to the DB
+	$db = DB::get_instance();
+	// displays rows for each VM
+	$vm = $this->vm_table[$i];
+	$vm->metrics_all($i);
+	$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
+	$state = $dbresult->fetchSingle();
+	$cpu_use = $vm->vcpu_use;
+	// build array of cpu
+	foreach($cpu_use as $cpu) {
+		$cpu_use[] = $cpu;
+	}
+	
+	return $result = array(
+					'name' => $vm->name,
+					'state' => $vm->state,
+					'cpu_number' => $vm->vcpu_number,
+					'cpu_use' => $cpu_use,
+					'started' => $vm->date->timestamp,
+					'modified' => $vm->lastupdate->timestamp);
+	}
+
 	public function display_frame_all_vm() {
-		// if there is no DomU attached
-		if ($this->vm_attached_number()<1) {
-			$return = '<p class="center">No DomU detected on '.$this->address.' !</p>';
+		$json = array();
+		$domUs = array();
+		$vm_number = $this->vm_attached_number();
+		
+		if ($vm_number<1) {
+			$json = array(
+					'id' => $this->id,
+					'name' => $this->address,
+					'vm_number' => 0,
+					'domUs' => null
+					);
 		}
 		else {
-			$return = '<table>
-				<tr>
-					<th>Name</th>
-					<th>State</th>
-					<th>Actions</th>
-					<th>Load</th>
-				</tr>';
-
 			for($i=1; $i<count($this->vm_table);$i++) {
-					$return .= $this->display_frame_vm($i);
+				$domUs[$i] = $this->vm_json($i);
 			}
-			$return .= '</table>';
+			$json = array(
+					'id' => $this->id,
+					'name' => $this->address,
+					'vm_number' => $vm_number,
+					'domUs' => $domUs);
 		}
-			return $return;
+		
+		return json_encode($json);
 	}
 
 	/**
