@@ -84,7 +84,7 @@ class Dom0
 	public function vm_attached_number() {
 		// connect to the DB
 		$db = DB::get_instance();
-		$dbresult = $db->query('SELECT COUNT(*) FROM domU WHERE domN="'.$this->id.'" AND state!="Migrated"');
+		$dbresult = $db->query('SELECT COUNT(*) FROM domU WHERE id="'.$this->id.'" AND state!="Migrated"');
 		$count = $dbresult->fetchSingle();
 
 		return $count-1;
@@ -333,7 +333,7 @@ class Dom0
 				// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
 				// update state to migrated
 				//echo 'MIGREE : '.$vm->name.' !!';
-				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND domN="'.$this->id.'"');
+				$db->query('UPDATE domU SET state="Migrated" WHERE vm_name="'.$vm->name.'" AND id="'.$this->id.'"');
 			}
 		}
 	}
@@ -344,7 +344,7 @@ class Dom0
 
 		// displays rows for each VM
 		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND domN='$this->id'");
+		$dbresult = $db->query("SELECT state FROM domU WHERE vm_name='$vm->name' AND id='$this->id'");
 		$state = $dbresult->fetchSingle();
 		$title_window = "<b>$vm->name</b> on $this->address";
 		if ($state=="Migrated") {
