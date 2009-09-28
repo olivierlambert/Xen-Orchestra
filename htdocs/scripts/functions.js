@@ -20,7 +20,7 @@ function disp_vm(id,domN,vm) {
 }
 
 function disp_migrate(id,domN) {
-	var url1 = 'migrate.php?vm='; 
+	var url1 = 'migrate.php?vm=';
 	var url2 = '&dom0=';
 	var urlfinal = url1+id+url2+domN;
 	win = new Window(
@@ -67,18 +67,18 @@ function initPage(e) {
 	});
 } // initPage : add observers, refresh time etc.
 
+// todo : switch state pour bon lien (cf display_frame_vm) etc. bien parti !!!
 function content_dom0(domUs,number) {
-	//for (domU in domUs) {
-	//	var txt = domU.name;
-	//	alert(txt);
-	//}
-	//var key = Object.keys(domUs);
-	//return key;
-	//alert(key);
-	for (i=0;i<number;i++) {
-		var name = domUs[i].name;
+var n = domUs.length;
+var result = '<table><tr><th>Name</th><th>State</th><th>Actions</th><th>Load</th></tr>';
+	for (var i=0;i<n;i++) {
+		result = result+'<tr>';
+		result = result+'<td>'+domUs[i].name+'</td>';
+		result = result+'<td>'+domUs[i].state+'</td>';
+		result = result+'<tr>';
 	}
-	return name;
+result = result+'</table>';
+return result;
 }
 
 function display_dom0(dom0,row,id,number) {
@@ -91,9 +91,6 @@ function display_dom0(dom0,row,id,number) {
 		onComplete: function(transport) {
 		var json = transport.responseText.evalJSON();
 		var content = content_dom0(json.domUs,json.vm_number);
-		//var test = json.domUs;
-		//var content = json.domUs[0].name;
-		//alert(isArray(test));
 		portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), row);
 		},
 		onFailure: function() {
