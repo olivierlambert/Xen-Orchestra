@@ -161,11 +161,7 @@ caption {
 	max-width:1000px;
 }
 
-#page {
-	background-color: #111;
-}
-
-#page table {
+#main table {
 	margin : auto;
 	border-width:3px;
 	border-style:medium solid;
@@ -174,14 +170,14 @@ caption {
 	width:100%;
 
 }
-#page th {
+#main th {
 	margin : 5 5 5 5 px;
 	padding : 8px 8px;
 	text-align : center;
 	color: #111;
 }
 
-#page td {
+#main td {
 	/*margin : 5 5 5 5 px;*/
 	padding : 5px 5px;
 	text-align : center;
@@ -189,21 +185,21 @@ caption {
 }
 
 
-#page tr {
+#main tr {
 	/*background-color: #eee;*/
 }
 
-#page tr:hover {
+#main tr:hover {
 	background-color: #ccc;
 }
 
-#page img
+#main img
 {
 	margin-bottom: -3px;
 	margin-right: 5px;
 	margin-left: 5px;
 }
-
+/*
 #main th {
 	border:1px thin black;
 	padding:5px;
@@ -216,20 +212,20 @@ caption {
 	max-width:80px;
 
 }
-
+*/
 #main img
 {
 	margin-bottom: -3px;
 	margin-right: 5px;
 	margin-left: 5px;
 }
-
+/*
 #main td {
 	border-width:1px;
 	border-style:solid;
 	border-color:#111;
 	min-width: 80px;
-/*	max-width:600px;*/
+/*	max-width:600px;*//*
 	margin : 5 5 5 5 px;
 	padding : 5px;
 }
@@ -237,7 +233,7 @@ caption {
 #main tr:hover {
 	background-color: #ddd
 }
-
+*/
 caption {
 	text-align: center;
 	color: #666;

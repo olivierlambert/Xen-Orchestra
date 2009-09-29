@@ -539,7 +539,7 @@ class Dom0
 	$vm = $this->vm_table[$i];
 	$vm->metrics_all($i);
 	$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
-	$state = $dbresult->fetchSingle();
+	$state = $vm->get_state();
 	$cpu_use = $vm->vcpu_use;
 	$cpu_counter = array();
 	// build array of cpu
@@ -549,7 +549,7 @@ class Dom0
 
 	return $result = array(
 					'name' => $vm->name,
-					'state' => $vm->state,
+					'state' => $state,
 					'cpu_number' => $vm->vcpu_number,
 					'cpu_use' => $cpu_counter,
 					'started' => $vm->date->timestamp,

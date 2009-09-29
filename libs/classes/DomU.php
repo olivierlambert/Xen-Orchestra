@@ -135,6 +135,10 @@ class DomU {
 	}
 	*/
 
+	public function get_state() {
+		return $this->handle->send("VM.get_power_state",$this->id);
+	}
+	
 	public function migrate($dest,$live) {
 		$port = array("port" => 8002);
 		$params = array($this->id,$dest,true,$port);

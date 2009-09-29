@@ -51,7 +51,21 @@ function testalert() {
 }
 
 function initPage(e) {
-	$('btnReload').observe('click',manualreload);
+	//$('btnMore').observe('click',alert('test'));
+	//$("window").observe('click',alert($("window").value));
+	//var test = $("window");
+	//alert(test);
+	var url = 'refresh_time.php';
+	var req = new Ajax.Request(url,
+	{
+		method:'get',
+		onComplete: function(transport) {
+			var response = transport.responseText || "20";
+		},
+		onFailure: function() {
+			alert('Something went wrong...')
+		}
+	});/*
 	var url = 'refresh_time.php';
 	var req = new Ajax.Request(url,
 	{
@@ -64,7 +78,7 @@ function initPage(e) {
 		onFailure: function() {
 			alert('Something went wrong...')
 		}
-	});
+	});*/
 } // initPage : add observers, refresh time etc.
 
 
@@ -110,7 +124,7 @@ var table_templ = {
 		result = result+'<td>'+domUs[i].name+'</td>';
 		result = result+'<td>'+domUs[i].state+'</td>';
 		result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
-		result = result+'<td><img border=0 title="Edit this DomU" onclick="disp_vm('+i+','+i+','+domUs[i].name+')" src="img/action.png"></td>';
+		result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" onclick="disp_vm('+i+','+i+','+domUs[i].name+')" src="img/action.png"></a></td>';
 		result = result+'<tr>';
 	}
 var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
@@ -119,7 +133,7 @@ return templ.evaluate(table_templ);
 //return result;
 }
 
-function display_dom0(dom0,row,id,number) {
+function display_dom0(row,id,number) {
 	var url = 'display_dom0.php';
 
 	var req = new Ajax.Request(url,
@@ -137,4 +151,4 @@ function display_dom0(dom0,row,id,number) {
 	});
 }
 
-document.observe('dom:loaded', initPage);
+document.observe('dom:loaded',initPage);
