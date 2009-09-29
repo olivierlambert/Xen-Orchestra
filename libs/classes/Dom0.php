@@ -72,7 +72,7 @@ class Dom0
 	}
 
 	public function create_object_vm()
-
+	{
 		$db = DB::get_instance();
 		$this->vm_table = array ();
 		foreach ($this->list_id_vm as $val)
