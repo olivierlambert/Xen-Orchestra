@@ -56,7 +56,7 @@ class Model
 		}
 		return $dom0s;
 	}
-	
+
 	public static function get_dom0s_number($force_refresh = false)
 	{
 		static $dom0s = null;
@@ -93,7 +93,7 @@ class Model
 			Db::get_instance()->query('UPDATE dom0 SET object="'.sqlite_escape_string (serialize ($dom0)).'" WHERE id="'.sqlite_escape_string ($dom0->id).'"');
 		}
 	}
-	
+
 	public static function get_domU($name, $state, $id)
 	{
 		//static $dom0s = array ();
@@ -101,19 +101,18 @@ class Model
 		. 'id = "' . sqlite_escape_string($id) . '" AND '
 		. 'state = "' . $state . '" AND '
 		. 'name = "' . $name . '"');
-		
+
 		$compare = $result->fetchSingle();
 		//var_dump($compare);
-		
+
 	if ($compare === false)
 	{
 		return null;
 	}
-		
-		return $name; 
+
+		return $name;
 	}
-	
-	
+
 	private function __construct()
 	{}
 }

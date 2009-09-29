@@ -71,20 +71,23 @@ class Dom0
 		}
 	}
 
-	public function create_object_vm() {
+	public function create_object_vm()
+
 		$db = DB::get_instance();
 		$this->vm_table = array ();
-		foreach ($this->list_id_vm as $val) {
+		foreach ($this->list_id_vm as $val)
+		{
 			$domU = new DomU($val,$this->handle);
-			if (Model::get_domU($domU->name,$domU->state,$this->id) === null) {
+			if (Model::get_domU($domU->name,$domU->state,$this->id) === null)
+			{
 				$db->query('INSERT INTO domU (name,state,id) VALUES ("'.$domU->name.'","'.$domU->state.'","'.$this->id.'")');
-
 			}
 			$this->vm_table[] = $domU;
 		}
 	}
 
-	public function vm_attached_number() {
+	public function vm_attached_number()
+	{
 		// connect to the DB
 		$db = DB::get_instance();
 		$dbresult = $db->query('SELECT COUNT(*) FROM domU WHERE id="'.$this->id.'" AND state!="Migrated"');
@@ -93,13 +96,15 @@ class Dom0
 		return $count-1;
 	}
 
-	public function host_infos() {
+	public function host_infos()
+	{
 		$this->id_dom0 = $this->handle->send('host.get_all');
 		$this->id_metrics_dom0 = $this->handle->send('host_metrics.get_all');
 		$this->id_metrics_dom0 = $this->id_metrics_dom0[0];
 	}
 
-	public function host_record() {
+	public function host_record()
+	{
 		$this->host_infos();
 		return (
 		//$this->handle->send("host.get_cpu_configuration",$this->id_dom0),
@@ -113,83 +118,78 @@ class Dom0
 		);
 	}
 
-	public function get_vif_info($id) {
+	public function get_vif_info($id)
+	{
 		$this->vif_record = $this->handle->send('VIF.get_record',$id);
 		return $this->vif_record;
 	}
 
-	public function get_uuid($i) {
+	public function get_uuid($i)
+	{
 		$domU = $this->vm_table[$i];
 		$string = $domU->sid;
 		return $string;
 	}
 
-	public function get_state($i) {
+	public function get_state($i)
+	{
 		$domU = $this->vm_table[$i];
 		$string = $domU->state;
 		return $string;
 	}
 
-	public function get_record($i) {
+	public function get_record($i)
+	{
 		$domU = $this->vm_table[$i];
 		$string = $domU->record;
 		return $string;
 	}
 
-	public function destroy_vm($i) {
+	public function destroy_vm($i)
+	{
 		$domU = $this->vm_table[$i];
 		$domU->destroy();
 	}
 
-	public function shutdown_vm($i) {
+	public function shutdown_vm($i)
+	{
 		$domU = $this->vm_table[$i];
 		$domU->shutdown();
 	}
 
-	public function start_vm($i) {
+	public function start_vm($i)
+	{
 		$is_paused = false;
 		$domU = $this->vm_table[$i];
 		$domU->start($is_paused);
 	}
 
-	public function pause_vm($i) {
+	public function pause_vm($i)
+	{
 		$domU = $this->vm_table[$i];
 		$domU->pause();
 	}
 
-	public function unpause_vm($i) {
+	public function unpause_vm($i)
+	{
 		$domU = $this->vm_table[$i];
 		$domU->unpause();
 	}
 
-	public function get_name($i) {
+	public function get_name($i)
+	{
 		$domU = $this->vm_table[$i];
 		return $domU->name;
 	}
 
-	public function migrate_vm($i,$dest,$live) {
+	public function migrate_vm($i,$dest,$live)
+	{
 		$domU = $this->vm_table[$i];
 		$domU->migrate($dest,$live);
 	}
-	/*
-	public function is_migrated($i) {
-		$domU = $this->vm_table[$i];
-		return $domU->migrated;
-	}
 
-	public function set_migrated($i,$bool) {
-		$domU = $this->vm_table[$i];
-		$domU->set_migrated($bool);
-	}
-
-	public function clone_vm($i,$name) {
-		$domU = $this->vm_table[$i];
-		$domU->clonevm($name);
-	}
-	*/
-	// to String
-
-	public function __toString() {
+	public function __toString()
+	{
 		return $this->id;
 	}
 
@@ -323,223 +323,31 @@ class Dom0
 		</table>
 		';
 	}
-	public function detect_migrated() {
+	public function detect_migrated()
+	{
 		// connect to the DB
 		$db = DB::get_instance();
-		for($i=1; $i<count($this->vm_table);$i++) {
+		for($i=1; $i<count($this->vm_table);$i++)
+		{
 			// displays rows for each VM
 			$vm = $this->vm_table[$i];
 			$dbresult = $db->query('SELECT COUNT (name) FROM domU WHERE name="'.$vm->name.'"');
 			$result = $dbresult->fetchSingle();
 
-			if ($result>1 && $vm->state=='Halted') {
-				// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
-				// update state to migrated
-				//echo 'MIGREE : '.$vm->name.' !!';
+			if ($result>1 && $vm->state=='Halted')
+			{
 				$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
 			}
 		}
 	}
-/*
-	public function display_row_vm($i) {
-		// connect to the DB
-		$db = DB::get_instance();
 
-		// displays rows for each VM
-		$vm = $this->vm_table[$i];
-		$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
-		$state = $dbresult->fetchSingle();
-		$title_window = '<b>'.$vm->name.'</b> on '.$this->address.'';
-		if ($state=='Migrated') {
-			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
-		}
-		else {
-			$array = $vm->get_preview();
-			$vm->metrics_all($i);
-
-			// extra infos
-			$cpu_use = $vm->vcpu_use;
-			$cpu_number = $vm->vcpu_number;
-			$started = $vm->date->timestamp;
-			$modified = $vm->lastupdate->timestamp;
-
-			// Display different icons depending of the state
-			if ($array['state']=='Running') {
-				$id = "pause";
-				$action1 = "pause_vm";
-				$icon1 = "pause.png";
-				$title1 = "Pause this DomU";
-				$action2 = "shutdown_vm";
-				$icon2 = "stop.png";
-				$title2 = "Halt this DomU";
-			}
-			elseif ($array['state']=='Paused') {
-				$id = "unpause";
-				$action1 = "unpause_vm";
-				$icon1 = "play.png";
-				$title1 = "Unpause this DomU";
-				$action2 = "shutdown_vm";
-				$icon2 = "stop.png";
-				$title2 = "Halt this DomU";
-			}
-			elseif ($array['state']=='Halted') {
-				$id = "start";
-				$action1 = "start_vm";
-				$icon1 = "start.png";
-				$title1 = "Start this DomU";
-				$action2 = "destroy_vm";
-				$icon2 = "destroy.png";
-				$title2 = "Remove this DomU from Xen Management";
-			}
-			// fill the line with each value
-			echo '<tr>';
-			foreach ($array as $val) {
-				echo '<td>'.$val.'</td>';
-			}
-			// add action icons
-			echo '
-			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->id.'">
-			<img border=0 title="'.$title1.'" src="img/'.$icon1.'"></a>
-			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->id.'">
-			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
-			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->id.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
-
-			<td>';
-			// CPU counter
-			foreach ($cpu_use as $cpu) {
-				$val = round($cpu*100,2);
-				if ($val < 25) {
-					echo '<img border=0 title="'.$val.'" src="img/cgreen.png">';
-				}
-				elseif ($val < 50) {
-					echo '<img border=0 title="'.$val.'" src="img/cyellow.png">';
-				}
-				elseif ($val < 75) {
-					echo '<img border=0 title="'.$val.'" src="img/corange.png">';
-				}
-				else {
-					echo '<img border=0 title="'.$val.'" src="img/cred.png">';
-				}
-			}
-			echo '</td></tr>';
-		}
-	}
-	*/
-/*
-	public function display_frame_vm($i) {
-		// connect to the DB
-		$db = DB::get_instance();
-
-		// displays rows for each VM
-		$vm = $this->vm_table[$i];
-		$dbresult = $db->query("SELECT state FROM domU WHERE name='$vm->name' AND id='$this->id'");
-		$state = $dbresult->fetchSingle();
-		$title_window = "<b>$vm->name</b> on $this->address";
-		if ($state=="Migrated") {
-			// THIS IS A MIGRATED VM : DO NOT DISPLAY !!
-		}
-		else {
-			$array = $vm->get_preview();
-			$vm->metrics_all($i);
-
-			// extra infos
-			$cpu_use = $vm->vcpu_use;
-			$cpu_number = $vm->vcpu_number;
-			$started = $vm->date->timestamp;
-			$modified = $vm->lastupdate->timestamp;
-
-			// Display different icons depending of the state
-			if ($array['state']=="Running") {
-				$action1 = "pause_vm";
-				$icon1 = "pause.png";
-				$title1 = "Pause this DomU";
-				$action2 = "shutdown_vm";
-				$icon2 = "stop.png";
-				$title2 = "Halt this DomU";
-			}
-			elseif ($array['state']=="Paused") {
-				$action1 = "unpause_vm";
-				$icon1 = "play.png";
-				$title1 = "Unpause this DomU";
-				$action2 = "shutdown_vm";
-				$icon2 = "stop.png";
-				$title2 = "Halt this DomU";
-			}
-			elseif ($array['state']=="Halted") {
-				$action1 = "start_vm";
-				$icon1 = "start.png";
-				$title1 = "Start this DomU";
-				$action2 = "destroy_vm";
-				$icon2 = "destroy.png";
-				$title2 = "Remove this DomU from Xen Management";
-			}
-			else {
-				// Crashed, TODO.
-			}
-			// fill the line with each value
-			$return = '<tr>';
-			foreach ($array as $val) {
-				$return .= '<td>'.$val.'</td>';
-			}
-			// add action icons
-			$return .= '
-			<td><a href="index.php?vm='.$i.'&action='.$action1.'&dom0='.$this->id.'">
-			<img border=0 title="'.$title1.'" src="img/'.$icon1.'"></a>
-			<a href="index.php?vm='.$i.'&action='.$action2.'&dom0='.$this->id.'">
-			<img border=0 title="'.$title2.'" src="img/'.$icon2.'"></a>
-			<a href="#"><img border=0 title="Edit this DomU" onclick="disp_vm('.$i.',\''.$this->id.'\',\''.$title_window.'\')" src="img/action.png"></a></td>
-
-			<td>';
-			// CPU counter
-			foreach ($cpu_use as $cpu) {
-				$val = round($cpu*100,2);
-				if ($val < 25) {
-					$return .= '<img border=0 title="'.$val.'" src="img/cgreen.png">';
-				}
-				elseif ($val < 50) {
-					$return .= '<img border=0 title="'.$val.'" src="img/cyellow.png">';
-				}
-				elseif ($val < 75) {
-					$return .= '<img border=0 title="'.$val.'" src="img/corange.png">';
-				}
-				else {
-					$return .= '<img border=0 title="'.$val.'" src="img/cred.png">';
-				}
-			}
-			$return .= '</td></tr>';
-		}
-	return $return;
-	}
-
-	public function display_table_all_vm() {
-		// if there is no DomU attached
-		if ($this->vm_attached_number()<1) {
-			echo '<h4>No DomU detected on '.$this->address.'</h4>';
-		}
-		else {
-			echo '<br/><table>
-				<caption>Dom0 '.$this->address.'</caption>
-				<tr>
-					<th>Name</th>
-					<th>State</th>
-					<th>Actions</th>
-					<th>Load</th>
-				</tr>';
-			//$this->detect_migrated();
-			for($i=1; $i<count($this->vm_table);$i++) {
-					$this->display_row_vm($i);
-			}
-			echo '</table><br/>';
-		}
-	}
-*/
 	public function vm_json($i) {
-	// connect to the DB
 	$db = DB::get_instance();
 	// displays rows for each VM
 	$vm = $this->vm_table[$i];
 	$vm->metrics_all($i);
-	$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
+	//!!Model::get_domU($vm->name, "Migrated", $this->id)
+	//!!$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
 	$state = $vm->get_state();
 	$cpu_use = $vm->vcpu_use;
 	$cpu_counter = array();
@@ -557,12 +365,14 @@ class Dom0
 					'modified' => $vm->lastupdate->timestamp);
 	}
 
-	public function display_frame_all_vm() {
+	public function table_dom0()
+	{
 		$result = array();
 		$domUs = array();
 		$vm_number = $this->vm_attached_number();
 
-		if ($vm_number<1) {
+		if ($vm_number<1)
+		{
 			$result = array(
 					'id' => $this->id,
 					'name' => $this->address,
@@ -570,9 +380,11 @@ class Dom0
 					'domUs' => null
 					);
 		}
-		else {
+		else
+		{
 			$n = count($this->vm_table);
-			for($i=1; $i<$n;$i++) {
+			for($i=1; $i<$n;$i++)
+			{
 				$domUs[] = $this->vm_json($i);
 			}
 			$result = array(
@@ -618,8 +430,8 @@ class Dom0
 	 */
 	private $user;
 
-	private function connect() {
-
+	private function connect()
+	{
 		$method = "session.login_with_password";
 		$params = array ($this->user,$this->password);
 		$request = xmlrpc_encode_request($method,$params);

@@ -147,12 +147,12 @@ document.observe('dom:loaded',function(e)
 				if (weightleft <= weightright)
 				{
 					weightleft = weightleft+item.vm_number;
-					portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), 0);
+					portal.add(new Xilinus.Widget().setTitle(item.name).setContent(content), 0);
 				}
 				else
 				{
 					weighright = weightright+item.vm_number;
-					portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), 1);
+					portal.add(new Xilinus.Widget().setTitle(item.name).setContent(content), 1);
 				}
 			}
 			);
