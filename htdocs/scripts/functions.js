@@ -32,7 +32,7 @@ function disp_migrate(id,domN) {
 		width : 400,
 		//height : 100
 	}
-)
+	);
 win.show();
 
 }
@@ -46,52 +46,15 @@ function close_reload() {
 	setTimeout(function() {top.location.reload(true);},100);
 }
 
-function testalert() {
-	alert("TOTO");
-}
-
-function initPage(e) {
-	//$('btnMore').observe('click',alert('test'));
-	//$("window").observe('click',alert($("window").value));
-	//var test = $("window");
-	//alert(test);
-	var url = 'refresh_time.php';
-	var req = new Ajax.Request(url,
-	{
-		method:'get',
-		onComplete: function(transport) {
-			var response = transport.responseText || "20";
-		},
-		onFailure: function() {
-			alert('Something went wrong...')
-		}
-	});/*
-	var url = 'refresh_time.php';
-	var req = new Ajax.Request(url,
-	{
-		method:'get',
-		onComplete: function(transport) {
-			var response = transport.responseText || "20";
-			new Ajax.PeriodicalUpdater('main', 'naked.php',
-				{frequency: response, decay: 1.2});
-		},
-		onFailure: function() {
-			alert('Something went wrong...')
-		}
-	});*/
-} // initPage : add observers, refresh time etc.
-
-
-function call_cpu_buttons(cpus) {
-	/*var t = new Template {
-		row :'<img border=0 title=#{action1} src=#{icon1}><img border=0 title=#{action2} src=#{icon2}><img border=0 title="Edit this DomU" onclick="disp_vm('+i+',\''.$this->id.'\',\''.$title_window.'\')" src="img/action.png">'
-	};*/
+function call_cpu_buttons(cpus)
+{
 	var n = cpus.length;
-
-	if (n == 0) {
+	if (n == 0)
+	{
 		return '';
 	}
-	else {
+	else
+	{
 		var result = '';
 		for (var i=0;i<n;i++) {
 			if (cpus[i]<25) {
@@ -107,48 +70,98 @@ function call_cpu_buttons(cpus) {
 				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cred.png">';
 			}
 		}
-	return result;
+		return result;
 	}
 }
-// todo : switch state pour bon lien (cf display_frame_vm) etc. bien parti !!!
-function content_dom0(domUs,number) {
-var n = domUs.length;
-var result = '';
-var table_templ = {
-	tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
-	tablebottom : '</table>'
-	};
-	
-	for (var i=0;i<n;i++) {
-		result = result+'<tr>';
-		result = result+'<td>'+domUs[i].name+'</td>';
-		result = result+'<td>'+domUs[i].state+'</td>';
-		result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
-		result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" onclick="disp_vm('+i+','+i+','+domUs[i].name+')" src="img/action.png"></a></td>';
-		result = result+'<tr>';
-	}
-var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
-return templ.evaluate(table_templ);
-//result = result+'</table>';
-//return result;
+
+function content_dom0(domUs,number)
+{
+	var n = domUs.length;
+	var result = '';
+	var table_templ = {
+		tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
+		tablebottom : '</table>'
+		};
+
+		for (var i=0;i<n;i++)
+		{
+			result = result+'<tr>';
+			result = result+'<td>'+domUs[i].name+'</td>';
+			result = result+'<td>'+domUs[i].state+'</td>';
+			result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
+			result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" onclick="disp_vm('+i+','+i+','+domUs[i].name+')" src="img/action.png"></a></td>';
+			result = result+'<tr>';
+		}
+	var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
+	return templ.evaluate(table_templ);
 }
 
 function display_dom0(row,id,number) {
 	var url = 'display_dom0.php';
-
 	var req = new Ajax.Request(url,
 	{
-		method:'post',
-		postBody:'id='+id,
-		onComplete: function(transport) {
-		var json = transport.responseText.evalJSON();
-		var content = content_dom0(json.domUs,json.vm_number);
-		portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), row);
+		method:'get',
+		onComplete: function(transport)
+		{
+			var json = transport.responseText.evalJSON();
+			var content = content_dom0(json.domUs,json.vm_number);
+			portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), row);
 		},
-		onFailure: function() {
+		onFailure: function()
+		{
 			alert('Something went wrong...')
 		}
 	});
 }
 
-document.observe('dom:loaded',initPage);
+document.observe('dom:loaded',function(e)
+{
+	var portal = new Xilinus.Portal("#main div");
+	var url = 'refresh_time.php';
+	var req = new Ajax.Request(url,
+	{
+		method:'get',
+		onComplete: function(transport)
+		{
+			var response = transport.responseText || "20";
+		},
+		onFailure: function()
+		{
+			alert('Something went wrong...')
+		}
+	}
+	);
+	var url = 'display_dom0.php';
+	var req = new Ajax.Request(url,
+	{
+		method:'get',
+		onComplete: function(transport)
+		{
+			var result = transport.responseText;
+			var json = result.evalJSON();
+			var weightleft = 0;
+			var weightright = 0;
+			json.each(function(item)
+			{
+				var content = content_dom0(item.domUs,item.vm_number);
+				if (weightleft <= weightright)
+				{
+					weightleft = weightleft+item.vm_number;
+					portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), 0);
+				}
+				else
+				{
+					weighright = weightright+item.vm_number;
+					portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), 1);
+				}
+			}
+			);
+		},
+		onFailure: function()
+		{
+			alert('Something went wrong...')
+		}
+	}
+	);
+}
+);

@@ -340,7 +340,7 @@ class Dom0
 			}
 		}
 	}
-
+/*
 	public function display_row_vm($i) {
 		// connect to the DB
 		$db = DB::get_instance();
@@ -424,7 +424,8 @@ class Dom0
 			echo '</td></tr>';
 		}
 	}
-
+	*/
+/*
 	public function display_frame_vm($i) {
 		// connect to the DB
 		$db = DB::get_instance();
@@ -531,7 +532,7 @@ class Dom0
 			echo '</table><br/>';
 		}
 	}
-
+*/
 	public function vm_json($i) {
 	// connect to the DB
 	$db = DB::get_instance();
@@ -557,12 +558,12 @@ class Dom0
 	}
 
 	public function display_frame_all_vm() {
-		$json = array();
+		$result = array();
 		$domUs = array();
 		$vm_number = $this->vm_attached_number();
 
 		if ($vm_number<1) {
-			$json = array(
+			$result = array(
 					'id' => $this->id,
 					'name' => $this->address,
 					'vm_number' => 0,
@@ -574,14 +575,14 @@ class Dom0
 			for($i=1; $i<$n;$i++) {
 				$domUs[] = $this->vm_json($i);
 			}
-			$json = array(
+			$result = array(
 					'id' => $this->id,
 					'name' => $this->address,
 					'vm_number' => $vm_number,
 					'domUs' => $domUs);
 		}
 
-		return json_encode($json);
+		return $result;
 	}
 
 	/**

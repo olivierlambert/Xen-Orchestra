@@ -1,6 +1,7 @@
 <?php
 
-class DomU {
+class DomU
+{
 
 	public $name,$sid,$id,$xid,$state,$kernel,$weight,$cap,$record;
 	public $s_max_ram,$s_min_ram,$d_max_ram,$d_min_ram,$template;
@@ -11,7 +12,8 @@ class DomU {
 	public $metricsid,$metrics;
 	public $vcpu_use,$vcpu_number,$date,$lastupdate;
 
-	public function __construct($id,$handle) {
+	public function __construct($id,$handle)
+	{
 		$this->id = $id;
 		$this->handle = $handle;
 		$this->record = $this->handle->send("VM.get_record",$this->id);
@@ -54,11 +56,11 @@ class DomU {
 				$this->handle->send ('VM.' . $name, $this->id);
 				break;
 			case 'reboot':
-				$this->handle->send("VM.hard_reboot", $this->id);
+				$this->handle->send('VM.hard_reboot', $this->id);
 				break;
 			case 'shutdown':
 				//* TODO: decide wether we use hard or clean shutdown.
-				$this->handle->send("VM.hard_shutdown", $this->id);
+				$this->handle->send('VM.hard_shutdown', $this->id);
 				/*/
 				$this->handle->send("VM.clean_shutdown",$this->id);
 				//*/
@@ -107,8 +109,8 @@ class DomU {
 	}
 
 
-	public function get_all_infos() {
-
+	public function get_all_infos()
+	{
 		return array($this->xid,$this->name,$this->state,$this->kernel,
 		$this->weight,$this->cap,$this->s_max_ram,$this->s_min_ram,
 		$this->d_max_ram,$this->d_min_ram,$this->auto_power_on,
@@ -118,8 +120,9 @@ class DomU {
 		$this->vifs,$this->vbds,$this->sid);
 	}
 
-	public function metrics_all() {
-		$this->metrics = $this->handle->send("VM_metrics.get_record",$this->metricsid);
+	public function metrics_all()
+	{
+		$this->metrics = $this->handle->send('VM_metrics.get_record',$this->metricsid);
 		$this->vcpu_use = $this->metrics['VCPUs_utilisation'];
 		$this->vcpu_number = $this->metrics['VCPUs_number'];
 		$this->date = $this->metrics['start_time'];
@@ -135,22 +138,26 @@ class DomU {
 	}
 	*/
 
-	public function get_state() {
+	public function get_state()
+	{
 		return $this->handle->send("VM.get_power_state",$this->id);
 	}
-	
-	public function migrate($dest,$live) {
+
+	public function migrate($dest,$live)
+	{
 		$port = array("port" => 8002);
 		$params = array($this->id,$dest,true,$port);
 		$this->handle->send("VM.migrate",$params);
 	}
 
 
-	public function set_migrated($bool) {
+	public function set_migrated($bool)
+	{
 		$this->migrated = $bool;
 	}
 
-	public function start($is_paused){
+	public function start($is_paused)
+	{
 		$params = array($this->id,$is_paused);
 		$this->handle->send("VM.start",$params);
 	}

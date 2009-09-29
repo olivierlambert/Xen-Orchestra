@@ -4,14 +4,11 @@ require 'includes/header.php';
 echo '<div id="main">';
 ?>
 
-
 <div id="widget_col_0"></div>
 <div id="widget_col_1"></div>
 
 
 <?php
-include 'naked.php';
-
 $cfg = Config::get_instance();
 $db = Db::get_instance();
 

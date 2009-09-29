@@ -1,8 +1,8 @@
 <?php
 require_once dirname (__FILE__) . '/../includes/prepend.php';
 
-echo '<script type="text/javascript">var portal = new Xilinus.Portal("#main div");</script>';
-
+<script type="text/javascript">var portal = new Xilinus.Portal("#main div");</script>
+/*
 $row = 0;
 $i = 0;
 $number = Model::get_dom0s_number();
@@ -13,6 +13,6 @@ echo '<script type="text/javascript">display_dom0('.$row.',"'.$dom0.'","'.$numbe
 $i++;
 //echo '<p id="window" title="'.$dom0.'"></p>';
 }
+*/
 
-?>
 
