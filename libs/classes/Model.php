@@ -84,7 +84,7 @@ class Model
 	 */
 	public static function set_dom0(Dom0 $dom0)
 	{
-		Db::get_instance()->query('INSERT OR REPLACE INTO dom0 (id, object) '
+		Db::get_instance()->query('INSERT OR REPLACE INTO dom0 (id,object) '
 			. 'VALUES ("' . sqlite_escape_string ($dom0->id) . '","'
 			. sqlite_escape_string (serialize ($dom0)) . '")');
 	}

@@ -2,7 +2,7 @@
 require_once dirname (__FILE__) . '/../includes/prepend.php';
 
 $id = isset($_POST['id']) ? $_POST['id'] : false;
-$id = 'xena1:9363';
+$id = 'xena2:9363';
 
 list($address, $port) = explode(':', $id, 2);
 

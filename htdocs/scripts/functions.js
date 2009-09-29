@@ -68,17 +68,12 @@ function initPage(e) {
 } // initPage : add observers, refresh time etc.
 
 function content_dom0(domUs,number) {
-	//for (domU in domUs) {
-	//	var txt = domU.name;
-	//	alert(txt);
-	//}
-	//var key = Object.keys(domUs);
-	//return key;
-	//alert(key);
+	var i=0;
 	for (i=0;i<number;i++) {
-		var name = domUs[i].name;
+		//var mess = domUs[i].name;
+		alert(i);
 	}
-	return name;
+	return domUs[2].name;
 }
 
 function display_dom0(dom0,row,id,number) {
@@ -91,9 +86,7 @@ function display_dom0(dom0,row,id,number) {
 		onComplete: function(transport) {
 		var json = transport.responseText.evalJSON();
 		var content = content_dom0(json.domUs,json.vm_number);
-		//var test = json.domUs;
 		//var content = json.domUs[0].name;
-		//alert(isArray(test));
 		portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), row);
 		},
 		onFailure: function() {
