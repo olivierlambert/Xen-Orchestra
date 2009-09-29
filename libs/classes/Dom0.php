@@ -78,7 +78,7 @@ class Dom0
 			$domU = new DomU($val,$this->handle);
 			if (Model::get_domU($domU->name,$domU->state,$this->id) === null) {
 				$db->query('INSERT INTO domU (name,state,id) VALUES ("'.$domU->name.'","'.$domU->state.'","'.$this->id.'")');
-				
+
 			}
 			$this->vm_table[] = $domU;
 		}
@@ -541,16 +541,17 @@ class Dom0
 	$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
 	$state = $dbresult->fetchSingle();
 	$cpu_use = $vm->vcpu_use;
+	$cpu_counter = array();
 	// build array of cpu
 	foreach($cpu_use as $cpu) {
-		$cpu_use[] = $cpu;
+		$cpu_counter[] = round($cpu*100,2);
 	}
-	
+
 	return $result = array(
 					'name' => $vm->name,
 					'state' => $vm->state,
 					'cpu_number' => $vm->vcpu_number,
-					'cpu_use' => $cpu_use,
+					'cpu_use' => $cpu_counter,
 					'started' => $vm->date->timestamp,
 					'modified' => $vm->lastupdate->timestamp);
 	}
@@ -559,7 +560,7 @@ class Dom0
 		$json = array();
 		$domUs = array();
 		$vm_number = $this->vm_attached_number();
-		
+
 		if ($vm_number<1) {
 			$json = array(
 					'id' => $this->id,
@@ -569,8 +570,9 @@ class Dom0
 					);
 		}
 		else {
-			for($i=1; $i<count($this->vm_table);$i++) {
-				$domUs[$i] = $this->vm_json($i);
+			$n = count($this->vm_table);
+			for($i=1; $i<$n;$i++) {
+				$domUs[] = $this->vm_json($i);
 			}
 			$json = array(
 					'id' => $this->id,
@@ -578,7 +580,7 @@ class Dom0
 					'vm_number' => $vm_number,
 					'domUs' => $domUs);
 		}
-		
+
 		return json_encode($json);
 	}
 

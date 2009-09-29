@@ -17,15 +17,13 @@ class Model
 		if ($force_refresh || !isset ($dom0s[$id]))
 		{
 			$result = Db::get_instance()->query('SELECT object FROM dom0 WHERE '
-				. 'id = "' . sqlite_escape_string($id) . '"');
-				
+			. 'id = "'.sqlite_escape_string($id).'"');
 			$compare = $result->fetchSingle();
-			
 			if ($compare === false)
 			{
 				return null;
 			}
-			$dom0s[$id] = unserialize($result->fetchSingle());
+			$dom0s[$id] = unserialize($compare);
 		}
 		return $dom0s[$id]; // We are sure, it is correctly defined.
 	}
@@ -84,15 +82,21 @@ class Model
 	 */
 	public static function set_dom0(Dom0 $dom0)
 	{
-		Db::get_instance()->query('INSERT OR REPLACE INTO dom0 (id,object) '
-			. 'VALUES ("' . sqlite_escape_string ($dom0->id) . '","'
-			. sqlite_escape_string (serialize ($dom0)) . '")');
+		$dbresult = Db::get_instance()->query('SELECT COUNT(*) FROM dom0 WHERE id="'.sqlite_escape_string($dom0->id).'"');
+		$count = $dbresult->fetchSingle();
+		if ($count == 0) {
+			Db::get_instance()->query('INSERT INTO dom0 (id,object) '
+				. 'VALUES ("' . sqlite_escape_string ($dom0->id) . '","'
+				. sqlite_escape_string (serialize ($dom0)) . '")');
+		}
+		else {
+			Db::get_instance()->query('UPDATE dom0 SET object="'.sqlite_escape_string (serialize ($dom0)).'" WHERE id="'.sqlite_escape_string ($dom0->id).'"');
+		}
 	}
 	
 	public static function get_domU($name, $state, $id)
 	{
 		//static $dom0s = array ();
-
 		$result = Db::get_instance()->query('SELECT name FROM domU WHERE '
 		. 'id = "' . sqlite_escape_string($id) . '" AND '
 		. 'state = "' . $state . '" AND '

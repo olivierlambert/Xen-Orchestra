@@ -20,7 +20,7 @@ function disp_vm(id,domN,vm) {
 }
 
 function disp_migrate(id,domN) {
-	var url1 = 'migrate.php?vm='; 
+	var url1 = 'migrate.php?vm=';
 	var url2 = '&dom0=';
 	var urlfinal = url1+id+url2+domN;
 	win = new Window(
@@ -67,13 +67,56 @@ function initPage(e) {
 	});
 } // initPage : add observers, refresh time etc.
 
-function content_dom0(domUs,number) {
-	var i=0;
-	for (i=0;i<number;i++) {
-		//var mess = domUs[i].name;
-		alert(i);
+
+function call_cpu_buttons(cpus) {
+	/*var t = new Template {
+		row :'<img border=0 title=#{action1} src=#{icon1}><img border=0 title=#{action2} src=#{icon2}><img border=0 title="Edit this DomU" onclick="disp_vm('+i+',\''.$this->id.'\',\''.$title_window.'\')" src="img/action.png">'
+	};*/
+	var n = cpus.length;
+
+	if (n == 0) {
+		return '';
 	}
-	return domUs[2].name;
+	else {
+		var result = '';
+		for (var i=0;i<n;i++) {
+			if (cpus[i]<25) {
+				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cgreen.png">';
+			}
+			else if (cpus[i]<50) {
+				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cyellow.png">';
+			}
+			else if (cpus[i]<75) {
+				result = result+'<img border=0 title="'+cpus[i]+'" src="img/corange.png">';
+			}
+			else {
+				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cred.png">';
+			}
+		}
+	return result;
+	}
+}
+// todo : switch state pour bon lien (cf display_frame_vm) etc. bien parti !!!
+function content_dom0(domUs,number) {
+var n = domUs.length;
+var result = '';
+var table_templ = {
+	tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
+	tablebottom : '</table>'
+	};
+	
+	for (var i=0;i<n;i++) {
+		result = result+'<tr>';
+		result = result+'<td>'+domUs[i].name+'</td>';
+		result = result+'<td>'+domUs[i].state+'</td>';
+		result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
+		result = result+'<td><img border=0 title="Edit this DomU" onclick="disp_vm('+i+','+i+','+domUs[i].name+')" src="img/action.png"></td>';
+		result = result+'<tr>';
+	}
+var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
+return templ.evaluate(table_templ);
+//result = result+'</table>';
+//return result;
 }
 
 function display_dom0(dom0,row,id,number) {
@@ -86,7 +129,6 @@ function display_dom0(dom0,row,id,number) {
 		onComplete: function(transport) {
 		var json = transport.responseText.evalJSON();
 		var content = content_dom0(json.domUs,json.vm_number);
-		//var content = json.domUs[0].name;
 		portal.add(new Xilinus.Widget().setTitle(json.name).setContent(content), row);
 		},
 		onFailure: function() {

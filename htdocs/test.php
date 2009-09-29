@@ -13,11 +13,13 @@ require 'includes/header.php';
 $row = 0;
 $i = 0;
 $number = Model::get_dom0s_number();
+
 foreach (Model::get_dom0s() as $dom0) {
 $row = $i % 2;
-echo '<script type="text/javascript">display_dom0(portal,'.$row.',"'.$dom0.','.$number.'");</script>';
+echo '<script type="text/javascript">display_dom0(portal,'.$row.',"'.$dom0.'","'.$number.'");</script>';
 $i++;
 }
 
 ?>
 </div>
+
