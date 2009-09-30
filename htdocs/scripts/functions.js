@@ -82,23 +82,26 @@ function content_dom0(domUs,number)
 	{
 		return '<p>No DomU detected</p>';
 	}
-	var table_templ =
+	else
 	{
-		tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
-		tablebottom : '</table>'
-	};
-
-		domUs.each(function (domU)
+		var table_templ =
 		{
-			result = result+'<tr>';
-			result = result+'<td>'+domU.name+'</td>';
-			result = result+'<td>'+domU.state+'</td>';
-			result = result+'<td>'+call_cpu_buttons(domU.cpu_use)+'</td>';
-			result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" src="img/action.png"></a></td>';
-			result = result+'<tr>';
-		});
-	var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
-	return templ.evaluate(table_templ);
+			tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
+			tablebottom : '</table>'
+		};
+
+			domUs.each(function (domU)
+			{
+				result = result+'<tr>';
+				result = result+'<td>'+domU.name+'</td>';
+				result = result+'<td>'+domU.state+'</td>';
+				result = result+'<td>'+call_cpu_buttons(domU.cpu_use)+'</td>';
+				result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" src="img/action.png"></a></td>';
+				result = result+'<tr>';
+			});
+		var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
+		return templ.evaluate(table_templ);
+	}
 }
 
 function display_dom0(row,id,number)
