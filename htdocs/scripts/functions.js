@@ -83,15 +83,15 @@ function content_dom0(domUs,number)
 		tablebottom : '</table>'
 		};
 
-		for (var i=0;i<n;i++)
+		domUs.each(function (domU)
 		{
 			result = result+'<tr>';
-			result = result+'<td>'+domUs[i].name+'</td>';
-			result = result+'<td>'+domUs[i].state+'</td>';
-			result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
-			result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" onclick="disp_vm('+i+','+i+','+domUs[i].name+')" src="img/action.png"></a></td>';
+			result = result+'<td>'+domU.name+'</td>';
+			result = result+'<td>'+domU.state+'</td>';
+			result = result+'<td>'+call_cpu_buttons(domU.cpu_use)+'</td>';
+			result = result+'<td><a><img id="btnMore" border=0 title="Edit this DomU" src="img/action.png"></a></td>';
 			result = result+'<tr>';
-		}
+		});
 	var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
 	return templ.evaluate(table_templ);
 }

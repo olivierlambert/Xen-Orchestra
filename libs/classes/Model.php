@@ -50,7 +50,7 @@ class Model
 			foreach ($result->fetchAll() as $dom0)
 			{
 				$dom0 = unserialize($dom0[0]);
-				$dom0->detect_migrated();
+				//$dom0->detect_migrated();
 				$dom0s[$dom0->id] = $dom0;
 			}
 		}

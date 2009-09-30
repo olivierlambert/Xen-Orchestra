@@ -333,10 +333,12 @@ class Dom0
 			$vm = $this->vm_table[$i];
 			$dbresult = $db->query('SELECT COUNT (name) FROM domU WHERE name="'.$vm->name.'"');
 			$result = $dbresult->fetchSingle();
-
+			echo 'OCCURENCES : '.$result.' // ';
 			if ($result>1 && $vm->state=='Halted')
 			{
-				$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
+				//$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
+				//$vm->state = 'Migrated';
+				unset($this->vm_table[$i]);
 			}
 		}
 	}
@@ -346,8 +348,8 @@ class Dom0
 	// displays rows for each VM
 	$vm = $this->vm_table[$i];
 	$vm->metrics_all($i);
-	//!!Model::get_domU($vm->name, "Migrated", $this->id)
-	//!!$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
+	//if (Model::get_domU($vm->name, "Migrated", $this->id)) {return null;}
+	//$dbresult = $db->query('SELECT state FROM domU WHERE name="'.$vm->name.'" AND id="'.$this->id.'" AND state!="Migrated"');
 	$state = $vm->get_state();
 	$cpu_use = $vm->vcpu_use;
 	$cpu_counter = array();
@@ -367,6 +369,10 @@ class Dom0
 
 	public function table_dom0()
 	{
+		$this->list_id_vm = $this->handle->send('VM.get_all');
+		$this->create_object_vm();
+		$this->detect_migrated();
+		
 		$result = array();
 		$domUs = array();
 		$vm_number = $this->vm_attached_number();
