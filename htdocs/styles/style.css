@@ -1,7 +1,7 @@
 html
 {
 	/*background-color: #1a1a1a;*/
-	background-color: #ddd;
+	background-color: #eee;
 	font-family:arial, verdana, sans-serif;
 	font-size: 10pt;
 
@@ -190,7 +190,7 @@ caption {
 }
 
 #main tr:hover {
-	background-color: #ccc;
+	background-color: #eee;
 }
 
 #main img
@@ -231,7 +231,7 @@ caption {
 }
 
 #main tr:hover {
-	background-color: #ddd
+	background-color: #111
 }
 */
 caption {
@@ -276,7 +276,8 @@ float:left;
 }
 
 .widget_w {
-	border-left:1px solid #B9B9B9;
+	border-left:1px solid #777;
+	/*#B9B9B9;*/
 	margin-left:5px;
 }
 
@@ -302,7 +303,7 @@ float:left;
 	font:normal 12px/1em Tahoma, Arial, sans-serif;
 	overflow:hidden;
 	padding:5px;
-	border-right:1px solid #B9B9B9;
+	border-right:1px solid #777;
 	margin-right:5px;
 }
 
