@@ -336,7 +336,7 @@ class Dom0
 			//echo 'OCCURENCES : '.$result.' // ';
 			if ($result>1 && $vm->state=='Halted')
 			{
-				//$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
+				$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
 				//$vm->state = 'Migrated';
 				unset($this->vm_table[$i]);
 			}
@@ -375,9 +375,9 @@ class Dom0
 		
 		$result = array();
 		$domUs = array();
-		$vm_number = $this->vm_attached_number();
-
-		if ($vm_number<1)
+		//$vm_number = $this->vm_attached_number();
+		$n = count($this->vm_table)-1;
+		if ($n<1)
 		{
 			$result = array(
 					'id' => $this->id,
@@ -388,15 +388,14 @@ class Dom0
 		}
 		else
 		{
-			$n = count($this->vm_table);
-			for($i=1; $i<$n;$i++)
+			for($i=1; $i<$n+1;$i++)
 			{
 				$domUs[] = $this->vm_json($i);
 			}
 			$result = array(
 					'id' => $this->id,
 					'name' => $this->address,
-					'vm_number' => $vm_number,
+					'vm_number' => $n,
 					'domUs' => $domUs);
 		}
 

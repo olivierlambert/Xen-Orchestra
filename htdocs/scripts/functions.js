@@ -76,14 +76,15 @@ function call_cpu_buttons(cpus)
 
 function content_dom0(domUs,number)
 {
-	var n = domUs.length;
 	var result = '';
-	if (number < 1)
+	alert(number);
+	if (number<1)
 	{
 		return '<p>No DomU detected</p>';
 	}
 	else
 	{
+		var n = domUs.length;
 		var table_templ =
 		{
 			tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
@@ -103,7 +104,7 @@ function content_dom0(domUs,number)
 		return templ.evaluate(table_templ);
 	}
 }
-
+/*
 function display_dom0(row,id,number)
 {
 	var url = 'display_dom0.php';
@@ -122,7 +123,7 @@ function display_dom0(row,id,number)
 		}
 	});
 }
-
+*/
 function refresh_windows(windows)
 {
 	var url = 'display_dom0.php';
