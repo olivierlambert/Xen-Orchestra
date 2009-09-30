@@ -78,10 +78,15 @@ function content_dom0(domUs,number)
 {
 	var n = domUs.length;
 	var result = '';
-	var table_templ = {
+	if (number < 1)
+	{
+		return '<p>No DomU detected</p>';
+	}
+	var table_templ =
+	{
 		tabletop : '<table><tr><th>Name</th><th>State</th><th>Load</th><th>More...</th></tr>',
 		tablebottom : '</table>'
-		};
+	};
 
 		domUs.each(function (domU)
 		{
