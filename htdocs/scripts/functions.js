@@ -77,7 +77,6 @@ function call_cpu_buttons(cpus)
 function content_dom0(domUs,number)
 {
 	var result = '';
-	alert(number);
 	if (number<1)
 	{
 		return '<p>No DomU detected</p>';
