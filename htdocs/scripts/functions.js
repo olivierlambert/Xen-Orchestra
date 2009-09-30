@@ -96,7 +96,8 @@ function content_dom0(domUs,number)
 	return templ.evaluate(table_templ);
 }
 
-function display_dom0(row,id,number) {
+function display_dom0(row,id,number)
+{
 	var url = 'display_dom0.php';
 	var req = new Ajax.Request(url,
 	{
@@ -114,6 +115,30 @@ function display_dom0(row,id,number) {
 	});
 }
 
+function refresh_windows(windows)
+{
+	var url = 'display_dom0.php';
+	var req = new Ajax.PeriodicalUpdater('page',url,
+	{
+		method:'get',
+		frequency: response,
+		decay: 1.2,
+		onSuccess: function(transport)
+		{
+			var result = transport.responseText;
+			var json = result.evalJSON();
+			n = json.size();
+			for (var i=0;i<n;i++)
+			{
+				var current_id = json[i].id;
+				var content = content_dom0(json[i].domUs,json[i].vm_number);
+				windows[i].setContent(content);
+				windows[i].updateHeight();
+			}
+		}
+	});
+}
+
 document.observe('dom:loaded',function(e)
 {
 	var portal = new Xilinus.Portal("#main div");
@@ -123,7 +148,7 @@ document.observe('dom:loaded',function(e)
 		method:'get',
 		onComplete: function(transport)
 		{
-			var response = transport.responseText || "20";
+			response = transport.responseText || "20";
 		},
 		onFailure: function()
 		{
@@ -141,21 +166,29 @@ document.observe('dom:loaded',function(e)
 			var json = result.evalJSON();
 			var weightleft = 0;
 			var weightright = 0;
+			var windows = new Array();
 			json.each(function(item)
 			{
+				var id = item.id;
 				var content = content_dom0(item.domUs,item.vm_number);
+				var window = new Xilinus.Widget().setTitle(item.name).setContent(content);
 				if (weightleft <= weightright)
 				{
 					weightleft = weightleft+item.vm_number;
-					portal.add(new Xilinus.Widget().setTitle(item.name).setContent(content), 0);
+					portal.add(window, 0);
 				}
 				else
 				{
 					weighright = weightright+item.vm_number;
-					portal.add(new Xilinus.Widget().setTitle(item.name).setContent(content), 1);
+					portal.add(window,1);
 				}
-			}
-			);
+				windows.push(window);
+			});
+			setTimeout(function()
+			{
+				refresh_windows(windows,response);
+			},response*1000);
+			
 		},
 		onFailure: function()
 		{
