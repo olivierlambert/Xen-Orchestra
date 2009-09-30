@@ -333,7 +333,7 @@ class Dom0
 			$vm = $this->vm_table[$i];
 			$dbresult = $db->query('SELECT COUNT (name) FROM domU WHERE name="'.$vm->name.'"');
 			$result = $dbresult->fetchSingle();
-			echo 'OCCURENCES : '.$result.' // ';
+			//echo 'OCCURENCES : '.$result.' // ';
 			if ($result>1 && $vm->state=='Halted')
 			{
 				//$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
