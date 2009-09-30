@@ -276,7 +276,7 @@ float:left;
 }
 
 .widget_w {
-	border-left:1px solid #777;
+	border-left:1px solid #888;
 	/*#B9B9B9;*/
 	margin-left:5px;
 }
@@ -298,12 +298,13 @@ float:left;
 }
 
 .widget_content {
-	background-color:#FDFDFD;
+	background-color: #f9f9f9;
+	/*#FDFDFD;*/
 	color:#111;
 	font:normal 12px/1em Tahoma, Arial, sans-serif;
 	overflow:hidden;
 	padding:5px;
-	border-right:1px solid #777;
+	border-right:1px solid #888;
 	margin-right:5px;
 }
 
