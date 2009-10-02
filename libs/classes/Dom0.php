@@ -5,6 +5,7 @@ class Dom0
 	public
 		$list_id_vm,
 		$vm_table,
+		$id_object,
 		$vif_record,
 		$handle;
 
@@ -75,6 +76,8 @@ class Dom0
 	{
 		$db = DB::get_instance();
 		$this->vm_table = array ();
+		$this->id_object = array ();
+		$i = 0;
 		foreach ($this->list_id_vm as $val)
 		{
 			$domU = new DomU($val,$this->handle);
@@ -82,8 +85,15 @@ class Dom0
 			{
 				$db->query('INSERT INTO domU (name,state,id) VALUES ("'.$domU->name.'","'.$domU->state.'","'.$this->id.'")');
 			}
+			$this->id_object[$i] = $domU->name;
 			$this->vm_table[] = $domU;
+			$i++;
 		}
+	}
+
+	public function name_to_id($name)
+	{
+		return array_search($name,$this->id_object);
 	}
 
 	public function vm_attached_number()
@@ -216,9 +226,10 @@ class Dom0
 		}
 	}
 	
-	public function complete_vm_json($i,$other_domains)
+	public function complete_vm_json($name)
 	{
-		$domU = $this->vm_table[$i];
+		$id = $this->name_to_id($name);
+		$domU = $this->vm_table[$id];
 		$domU->metrics_all();
 		return $array = $domU->get_all_infos();
 	}

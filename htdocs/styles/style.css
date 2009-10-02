@@ -38,6 +38,16 @@ h5
 	width : 20%
 }
 
+#vm
+{
+	width: 5em;
+}
+
+#vm h3
+{
+	text-align: center;
+	margin: 1em auto 1em auto
+}
 
 #main h1
 {
@@ -166,7 +176,7 @@ caption {
 	padding : 8px 8px;
 	background-color: #222;
 	text-align : center;
-	color: #eef;
+	color: #aaa;
 }
 
 #main td {

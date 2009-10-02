@@ -157,24 +157,15 @@ caption {
 	border-style:medium solid;
 	border-color:#444;
 	border-collapse:collapse;
-	/*width:480px;*/
-	max-width:1000px;
-}
-
-#main table {
-	margin : auto;
-	border-width:3px;
-	border-style:medium solid;
-	border-color:#444;
-	border-collapse:collapse;
 	width:100%;
-
 }
+
 #main th {
 	margin : 5 5 5 5 px;
 	padding : 8px 8px;
 	text-align : center;
 	color: #111;
+	background-color: #f6f6f6;
 }
 
 #main td {
@@ -186,7 +177,7 @@ caption {
 
 
 #main tr {
-	/*background-color: #eee;*/
+	border-top : 1px solid #eee;
 }
 
 #main tr:hover {

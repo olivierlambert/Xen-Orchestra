@@ -9,8 +9,10 @@ $id 		= isset ($_GET['id']) ? $_GET['id'] : false; 		// dom0 number
 
 $result = array();
 
-$domU = Model::get_dom0s($name,$state,$id);
+$dom0 = Model::get_dom0($id);
+$result =  $dom0->complete_vm_json($name);
 
+echo json_encode($result);
 //$dom0->table_dom0();
 
 //echo json_encode($result);

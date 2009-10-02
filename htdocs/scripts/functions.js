@@ -68,9 +68,9 @@ function call_cpu_buttons(cpus)
 		return result;
 	}
 }
-function display_vm(name,state,id)
+function display_vm(name,state,id,n)
 {
-	var url = 'display_domU.php';
+	var url = 'display_domU.php?name='+name+'&state='+state+'&id='+id+'';
 	var req = new Ajax.Request(url,
 	{
 		method:'get',
@@ -78,7 +78,22 @@ function display_vm(name,state,id)
 		{
 			var result = transport.responseText;
 			var json = result.evalJSON();
-			var windows = new Array();
+			win = new Window(
+			{
+				className:"alphacube",
+				showProgress: true,
+			});
+			var html = '<div id="vm"><h3>Overview</h3></div>';
+			html = html+'<p>State : '+json.state+'</p>';
+			html = html+'<p>Date of creation : '+json.date+'</p>';
+			html = html+'<p>Last updated : '+json.lastupdate+'</p>';
+			html = html+'<p>VCPU number : '+json.vcpu_number+'</p>';
+			
+			win.setTitle(name);
+			win.setHTMLContent(html);
+			win.show();
+			win.updateWidth();
+			win.updateHeight();
 		},
 		onFailure: function()
 		{
@@ -87,7 +102,7 @@ function display_vm(name,state,id)
 	}
 	);
 }
-function content_dom0(domUs,number,old_domUs)
+function content_dom0(domUs,number,old_domUs,id)
 {
 	var result = '';
 	if (number<1)
@@ -108,7 +123,7 @@ function content_dom0(domUs,number,old_domUs)
 				result = result+'<td>'+domUs[i].name+'</td>';
 				result = result+'<td>'+domUs[i].state+'</td>';
 				result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
-				result = result+'<td><a href="#" onclick="display_vm('+domUs[i].name+','+domUs[i].state+','+domUs[i].id+');"><img border=0 title="Edit this DomU" src="img/action.png"></a></td>';
+				result = result+'<td><a href="#" onclick="display_vm(\''+domUs[i].name+'\',\''+domUs[i].state+'\',\''+id+'\');"><img border=0 title="Edit this DomU" src="img/action.png"></a></td>';
 				result = result+'<tr>';
 
 				if (old_domUs!= null && (domUs[i].state!==old_domUs[i].state || domUs[i].name!==old_domUs[i].name))
@@ -138,7 +153,7 @@ function refresh_windows(windows,response,previousjson)
 			for (var i=0;i<n;i++)
 			{
 				var current_id = json[i].id;
-				var content = content_dom0(json[i].domUs,json[i].vm_number,previousjson[i].domUs);
+				var content = content_dom0(json[i].domUs,json[i].vm_number,previousjson[i].domUs,current_id);
 				windows[i].setContent(content);
 				windows[i].updateHeight();
 			}
@@ -178,7 +193,7 @@ document.observe('dom:loaded',function(e)
 			json.each(function(item)
 			{
 				var id = item.id;
-				var content = content_dom0(item.domUs,item.vm_number,null);
+				var content = content_dom0(item.domUs,item.vm_number,null,id);
 				var window = new Xilinus.Widget().setTitle(item.name).setContent(content);
 				if (weightleft <= weightright)
 				{
