@@ -215,7 +215,14 @@ class Dom0
 			echo '<tr><td>No other Dom0\'s found !</tr></td></table>';
 		}
 	}
-
+	
+	public function complete_vm_json($i,$other_domains)
+	{
+		$domU = $this->vm_table[$i];
+		$domU->metrics_all();
+		return $array = $domU->get_all_infos();
+	}
+	
 	public function display_page_vm($i,$other_domains) {
 
 		$domU = $this->vm_table[$i];
