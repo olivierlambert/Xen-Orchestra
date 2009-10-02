@@ -1,7 +1,7 @@
 html
 {
 	/*background-color: #1a1a1a;*/
-	background-color: #ffffff;
+	background-color: #eee;
 	font-family:arial, verdana, sans-serif;
 	font-size: 10pt;
 
@@ -38,16 +38,6 @@ h5
 	width : 20%
 }
 
-#vm
-{
-	width: 5em;
-}
-
-#vm h3
-{
-	text-align: center;
-	margin: 1em auto 1em auto
-}
 
 #main h1
 {
@@ -168,34 +158,30 @@ caption {
 	border-color:#444;
 	border-collapse:collapse;
 	width:100%;
-
 }
 
 #main th {
 	margin : 5 5 5 5 px;
 	padding : 8px 8px;
-	background-color: #222;
 	text-align : center;
-	color: #aaa;
+	color: #111;
+	background-color: #f6f6f6;
 }
 
 #main td {
 	/*margin : 5 5 5 5 px;*/
 	padding : 5px 5px;
 	text-align : center;
-	color: #eee;
+	color: #111;
 }
 
 
 #main tr {
-	/*background-color: #eee;*/
-	border-top : 1px solid #222;
-	/*margin : 10px;*/
-	
+	border-top : 1px solid #eee;
 }
 
 #main tr:hover {
-	background-color: #111;
+	background-color: #eee;
 }
 
 #main img
@@ -241,7 +227,7 @@ caption {
 */
 caption {
 	text-align: center;
-	color: #eee;
+	color: #666;
 	font-size: 1.5em;
 	margin-bottom : 5px
 }
@@ -276,24 +262,24 @@ float:left;
 }
 /* Sliding doors technique */
 .widget_nw {
-	background:transparent url(alphacube/top_left.gif) no-repeat;
+	background:transparent url(alphacube/white/top_left.gif) no-repeat;
 	height:30px;
 }
 
 .widget_w {
-	border-left:1px solid #888;
+	border-left:1px solid #bbb;
 	/*#B9B9B9;*/
 	margin-left:5px;
 }
 
 .widget_sw {
-	background:transparent url(alphacube/bottom_left.gif) no-repeat;
+	background:transparent url(alphacube/white/bottom_left.gif) no-repeat;
 	height:15px;
 }
 
 .widget_title {
-	background:  url(alphacube/top_right.gif) repeat-x right top;
-	color:#eee;
+	background:  url(alphacube/white/top_right.gif) repeat-x right top;
+	color:#111;
 	font:bold 14px/25px Tahoma, Arial, sans-serif;
 	height:26px;
 	margin:0 0 0 15px;
@@ -303,19 +289,18 @@ float:left;
 }
 
 .widget_content {
-	background-color: #1e1e1e;
-	/*#f9f9f9;*/
+	background-color: #fdfdfd;
 	/*#FDFDFD;*/
-	color:#fff;
-	/*font:normal 12px/1em Tahoma, Arial, sans-serif;*/
+	color:#111;
+	font:normal 12px/1em Tahoma, Arial, sans-serif;
 	overflow:hidden;
 	padding:5px;
-	border-right:1px solid #888;
+	border-right:1px solid #bbb;
 	margin-right:5px;
 }
 
 .widget_statusbar {
-	background:transparent url(alphacube/bottom_right.gif) repeat-x right top;
+	background:transparent url(alphacube/white/bottom_right.gif) repeat-x right top;
 	font-size:8px;
 	height:15px;
 	margin-left:11px;

@@ -21,7 +21,7 @@ if ($footer !== false)
 	<script type="text/javascript" src="scripts/scriptaculous.js"></script>
 	<script type="text/javascript" src="scripts/portal.js"></script>
 	
-	<link rel="stylesheet" media="screen" type="text/css" href="styles/style.css" />
+	<link rel="stylesheet" media="screen" type="text/css" href="styles/stylewhite.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/alphacube.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/spread.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/default.css" />

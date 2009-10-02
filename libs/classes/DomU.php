@@ -42,6 +42,8 @@ class DomU
 		$this->actions_after_shutdown 	= $this->record['actions_after_shutdown'];
 		$this->actions_after_reboot		= $this->record['actions_after_reboot'];
 		$this->actions_after_crash 		= $this->record['actions_after_crash'];
+		
+		
 	}
 
 	public function __call($name, $arguments)
@@ -111,15 +113,41 @@ class DomU
 
 	public function get_all_infos()
 	{
-		return array($this->xid,$this->name,$this->state,$this->kernel,
-		$this->weight,$this->cap,$this->s_max_ram,$this->s_min_ram,
-		$this->d_max_ram,$this->d_min_ram,$this->auto_power_on,
-		$this->suspend_vdi,$this->vcpu_max,$this->vcpus_at_startup,
-		$this->actions_after_shutdown,$this->actions_after_reboot,
-		$this->actions_after_crash,$this->template,$this->pvargs,
-		$this->vifs,$this->vbds,$this->sid);
+		$cpu_counter = array();
+		foreach($this->vcpu_use as $cpu)
+		{
+			$cpu_counter[] = round($cpu*100,2);
+		}
+		
+		return array(
+		'xid' => $this->xid,
+		'name' => $this->name,
+		'state' => $this->state,
+		'kernel' => $this->kernel,
+		'weight' => $this->weight,
+		'cap' => $this->cap,
+		's_max_ram' => $this->s_max_ram,
+		's_min_ram' => $this->s_min_ram,
+		'd_max_ram' => $this->d_max_ram,
+		'd_min_ram' => $this->d_min_ram,
+		'auto_power_on' => $this->auto_power_on,
+		'suspend_vdi' => $this->suspend_vdi,
+		'vcpu_max' => $this->vcpu_max,
+		'vcpus_at_startup' => $this->vcpus_at_startup,
+		'actions_after_shutdown' => $this->actions_after_shutdown,
+		'actions_after_reboot' => $this->actions_after_reboot,
+		'actions_after_crash' => $this->actions_after_crash,
+		'template' => $this->template,
+		'pvargs' => $this->pvargs,
+		'vifs' => $this->vifs,
+		'vbds' => $this->vbds,
+		'sid' => $this->sid,
+		'vcpu_use' => $cpu_counter,
+		'vcpu_number' => $this->vcpu_number,
+		'date' => $this->date->timestamp,
+		'lastupdate' => $this->lastupdate->timestamp);
 	}
-
+	
 	public function metrics_all()
 	{
 		$this->metrics = $this->handle->send('VM_metrics.get_record',$this->metricsid);

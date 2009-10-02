@@ -88,12 +88,12 @@
 
 .alphacube_title {
 	float:left;
+	font-weight:bold;
 	height:14px;
 	font-size:14px;
 	text-align:center;
 	margin-top:1px;
 	width:100%;
-	//color:#123456;
 	color:#eeeeee;
 }
 
@@ -101,8 +101,8 @@
 	overflow:auto;
 	color: #000;
 	font-family: Tahoma, Arial, sans-serif;
-  font: 12px arial;
-		background-image : url(alphacube/background.jpg);
+	font: 12px arial;
+	background-image : url(alphacube/background.jpg);
 			//background:#d9d9d9;
 }
 
