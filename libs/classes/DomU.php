@@ -90,7 +90,7 @@ class DomU
 			case 'state':
 				return $this->dom0->rpc_query("VM.get_power_state",$this->id);
 			case 'dom0':
-				return $this->dom0;
+				return $this->$name;
 		}
 		if (isset ($this->$name))
 		{
