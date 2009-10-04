@@ -75,7 +75,7 @@ class DomU
 				//* TODO: decide wether we use hard or clean shutdown.
 				$this->dom0->rpc_query('VM.hard_shutdown', $this->id);
 				/*/
-				$this->dom0->rpc_query("VM.clean_shutdown",$this->id);
+				$this->dom0->rpc_query('VM.clean_shutdown',$this->id);
 				//*/
 				break;
 			default:
@@ -88,7 +88,7 @@ class DomU
 		switch ($name)
 		{
 			case 'state':
-				return $this->dom0->rpc_query("VM.get_power_state",$this->id);
+				return $this->dom0->rpc_query('VM.get_power_state',$this->id);
 			case 'dom0':
 				return $this->$name;
 		}
@@ -162,9 +162,9 @@ class DomU
 
 	public function migrate($dest,$live)
 	{
-		$port = array("port" => 8002);
-		$params = array($this->id,$dest,true,$port);
-		$this->dom0->rpc_query("VM.migrate",$params);
+		$port = array('port' => 8002);
+		$params = array($this->id, $dest, true, $port);
+		$this->dom0->rpc_query('VM.migrate', $params);
 	}
 
 	public function set_migrated($bool)
@@ -174,8 +174,8 @@ class DomU
 
 	public function start($is_paused)
 	{
-		$params = array($this->id,$is_paused);
-		$this->dom0->rpc_query("VM.start",$params);
+		$params = array($this->id, $is_paused);
+		$this->dom0->rpc_query('VM.start', $params);
 	}
 
 	/**

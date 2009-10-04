@@ -3,11 +3,11 @@
 class Dom0
 {
 	public
-		$vm_table,
 		$vif_record;
 
-	//public $migrated; // table of name of migrated VM
-	public $id_dom0,$id_metrics_dom0;
+	public
+		$id_dom0,
+		$id_metrics_dom0;
 
 	/**
 	 * Create a new Dom0 object.
@@ -29,7 +29,7 @@ class Dom0
 
 		$this->connect();
 
-		$this->vm_table = &Model::get_domUs($this);
+		$this->domUs = &Model::get_domUs($this);
 	}
 
 	public function __get ($name)
@@ -69,16 +69,16 @@ class Dom0
 
 	public function getDomU($name)
 	{
-		if (isset ($this->vm_table[$name]))
+		if (isset ($this->domUs[$name]))
 		{
-			return $this->vm_table[$name];
+			return $this->domUs[$name];
 		}
 		return null;
 	}
 
 	public function getDomUs()
 	{
-		return $this->vm_table; // Maybe we should protect it.
+		return $this->domUs; // Maybe we should protect it.
 	}
 
 	public function host_infos()
@@ -96,25 +96,7 @@ class Dom0
 
 	public function get_vif_info($id)
 	{
-		return $this->connection->send('VIF.get_record',$id);
-	}
-
-	public function detect_migrated()
-	{
-		// connect to the DB
-		$db = DB::get_instance();
-		foreach($this->vm_table as $name => &$vm)
-		{
-			$dbresult = $db->query('SELECT COUNT (name) FROM domU WHERE name="'.$vm->name.'"');
-			$result = $dbresult->fetchSingle();
-			//echo 'OCCURENCES : '.$result.' // ';
-			if ($result>1 && $vm->state=='Halted')
-			{
-				$db->query('UPDATE domU SET state="Migrated" WHERE name="'.$vm->name.'" AND id="'.$this->id.'"');
-				//$vm->state = 'Migrated';
-				unset($this->vm_table[$name]);
-			}
-		}
+		return $this->connection->send('VIF.get_record', $id);
 	}
 
 	public function rpc_query($method, $params = null)
@@ -162,24 +144,39 @@ class Dom0
 	 */
 	private $connection;
 
+	/**
+	 * DomUs of this dom0.
+	 *
+	 * @var array
+	 */
+	private $domUs;
+
 	private function connect()
 	{
-		$method = "session.login_with_password";
+		$method = 'session.login_with_password';
 		$params = array ($this->user,$this->password);
 		$request = xmlrpc_encode_request($method,$params);
 		$context = stream_context_create(array('http' => array(
-			'method' => "POST",
-			'header' => "Content-Type: text/xml",
+			'method' => 'POST',
+			'header' => 'Content-Type: text/xml',
 			'content' => $request
 		)));
 
-		$file = file_get_contents("http://".$this->address.":".$this->port, false, $context);
-		if (!$file) {throw new Exception("Can't connect to $this->address");}
+		$file = file_get_contents(
+			'http://' . $this->address . ':' . $this->port,
+			false,
+			$context
+		);
+		if (!$file)
+		{
+			throw new Exception('Can\'t connect to ' . $this->address);
+		}
 
 		$response = xmlrpc_decode($file);
 		if (xmlrpc_is_fault($response))
 		{
-			trigger_error("xmlrpc: $response[faultString] ($response[faultCode])");
+			trigger_error('xmlrpc: ' . $response['faultString'] .' ('
+				. $response['faultCode'] . ')');
 		}
 		else
 		{
