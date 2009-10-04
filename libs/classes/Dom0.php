@@ -175,13 +175,11 @@ class Dom0
 		$response = xmlrpc_decode($file);
 		if (xmlrpc_is_fault($response))
 		{
-			trigger_error('xmlrpc: ' . $response['faultString'] .' ('
+			new Exception('XMLRPC error: ' . $response['faultString'] .' ('
 				. $response['faultCode'] . ')');
 		}
-		else
-		{
-			$id = $response['Value'];
-			$this->connection = new Rpc($this->address,$this->port,$id);
-		}
+
+		$id = $response['Value'];
+		$this->connection = new Rpc($this->address, $this->port, $id);
 	}
 }

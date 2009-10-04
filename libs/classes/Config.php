@@ -1,11 +1,14 @@
 <?php
 
-abstract class Config implements IteratorAggregate {
-	public static function get($name) {
+abstract class Config implements IteratorAggregate
+{
+	public static function get($name)
+	{
 		return self::get_instance()->$name;
 	}
 
-	public static function get_instance() {
+	public static function get_instance()
+	{
 		if (self::$instance == null)
 		{
 			self::$instance = new ConfigIniFile(ROOT_DIR . '/xen-orchestra.conf');
@@ -13,17 +16,20 @@ abstract class Config implements IteratorAggregate {
 		return self::$instance;
 	}
 
-	public static function set($name, $value) {
+	public static function set($name, $value)
+	{
 		self::get_instance()->$name = $value;
 	}
 
-	public function __destruct() {
+	public function __destruct()
+	{
 		if ($this->changed) {
 			$this->write();
 		}
 	}
 
-	public function __get($name) {
+	public function __get($name)
+	{
 		if ($this->entries == null)
 		{
 			$this->read();
@@ -31,7 +37,8 @@ abstract class Config implements IteratorAggregate {
 		return $this->entries[$name];
 	}
 
-	public function __isset($name) {
+	public function __isset($name)
+	{
 		if ($this->entries == null)
 		{
 			$this->read();
@@ -39,7 +46,8 @@ abstract class Config implements IteratorAggregate {
 		return isset($this->entries[$name]);
 	}
 
-	public function __set($name, $value) {
+	public function __set($name, $value)
+	{
 		if ($this->entries == null)
 		{
 			$this->read();
@@ -51,7 +59,8 @@ abstract class Config implements IteratorAggregate {
 		}
 	}
 
-	public function getIterator() {
+	public function getIterator()
+	{
 		if ($this->entries == null)
 		{
 			$this->read();

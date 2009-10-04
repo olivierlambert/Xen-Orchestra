@@ -12,15 +12,25 @@ class ConfigIniFile extends Config
 	{
 		$entries = parse_ini_file($this->file, true);
 
-		if (!isset($entries['global']))
+		if ($entries === false)
 		{
-			return;
+			throw new Exception('Cannot read the configuration file ('
+				. $this->file . ')');
 		}
 
-		$this->entries = array(
-			'global' => $entries['global']
-		);
-		unset ($entries['global']);
+		if (isset($entries['global']))
+		{
+			$this->entries = array(
+				'global' => $entries['global']
+			);
+			unset ($entries['global']);
+		}
+		else
+		{
+			$this->entries = array(
+				'global' => array()
+			);
+		}
 		$this->entries['dom0s'] = $entries;
 	}
 
