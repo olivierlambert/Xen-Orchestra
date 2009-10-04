@@ -1,6 +1,6 @@
 Server Requirements:
 - Apache
-- php5 + php5-sqlite + php5-xmlrpc
+- php5 + php5-xmlrpc
 - joinable Dom0 RPC daemon, see the README.txt
 
 1) Untar the tarball in your /var/www/ folder.
@@ -9,8 +9,5 @@ Server Requirements:
 
 3)edit your config file named "xen-orchestra.conf", see the comments
 
-4) run the installer (it will only create a small database):
-http://your-server-address/xen/install.php
-
-5) Then, open:
+4) Then, open:
 http://your-server-address/xen/htdocs/

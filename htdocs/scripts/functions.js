@@ -88,7 +88,7 @@ function display_vm(name,state,id,n)
 			html = html+'<p>Date of creation : '+json.date+'</p>';
 			html = html+'<p>Last updated : '+json.lastupdate+'</p>';
 			html = html+'<p>VCPU number : '+json.vcpu_number+'</p>';
-			
+
 			win.setTitle(name);
 			win.setHTMLContent(html);
 			win.show();
@@ -117,21 +117,20 @@ function content_dom0(domUs,number,old_domUs,id)
 			tabletop : '<table><th>Name</th><th>State</th><th>Load</th><th>More...</th>',
 			tablebottom : '</table>'
 		};
-			for (var i=0;i<n;i++)
+		for (var i=0;i<n;i++)
+		{
+			result+='<tr id="'+domUs[i].name+'">';
+			result+='<td>'+domUs[i].name+'</td>';
+			result+='<td>'+domUs[i].state+'</td>';
+			result+='<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
+			result+='<td><a href="#" onclick="display_vm(\''+domUs[i].name+'\',\''+domUs[i].state+'\',\''+id+'\');"><img border=0 title="Edit this DomU" src="img/action.png"></a></td>';
+			result+='<tr>';
+
+			if (old_domUs!= null && (domUs[i].state!==old_domUs[i].state || domUs[i].name!==old_domUs[i].name))
 			{
-				result = result+'<tr id="'+domUs[i].name+'">';
-				result = result+'<td>'+domUs[i].name+'</td>';
-				result = result+'<td>'+domUs[i].state+'</td>';
-				result = result+'<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
-				result = result+'<td><a href="#" onclick="display_vm(\''+domUs[i].name+'\',\''+domUs[i].state+'\',\''+id+'\');"><img border=0 title="Edit this DomU" src="img/action.png"></a></td>';
-				result = result+'<tr>';
-
-				if (old_domUs!= null && (domUs[i].state!==old_domUs[i].state || domUs[i].name!==old_domUs[i].name))
-				{
-					result = result+'<script type="text/javascript" language="javascript">Effect.Pulsate(\''+domUs[i].name+'\', { pulses: 8, duration: 3 });</script>';
-				}
-
+				//result = result+'<script type="text/javascript" language="javascript">Effect.Pulsate(\''+domUs[i].name+'\', { pulses: 8, duration: 3 });</script>';
 			}
+		}
 		var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
 		return templ.evaluate(table_templ);
 	}
@@ -211,7 +210,7 @@ document.observe('dom:loaded',function(e)
 			{
 				refresh_windows(windows,response,json);
 			},response*1000);
-			
+
 		},
 		onFailure: function()
 		{

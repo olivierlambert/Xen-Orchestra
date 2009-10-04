@@ -1,15 +1,19 @@
 <?php
 
-class ConfigIniFile extends Config {
-	public function __construct($file) {
+class ConfigIniFile extends Config
+{
+	public function __construct($file)
+	{
 		$this->file = $file;
 	}
 
 
-	protected function read() {
+	protected function read()
+	{
 		$entries = parse_ini_file($this->file, true);
 
-		if (!isset($entries['global'])) {
+		if (!isset($entries['global']))
+		{
 			return;
 		}
 
@@ -17,10 +21,11 @@ class ConfigIniFile extends Config {
 			'global' => $entries['global']
 		);
 		unset ($entries['global']);
-		$this->entries['domains'] = $entries;
+		$this->entries['dom0s'] = $entries;
 	}
 
-	protected function write() {
+	protected function write()
+	{
 		// Update config.
 	}
 

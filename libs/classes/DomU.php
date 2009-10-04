@@ -8,15 +8,15 @@ class DomU
 	public $auto_power_on,$suspend_vdi,$vcpu_max,$vcpus_at_startup,$actions_after_shutdown;
 	public $actions_after_crash,$actions_after_reboot,$pvargs;
 	public $vifs,$vbds,$consoles;
-	public $handle,$migrated;
+	public $migrated;
 	public $metricsid,$metrics;
 	public $vcpu_use,$vcpu_number,$date,$lastupdate;
 
-	public function __construct($id,$handle)
+	public function __construct($id, Dom0 $dom0)
 	{
 		$this->id = $id;
-		$this->handle = $handle;
-		$this->record = $this->handle->send("VM.get_record",$this->id);
+		$this->dom0 = $dom0;
+		$this->record = $this->dom0->rpc_query('VM.get_record',$this->id);
 
 		// build record
 		$this->sid 			= $this->record['uuid'];
@@ -42,8 +42,19 @@ class DomU
 		$this->actions_after_shutdown 	= $this->record['actions_after_shutdown'];
 		$this->actions_after_reboot		= $this->record['actions_after_reboot'];
 		$this->actions_after_crash 		= $this->record['actions_after_crash'];
-		
-		
+
+
+		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->metricsid);
+
+		$this->vcpu_number = $this->metrics['VCPUs_number'];
+		$this->date = $this->metrics['start_time'];
+		$this->lastupdate = $this->metrics['last_updated'];
+
+		$this->vcpu_use = array();
+		foreach($this->metrics['VCPUs_utilisation'] as $cpu)
+		{
+			$this->vcpu_use[] = round($cpu * 100, 2);
+		}
 	}
 
 	public function __call($name, $arguments)
@@ -55,16 +66,16 @@ class DomU
 			case 'resume':
 			case 'suspend':
 			case 'unpause':
-				$this->handle->send ('VM.' . $name, $this->id);
+				$this->dom0->rpc_query ('VM.' . $name, $this->id);
 				break;
 			case 'reboot':
-				$this->handle->send('VM.hard_reboot', $this->id);
+				$this->dom0->rpc_query('VM.hard_reboot', $this->id);
 				break;
 			case 'shutdown':
 				//* TODO: decide wether we use hard or clean shutdown.
-				$this->handle->send('VM.hard_shutdown', $this->id);
+				$this->dom0->rpc_query('VM.hard_shutdown', $this->id);
 				/*/
-				$this->handle->send("VM.clean_shutdown",$this->id);
+				$this->dom0->rpc_query("VM.clean_shutdown",$this->id);
 				//*/
 				break;
 			default:
@@ -76,6 +87,10 @@ class DomU
 	{
 		switch ($name)
 		{
+			case 'state':
+				return $this->dom0->rpc_query("VM.get_power_state",$this->id);
+			case 'dom0':
+				return $this->dom0;
 		}
 		if (isset ($this->$name))
 		{
@@ -114,70 +129,43 @@ class DomU
 	public function get_all_infos()
 	{
 		$cpu_counter = array();
-		foreach($this->vcpu_use as $cpu)
-		{
-			$cpu_counter[] = round($cpu*100,2);
-		}
-		
+
 		return array(
-		'xid' => $this->xid,
-		'name' => $this->name,
-		'state' => $this->state,
-		'kernel' => $this->kernel,
-		'weight' => $this->weight,
-		'cap' => $this->cap,
-		's_max_ram' => $this->s_max_ram,
-		's_min_ram' => $this->s_min_ram,
-		'd_max_ram' => $this->d_max_ram,
-		'd_min_ram' => $this->d_min_ram,
-		'auto_power_on' => $this->auto_power_on,
-		'suspend_vdi' => $this->suspend_vdi,
-		'vcpu_max' => $this->vcpu_max,
-		'vcpus_at_startup' => $this->vcpus_at_startup,
-		'actions_after_shutdown' => $this->actions_after_shutdown,
-		'actions_after_reboot' => $this->actions_after_reboot,
-		'actions_after_crash' => $this->actions_after_crash,
-		'template' => $this->template,
-		'pvargs' => $this->pvargs,
-		'vifs' => $this->vifs,
-		'vbds' => $this->vbds,
-		'sid' => $this->sid,
-		'vcpu_use' => $cpu_counter,
-		'vcpu_number' => $this->vcpu_number,
-		'date' => $this->date->timestamp,
-		'lastupdate' => $this->lastupdate->timestamp);
-	}
-	
-	public function metrics_all()
-	{
-		$this->metrics = $this->handle->send('VM_metrics.get_record',$this->metricsid);
-		$this->vcpu_use = $this->metrics['VCPUs_utilisation'];
-		$this->vcpu_number = $this->metrics['VCPUs_number'];
-		$this->date = $this->metrics['start_time'];
-		$this->lastupdate = $this->metrics['last_updated'];
-	}
-
-	// test cloning
-	// doesn't work : limited in API, to "EUNSUPPORTED Method Unsupported "
-	/*
-	public function clonevm($nameofclone) {
-		$params = array($this->id,$nameofclone);
-		$this->handle->send("VM.clone",$this->id);
-	}
-	*/
-
-	public function get_state()
-	{
-		return $this->handle->send("VM.get_power_state",$this->id);
+			'xid' => $this->xid,
+			'name' => $this->name,
+			'state' => $this->state,
+			'kernel' => $this->kernel,
+			'weight' => $this->weight,
+			'cap' => $this->cap,
+			's_max_ram' => $this->s_max_ram,
+			's_min_ram' => $this->s_min_ram,
+			'd_max_ram' => $this->d_max_ram,
+			'd_min_ram' => $this->d_min_ram,
+			'auto_power_on' => $this->auto_power_on,
+			'suspend_vdi' => $this->suspend_vdi,
+			'vcpu_max' => $this->vcpu_max,
+			'vcpus_at_startup' => $this->vcpus_at_startup,
+			'actions_after_shutdown' => $this->actions_after_shutdown,
+			'actions_after_reboot' => $this->actions_after_reboot,
+			'actions_after_crash' => $this->actions_after_crash,
+			'template' => $this->template,
+			'pvargs' => $this->pvargs,
+			'vifs' => $this->vifs,
+			'vbds' => $this->vbds,
+			'sid' => $this->sid,
+			'vcpu_use' => $this->vcpu_use,
+			'vcpu_number' => $this->vcpu_number,
+			'date' => $this->date->timestamp,
+			'lastupdate' => $this->lastupdate->timestamp
+		);
 	}
 
 	public function migrate($dest,$live)
 	{
 		$port = array("port" => 8002);
 		$params = array($this->id,$dest,true,$port);
-		$this->handle->send("VM.migrate",$params);
+		$this->dom0->rpc_query("VM.migrate",$params);
 	}
-
 
 	public function set_migrated($bool)
 	{
@@ -187,7 +175,14 @@ class DomU
 	public function start($is_paused)
 	{
 		$params = array($this->id,$is_paused);
-		$this->handle->send("VM.start",$params);
+		$this->dom0->rpc_query("VM.start",$params);
 	}
+
+	/**
+	 * The dom0 this domU belongs to.
+	 *
+	 * @param Dom0
+	 */
+	private $dom0;
 }
 
