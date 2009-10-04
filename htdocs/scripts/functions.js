@@ -129,6 +129,8 @@ function content_dom0(domUs,number,old_domUs,id)
 			if (old_domUs!= null && (domUs[i].state!==old_domUs[i].state || domUs[i].name!==old_domUs[i].name))
 			{
 				//result = result+'<script type="text/javascript" language="javascript">Effect.Pulsate(\''+domUs[i].name+'\', { pulses: 8, duration: 3 });</script>';
+				// can't work because the HTML is not already sent !
+				Effect.Pulsate(domUs[i].name, { pulses: 8, duration: 3 });
 			}
 		}
 		var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
