@@ -3,14 +3,9 @@
 class DomU
 {
 
-	public $name,$sid,$id,$xid,$state,$kernel,$weight,$cap,$record;
-	public $s_max_ram,$s_min_ram,$d_max_ram,$d_min_ram,$template;
-	public $auto_power_on,$suspend_vdi,$vcpu_max,$vcpus_at_startup,$actions_after_shutdown;
-	public $actions_after_crash,$actions_after_reboot,$pvargs;
-	public $vifs,$vbds,$consoles;
-	public $migrated;
-	public $metricsid,$metrics;
-	public $vcpu_use,$vcpu_number,$date,$lastupdate;
+	public $name, $vcpu_number, $vcpu_use;
+	private $id, $xid, $state, $record, $sid, $metrics, $date;
+	private $lastupdate;
 
 	public function __construct($id, Dom0 $dom0)
 	{
@@ -18,33 +13,13 @@ class DomU
 		$this->dom0 = $dom0;
 		$this->record = $this->dom0->rpc_query('VM.get_record',$this->id);
 
-		// build record
+		// get needed variables
 		$this->sid 			= $this->record['uuid'];
 		$this->name 		= $this->record['name_description'];
 		$this->xid 			= $this->record['domid'];
 		$this->state 		= $this->record['power_state'];
-		$this->kernel 		= $this->record['PV_kernel'];
-		$this->weight 		= $this->record['VCPUs_params']['weight'];
-		$this->cap 			= $this->record['VCPUs_params']['cap'];
-		$this->s_max_ram	= $this->record['memory_static_max'];
-		$this->s_min_ram	= $this->record['memory_static_min'];
-		$this->d_max_ram	= $this->record['memory_dynamic_max'];
-		$this->d_min_ram	= $this->record['memory_dynamic_min'];
-		$this->auto_power_on= $this->record['auto_power_on'];
-		$this->vcpu_max 	= $this->record['VCPUs_max'];
-		$this->template		= $this->record['is_a_template'];
-		$this->pvargs		= $this->record['PV_args'];
-		$this->vifs			= $this->record['VIFs'];
-		$this->vbds			= $this->record['VBDs'];
-		$this->consoles		= $this->record['consoles'];
-		$this->metricsid	= $this->record['metrics'];
-		$this->vcpus_at_startup 		= $this->record['VCPUs_at_startup'];
-		$this->actions_after_shutdown 	= $this->record['actions_after_shutdown'];
-		$this->actions_after_reboot		= $this->record['actions_after_reboot'];
-		$this->actions_after_crash 		= $this->record['actions_after_crash'];
 
-
-		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->metricsid);
+		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->record['metrics']);
 
 		$this->vcpu_number = $this->metrics['VCPUs_number'];
 		$this->date = $this->metrics['start_time'];
@@ -131,30 +106,29 @@ class DomU
 		$cpu_counter = array();
 
 		return array(
-			'xid' => $this->xid,
-			'name' => $this->name,
-			'state' => $this->state,
-			'kernel' => $this->kernel,
-			'weight' => $this->weight,
-			'cap' => $this->cap,
-			's_max_ram' => $this->s_max_ram,
-			's_min_ram' => $this->s_min_ram,
-			'd_max_ram' => $this->d_max_ram,
-			'd_min_ram' => $this->d_min_ram,
-			'auto_power_on' => $this->auto_power_on,
-			'suspend_vdi' => $this->suspend_vdi,
-			'vcpu_max' => $this->vcpu_max,
-			'vcpus_at_startup' => $this->vcpus_at_startup,
-			'actions_after_shutdown' => $this->actions_after_shutdown,
-			'actions_after_reboot' => $this->actions_after_reboot,
-			'actions_after_crash' => $this->actions_after_crash,
-			'template' => $this->template,
-			'pvargs' => $this->pvargs,
-			'vifs' => $this->vifs,
-			'vbds' => $this->vbds,
-			'sid' => $this->sid,
+			'xid' => $this->record['domid'],
+			'name' => $this->record['name_description'],
+			'state' => $this->record['power_state'],
+			'kernel' => $this->record['PV_kernel'],
+			'weight' => $this->record['VCPUs_params']['weight'],
+			'cap' => $this->record['VCPUs_params']['cap'],
+			's_max_ram' => $this->record['memory_static_max'],
+			's_min_ram' => $this->record['memory_static_min'],
+			'd_max_ram' => $this->record['memory_dynamic_max'],
+			'd_min_ram' => $this->record['memory_dynamic_min'],
+			'auto_power_on' => $this->record['auto_power_on'],
+			'vcpu_max' => $this->record['VCPUs_max'],
+			'vcpus_at_startup' => $this->record['VCPUs_at_startup'],
+			'actions_after_shutdown' => $this->record['actions_after_shutdown'],
+			'actions_after_reboot' => $this->record['actions_after_reboot'],
+			'actions_after_crash' => $this->record['actions_after_crash'],
+			'template' => $this->record['is_a_template'],
+			'pvargs' => $this->record['PV_args'],
+			'vifs' => $this->record['VIFs'],
+			'vbds' => $this->record['VBDs'],
+			'sid' => $this->record['uuid'],
 			'vcpu_use' => $this->vcpu_use,
-			'vcpu_number' => $this->vcpu_number,
+			'vcpu_number' => $this->metrics['VCPUs_number'],
 			'date' => $this->date->timestamp,
 			'lastupdate' => $this->lastupdate->timestamp
 		);
@@ -165,11 +139,6 @@ class DomU
 		$port = array('port' => 8002);
 		$params = array($this->id, $dest, true, $port);
 		$this->dom0->rpc_query('VM.migrate', $params);
-	}
-
-	public function set_migrated($bool)
-	{
-		$this->migrated = $bool;
 	}
 
 	public function start($is_paused)
