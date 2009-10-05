@@ -196,6 +196,7 @@ caption {
 
 #main tr:hover {
 	background-color: #111;
+	cursor:  pointer;
 }
 
 #main img

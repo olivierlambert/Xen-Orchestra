@@ -182,6 +182,7 @@ caption {
 
 #main tr:hover {
 	background-color: #eee;
+	cursor:  pointer;
 }
 
 #main img

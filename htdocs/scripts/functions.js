@@ -83,11 +83,13 @@ function display_vm(name,state,id,n)
 				className:"alphacube",
 				showProgress: true,
 			});
+			var date1 = new Date(json.date*1000);
+			var date2 = new Date(json.lastupdate*1000);
 			var html = '<div id="vm"><h3>Overview</h3></div>';
-			html = html+'<p>State : '+json.state+'</p>';
-			html = html+'<p>Date of creation : '+json.date+'</p>';
-			html = html+'<p>Last updated : '+json.lastupdate+'</p>';
-			html = html+'<p>VCPU number : '+json.vcpu_number+'</p>';
+			html+='<p>State : '+json.state+'</p>';
+			html+='<p>Date of creation : '+date1+'</p>';
+			html+='<p>Last updated : '+date2+'</p>';
+			html+='<p>VCPU number : '+json.vcpu_number+'</p>';
 
 			win.setTitle(name);
 			win.setHTMLContent(html);
@@ -97,12 +99,12 @@ function display_vm(name,state,id,n)
 		},
 		onFailure: function()
 		{
-			alert('Something went wrong...')
+			alert('Something went wrong...');
 		}
 	}
 	);
 }
-function content_dom0(domUs,number,old_domUs,id)
+function content_dom0(domUs,number,id)
 {
 	var result = '';
 	if (number<1)
@@ -111,30 +113,53 @@ function content_dom0(domUs,number,old_domUs,id)
 	}
 	else
 	{
-		var n = domUs.length;
 		var table_templ =
 		{
-			tabletop : '<table><th>Name</th><th>State</th><th>Load</th><th>More...</th>',
+			tabletop : '<table><th>Name</th><th>State</th><th>Load</th>',
 			tablebottom : '</table>'
 		};
-		for (var i=0;i<n;i++)
+		domUs.each(function (domU)
 		{
-			result+='<tr id="'+domUs[i].name+'">';
-			result+='<td>'+domUs[i].name+'</td>';
-			result+='<td>'+domUs[i].state+'</td>';
-			result+='<td>'+call_cpu_buttons(domUs[i].cpu_use)+'</td>';
-			result+='<td><a href="#" onclick="display_vm(\''+domUs[i].name+'\',\''+domUs[i].state+'\',\''+id+'\');"><img border=0 title="Edit this DomU" src="img/action.png"></a></td>';
-			result+='<tr>';
-
-			if (old_domUs!= null && (domUs[i].state!==old_domUs[i].state || domUs[i].name!==old_domUs[i].name))
-			{
-				//result = result+'<script type="text/javascript" language="javascript">Effect.Pulsate(\''+domUs[i].name+'\', { pulses: 8, duration: 3 });</script>';
-				// can't work because the HTML is not already sent !
-				Effect.Pulsate(domUs[i].name, { pulses: 8, duration: 3 });
-			}
-		}
+			result+='<tr id="'+domU.name+'" onclick="display_vm(\''+domU.name+'\',\''+domU.state+'\',\''+id+'\')">';
+			result+='<td>'+domU.name+'</td>';
+			result+='<td>'+domU.state+'</td>';
+			result+='<td>'+call_cpu_buttons(domU.cpu_use)+'</td>';
+			result+='</tr>';
+		});
 		var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
 		return templ.evaluate(table_templ);
+	}
+}
+
+function set_effects(previousdomUs,domUs)
+{
+	if (previousdomUs != null)
+	{
+		var n_prev_domUs = previousdomUs.size();
+		var n_domUs = domUs.size();
+		var not_finded = true;
+
+		if (n_domUs > 0)
+		{
+			previousdomUs.each(function (previousdomU)
+			{
+				domUs.each(function (domU)
+				{
+					if (previousdomU.name === domU.name)
+					{
+						not_finded = false;
+						if (previousdomU.state != domU.state)
+						{
+							Effect.Pulsate(domU.name, { pulses: 4, duration: 4 });
+						}
+					}
+				});
+				if (not_finded)
+				{
+					Effect.Pulsate(domU.name, { pulses: 4, duration: 4 });
+				}
+			});
+		}
 	}
 }
 
@@ -153,10 +178,13 @@ function refresh_windows(windows,response,previousjson)
 			var n = json.size();
 			for (var i=0;i<n;i++)
 			{
-				var current_id = json[i].id;
-				var content = content_dom0(json[i].domUs,json[i].vm_number,previousjson[i].domUs,current_id);
+				var content = content_dom0(json[i].domUs,json[i].vm_number,json[i].id);
 				windows[i].setContent(content);
 				windows[i].updateHeight();
+				if (previousjson != null)
+				{
+				set_effects(previousjson[i].domUs,json[i].domUs);
+				}
 			}
 			previousjson = json;
 		}
@@ -176,7 +204,7 @@ document.observe('dom:loaded',function(e)
 		},
 		onFailure: function()
 		{
-			alert('Something went wrong...')
+			alert('Something went wrong...');
 		}
 	}
 	);
@@ -193,17 +221,16 @@ document.observe('dom:loaded',function(e)
 			var windows = new Array();
 			json.each(function(item)
 			{
-				var id = item.id;
-				var content = content_dom0(item.domUs,item.vm_number,null,id);
+				var content = content_dom0(item.domUs,item.vm_number,item.id);
 				var window = new Xilinus.Widget().setTitle(item.name).setContent(content);
 				if (weightleft <= weightright)
 				{
-					weightleft = weightleft+item.vm_number;
+					weightleft = weightleft+item.vm_number+1;
 					portal.add(window, 0);
 				}
 				else
 				{
-					weighright = weightright+item.vm_number;
+					weighright = weightright+item.vm_number+1;
 					portal.add(window,1);
 				}
 				windows.push(window);
@@ -216,7 +243,7 @@ document.observe('dom:loaded',function(e)
 		},
 		onFailure: function()
 		{
-			alert('Something went wrong...')
+			alert('Something went wrong...');
 		}
 	}
 	);
