@@ -83,12 +83,10 @@ function display_vm(name,state,id,n)
 				className:"alphacube",
 				showProgress: true,
 			});
-			var date1 = new Date(json.date*1000);
-			var date2 = new Date(json.lastupdate*1000);
+			var date = new Date(json.date*1000);
 			var html = '<div id="vm"><h3>Overview</h3></div>';
 			html+='<p>State : '+json.state+'</p>';
-			html+='<p>Date of creation : '+date1+'</p>';
-			html+='<p>Last updated : '+date2+'</p>';
+			html+='<p>Date of creation : '+date+'</p>';
 			html+='<p>VCPU number : '+json.vcpu_number+'</p>';
 
 			win.setTitle(name);
