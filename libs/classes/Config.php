@@ -2,9 +2,14 @@
 
 abstract class Config implements IteratorAggregate
 {
-	public static function get($name)
+	public static function get($name, $default = null)
 	{
-		return self::get_instance()->$name;
+		$instance = self::get_instance;
+		if (isset($instance->$name))
+		{
+			return $instance->$name;
+		}
+		return $default;
 	}
 
 	public static function get_instance()

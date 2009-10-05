@@ -14,17 +14,17 @@ class Dom0
 	 *
 	 * @param address  ...
 	 * @param port     ...
-	 * @param user     ...
+	 * @param username ...
 	 * @param password ...
 	 *
 	 * @TODO Write proper doc, check arguments.
 	 */
-	public function __construct($address, $port, $user, $password)
+	public function __construct($address, $port, $username, $password)
 	{
 		$this->id = $address . ':' . $port;
 		$this->address = $address;
 		$this->port = $port;
-		$this->user = $user;
+		$this->username = $username;
 		$this->password = $password;
 
 		$this->connect();
@@ -39,7 +39,7 @@ class Dom0
 			case 'address':
 			case 'id':
 			case 'port':
-			case 'user':
+			case 'username':
 				return $this->$name;
 		}
 		if (isset ($this->$name))
@@ -73,7 +73,7 @@ class Dom0
 		{
 			return $this->domUs[$name];
 		}
-		return null;
+		return false;
 	}
 
 	public function getDomUs()
@@ -135,7 +135,7 @@ class Dom0
 	 *
 	 * @var string
 	 */
-	private $user;
+	private $username;
 
 	/**
 	 * Handle of the connection to the Xen daemon.
@@ -154,7 +154,7 @@ class Dom0
 	private function connect()
 	{
 		$method = 'session.login_with_password';
-		$params = array ($this->user,$this->password);
+		$params = array ($this->username,$this->password);
 		$request = xmlrpc_encode_request($method,$params);
 		$context = stream_context_create(array('http' => array(
 			'method' => 'POST',

@@ -10,11 +10,11 @@ refresh = 10
 ;; Server address and port. Example for 2 dom0 :
 ;;
 ;; [192.168.0.10:9363]
-;; user = test1
-;; pass = test1
+;; username = test1
+;; password = test1
 ;;
 ;; [192.168.0.11:9363]
-;; user = test1
-;; pass = test1
+;; username = test1
+;; password = test1
 ;;
 ;; Can be a name, e.g example.com:9363

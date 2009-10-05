@@ -14,13 +14,13 @@ $action		= isset ($_GET['action']) ? $_GET['action'] : false; 		// action to do 
 $target		= isset ($_GET['target']) ? $_GET['target'] : false; 		// target for migration
 
 $dom0 = Model::get_dom0($id);
-if ($dom0 == null)
+if ($dom0 === false)
 {
 	error('No such dom0.');
 }
 
 $domU = $dom0->getDomU($name);
-if ($domU == null)
+if ($domU === false)
 {
 	error('No such domU.');
 }

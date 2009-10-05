@@ -18,20 +18,7 @@ class ConfigIniFile extends Config
 				. $this->file . ')');
 		}
 
-		if (isset($entries['global']))
-		{
-			$this->entries = array(
-				'global' => $entries['global']
-			);
-			unset ($entries['global']);
-		}
-		else
-		{
-			$this->entries = array(
-				'global' => array()
-			);
-		}
-		$this->entries['dom0s'] = $entries;
+		$this->entries = $entries;
 	}
 
 	protected function write()
