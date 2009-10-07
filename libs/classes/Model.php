@@ -2,6 +2,48 @@
 
 final class Model
 {
+	public static function create_user($name, $password, $email, $permission,
+		$pw_hashed = false)
+	{
+		$db = Database::get_instance();
+		$stmt = $db->prepare('INSERT INTO "users" '
+			. '("name", "password", "email", "permission") VALUES '
+			. '(:name, :password, :email, :permission)');
+		if (!$pw_hashed)
+		{
+			$password = md5($password);
+		}
+
+		$r = $stmt->execute(array(
+			':name' => $name,
+			':password' => $password,
+			':email' => $email,
+			':permission' => ACL::to_string($permission),
+		));
+
+		if (!$r || ($stmt->rowCount() == 0))
+		{
+			return false;
+		}
+
+		return new User($db->lastInsertId('users_id_seq'), $name, $email, $permission); // Will only work with PostgreSQL.
+	}
+
+	public static function delete_user($name)
+	{
+		$db = Database::get_instance();
+		$stmt = $db->prepare('DELETE FROM "users" WHERE "name" = :name');
+
+		$r = $stmt->execute(array(
+			':name' => $name
+		));
+		if (!$r)
+		{
+			return false;
+		}
+		return ($stmt->rowCount() == 1);
+	}
+
 	/**
 	 * Returns the dom0 which has the id $id in the database or null.
 	 *
@@ -144,11 +186,11 @@ final class Model
 	 *
 	 * @return The user or false.
 	 */
-	public static function get_user($name, $password = null)
+	public static function get_user($name, $password = null, $pw_hashed = false)
 	{
 		$db = Database::get_instance();
-		$sql = 'SELECT id, mail, permissions FROM users '
-			. 'WHERE name = :name';
+		$sql = 'SELECT "id", "email", "permission" FROM "users" '
+			. 'WHERE "name" = :name';
 
 		if ($password === null)
 		{
@@ -156,24 +198,33 @@ final class Model
 		}
 		else
 		{
-			$stmt = $db->prepare($sql . ' AND password = :password');
-			$stmt->bindValue(':password', $password);
+			$stmt = $db->prepare($sql . ' AND "password" = :password');
+			if ($pw_hashed)
+			{
+				$stmt->bindValue(':password', $password);
+			}
+			else
+			{
+				$stmt->bindValue(':password', md5($password));
+			}
 		}
 
-		if (!$stmt->execute(array(':name' => $name)))
+		$stmt->bindValue(':name', $name);
+
+		if (!$stmt->execute()
+			|| (($r = $stmt->fetch(PDO::FETCH_NUM)) === false))
 		{
 			return false; // The request failed.
 		}
 
-		$r = $stmt->fetch(PDO::FETCH_NUM);
-		return self::$users[$r[0]] = new User($r[0], $name, $r[1], $r[2]);
+		return new User($r[0], $name, rtrim($r[1]), ACL::from_string($r[2]));
 	}
 
-	public static function get_user_acls(User $user)
+	public static function &get_user_acls(User $user)
 	{
 		$db = Database::get_instance();
-		$stmt = $db->prepare('SELECT dom0_id, domU_name, permissions FROM acls '
-			. 'WHERE user_id = :user_id');
+		$stmt = $db->prepare('SELECT "dom0_id", "domU_name", "permission" '
+			. 'FROM "acls" WHERE "user_id" = :user_id');
 
 		if (!$stmt->execute(array(':user_id' => $user->id)))
 		{
@@ -183,6 +234,7 @@ final class Model
 		$acls = array();
 		while (($r = $stmt->fetch(PDO::FETCH_NUM)) !== false)
 		{
+			$r[0] = rtrim($r[0]);
 			if (!isset($acls[$r[0]]))
 			{
 				$acls[$r[0]] = array();
@@ -194,7 +246,7 @@ final class Model
 			}
 			else
 			{
-				$acls[$r[0]][$r[1]] = $r[2];
+				$acls[$r[0]][rtrim($r[1])] = ACL::from_string($r[2]);
 			}
 		}
 		return $acls;

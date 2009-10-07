@@ -2,20 +2,12 @@
 
 class User
 {
-	public const NONE = 0;
-
-	public const READ = 1;
-
-	public const WRITE = 2;
-
-	public const ADMIN = 3;
-
-	public function __construct($id, $name, $mail, $permissions)
+	public function __construct($id, $name, $email, $permission)
 	{
 		$this->id = $id;
 		$this->name = $name;
-		$this->mail = $mail;
-		$this->permissions = $permissions;
+		$this->email = $email;
+		$this->permission = $permission;
 	}
 
 	public function __get ($name)
@@ -24,13 +16,13 @@ class User
 		{
 			case 'id':
 			case 'name':
-			case 'mail':
-			case 'permissions':
+			case 'email':
+			case 'permission':
 				return $this->$name;
 			case 'acls':
 				if ($this->_acls === null)
 				{
-					$this->_acls = &Model::get_user_acls($this)
+					$this->_acls = &Model::get_user_acls($this);
 				}
 				return $this->_acls;
 		}
@@ -75,16 +67,16 @@ class User
 		{
 			return $acls[$dom0_id]['Domain-0'];
 		}
-		return $this->permissions;
+		return $this->permission;
 	}
 
 	private $id;
 
 	private $name;
 
-	private $mail;
+	private $email;
 
-	private $permissions;
+	private $permission;
 
-	private $_acls = null; // aka extended permissions.
+	private $_acls = null; // aka extended permission.
 }
