@@ -5,43 +5,34 @@ final class Model
 	public static function create_user($name, $password, $email, $permission,
 		$pw_hashed = false)
 	{
-		$db = Database::get_instance();
-		$stmt = $db->prepare('INSERT INTO "users" '
-			. '("name", "password", "email", "permission") VALUES '
-			. '(:name, :password, :email, :permission)');
+		if (!Database::is_enabled())
+		{
+			return false;
+		}
+
 		if (!$pw_hashed)
 		{
 			$password = md5($password);
 		}
 
-		$r = $stmt->execute(array(
-			':name' => $name,
-			':password' => $password,
-			':email' => $email,
-			':permission' => ACL::to_string($permission),
-		));
-
-		if (!$r || ($stmt->rowCount() == 0))
+		$id = Database::get_instance()->insert_user($name, $password, $email,
+			ACL::to_string($permission));
+		if ($id === false)
 		{
 			return false;
 		}
-
-		return new User($db->lastInsertId('users_id_seq'), $name, $email, $permission); // Will only work with PostgreSQL.
+		return self::$users[$name] = new User($id, $name, $password, $email,
+			$permission);
 	}
 
 	public static function delete_user($name)
 	{
-		$db = Database::get_instance();
-		$stmt = $db->prepare('DELETE FROM "users" WHERE "name" = :name');
-
-		$r = $stmt->execute(array(
-			':name' => $name
-		));
-		if (!$r)
+		if (Database::is_enabled() && Database::get_instance()->delete_user($name))
 		{
-			return false;
+			unset(self::$users[$name]); // He may have been in the cache.
+			return true;
 		}
-		return ($stmt->rowCount() == 1);
+		return false;
 	}
 
 	/**
@@ -51,12 +42,27 @@ final class Model
 	 *
 	 * @return The current user.
 	 */
-	public static function get_current_user ()
+	public static function get_current_user()
 	{
 		if (self::$current_user !== null)
 		{
 			return self::$current_user;
 		}
+
+		if (isset($_SESSION['user']))
+		{
+			self::$current_user = self::get_user($_SESSION['user']);
+
+			if (self::$current_user !== false)
+			{
+				// The user has been successfully retrieved.
+				return self::$current_user;
+			}
+
+			// An error occured, unregisters the user and falls back to "guest".
+			self::unregister_current_user();
+		}
+		return self::$current_user = self::get_user('guest');
 	}
 
 	/**
@@ -203,40 +209,110 @@ final class Model
 	 */
 	public static function get_user($name, $password = null, $pw_hashed = false)
 	{
-		$db = Database::get_instance();
-		$sql = 'SELECT "id", "email", "permission" FROM "users" '
-			. 'WHERE "name" = :name';
-
-		if ($password === null)
+		if (!isset(self::$users[$name]))
 		{
-			$stmt = $db->prepare($sql);
-		}
-		else
-		{
-			$stmt = $db->prepare($sql . ' AND "password" = :password');
-			if ($pw_hashed)
+			if (self::$all_users_retrieved)
 			{
-				$stmt->bindValue(':password', $password);
+				// The user is not in the cache and we know we have all the
+				// users in it, so we know he does not exist.
+				return false;
+			}
+			if (Database::is_enabled())
+			{
+				$user = Database::get_instance()->get_user('name', $name);
+
+				if ($user === false)
+				{
+					if ($name !== 'guest')
+					{
+						return self::$users[$name] = false;
+					}
+
+					// There must be a "guest" user in the database.
+					self::create_user('guest', '', '', ACL::NONE);
+				}
+				else
+				{
+					self::$users[$name] = new User($user['id'], $user['name'],
+						$user['password'], $user['email'],
+						ACL::from_string($user['permission']));
+				}
 			}
 			else
 			{
-				$stmt->bindValue(':password', md5($password));
+				if ($name !== 'guest')
+				{
+					// The database is disabled, only "guest" is available.
+					return false;
+				}
+				self::$users['guest'] = self::get_default_guest();
 			}
 		}
-
-		$stmt->bindValue(':name', $name);
-
-		if (!$stmt->execute()
-			|| (($r = $stmt->fetch(PDO::FETCH_NUM)) === false))
+		if (self::$users[$name] === false) // Already checked, not here.
 		{
-			return false; // The request failed.
+			return false;
 		}
-
-		return new User($r[0], $name, rtrim($r[1]), ACL::from_string($r[2]));
+		if ($password !== null)
+		{
+			if (!$pw_hashed)
+			{
+				$password = md5($password);
+			}
+			if ($password !== self::$users[$name]->password)
+			{
+				return false;
+			}
+		}
+		return self::$users[$name];
 	}
 
-	public static function &get_user_acls(User $user)
+	public static function get_users()
 	{
+		if (self::$all_users_retrieved)
+		{
+			return self::$users;
+		}
+
+		if (!Database::is_enabled())
+		{
+			self::$all_users_retrieved = true;
+			return self::$users = array(
+				'guest' => self::get_default_guest()
+			);
+		}
+
+		self::$users = array();
+		$stmt = Database::get_instance()->query('SELECT "id", "name", '
+			. '"password", "email", "permission" FROM "users"');
+
+		// What should we do if $stmt equals false?
+
+
+		while (($r = $stmt->fetch(PDO::FETCH_NUM)) !== false)
+		{
+			$r = array_map('rtrim', $r);
+			self::$users[$r[1]] = new User($r[0], $r[1], $r[2], $r[3],
+				ACL::from_string($r[4]));
+		}
+
+		if (!isset(self::$users['guest'])) // "guest" must always exist.
+		{
+			self::$all_users_retrieved = false;
+			self::get_user('guest'); // Ensures "guest" exi
+		}
+
+		self::$all_users_retrieved = true;
+
+		return self::$users;
+	}
+
+	public static function get_user_acls(User $user)
+	{
+		if (!Database::is_enabled())
+		{
+			return array();
+		}
+
 		$db = Database::get_instance();
 		$stmt = $db->prepare('SELECT "dom0_id", "domU_name", "permission" '
 			. 'FROM "acls" WHERE "user_id" = :user_id');
@@ -273,28 +349,52 @@ final class Model
 	 * registered as the current user, which means that each action will be done
 	 * with his permissions.
 	 *
-	 * @param $name
-	 * @param $password
-	 * @param $pw_hashed
+	 * @param string      $name
+	 * @param string|null $password
+	 * @param bool        $pw_hashed
 	 *
 	 * @return The user if the registration was a success, otherwise false.
 	 */
-	public static function register_current_user ($name, $password,
+	public static function register_current_user($name, $password = null,
 		$pw_hashed = false)
 	{
-
+		$user = self::get_user($name, $password, $pw_hashed);
+		if ($user === false)
+		{
+			return false;
+		}
+		$_SESSION['user'] = $name;
+		return self::$current_user = $user;
 	}
 
 	/**
 	 * Unregisters the current user.
-	 *
-	 * @return True if the unregistration was a success, otherwise false.
 	 */
-	public static function unregister_current_user ()
+	public static function unregister_current_user()
 	{
-
+		self::$current_user = null;
+		unset($_SESSION['user']);
 	}
 
+	/**
+	 * Updates the database to match the given user, registers him if necessary.
+	 *
+	 * @param User $u The user to update.
+	 *
+	 * @return Whether the update was successful.
+	 */
+	public static function update_user(User $u)
+	{
+		return (Database::is_enabled()
+			&& Database::get_instance()->update_user($u->id, $u->name,
+				$u->password, $u->email, ACL::to_string($u->permission)));
+	}
+
+	/**
+	 * The current user.
+	 *
+	 * @var User
+	 */
 	private static $current_user = null;
 
 	/**
@@ -323,18 +423,50 @@ final class Model
 	/**
 	 * This array contains all the domUs:  names => dom0_id => domU.
 	 *
-	 * TODO: optimize get_domUs in inserting in this array only halted domUs.
-	 *
 	 * @var array
 	 */
 	private static $domUs_by_names = array();
 
-
-/*
+	/**
+	 * This array contains all the users already fetched from the database.
+	 *
+	 * @var array
+	 */
 	private static $users = array();
 
+
+	/**
+	 * This flag equals true if all the users are already retrieved, otherwise
+	 * it equals false.
+	 *
+	 * @var boolean
+	 */
 	private static $all_users_retrieved = false;
-*/
+
+	/**
+	 * Returns the default "guest" user.
+	 * The default "guest" user is the user "guest" when the database is
+	 * disabled.
+	 *
+	 * @param $permission
+	 *
+	 * @return The default "guest" user.
+	 */
+	private static function get_default_guest($permission = null)
+	{
+		if ($permission === null)
+		{
+			if (isset($cfg->global['default_guest_permission']))
+			{
+				$permission = ACL::from_string($cfg->global['default_guest_permission']);
+			}
+			else
+			{
+				$permission = ACL::NONE;
+			}
+		}
+		return new User(-1, 'guest', '', '', $permission);
+	}
 
 	/**
 	 * Checks if there is a running domU with the name $name among the known

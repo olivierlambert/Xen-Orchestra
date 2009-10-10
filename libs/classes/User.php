@@ -2,10 +2,11 @@
 
 class User
 {
-	public function __construct($id, $name, $email, $permission)
+	public function __construct($id, $name, $password, $email, $permission)
 	{
 		$this->id = $id;
 		$this->name = $name;
+		$this->password = $password;
 		$this->email = $email;
 		$this->permission = $permission;
 	}
@@ -16,13 +17,14 @@ class User
 		{
 			case 'id':
 			case 'name':
+			case 'password':
 			case 'email':
 			case 'permission':
 				return $this->$name;
 			case 'acls':
 				if ($this->_acls === null)
 				{
-					$this->_acls = &Model::get_user_acls($this);
+					$this->_acls = Model::get_user_acls($this);
 				}
 				return $this->_acls;
 		}
@@ -73,6 +75,11 @@ class User
 	private $id;
 
 	private $name;
+
+	/**
+	 * The user's password, hashed with md5.
+	 */
+	private $password;
 
 	private $email;
 

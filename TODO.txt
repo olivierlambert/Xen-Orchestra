@@ -1,3 +1,24 @@
-Model::get_current_user ()
-Model::register_current_user ()
-Model::unregister_current_user ()
+Optimize Model::get_domUs() in inserting in Model::$domUs_by_names array only
+halted domUs.
+
+Make Model::create_user() handles PDOException when a unique constraint is
+violated to properly returns false.
+
+Model::get_user()
+Model::get_users()
+"guest" must always exists, even if he is not in the database.
+
+Model::delete_users()
+Model::create_users()
+Uses the cache to avoid unnecessary operations.
+
+Model::delete_users()
+Model::create_users()
+Model::get_user()
+Model::get_users()
+Provides a "$force_refresh" parameter.
+
+Handles the "recovery" user (almighty).
+
+SQL
+When an user is deleted, also delete his ACLs.
