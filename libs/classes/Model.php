@@ -45,6 +45,21 @@ final class Model
 	}
 
 	/**
+	 * Returns the current user.
+	 * If the user is not registered or if the database is disabled, the
+	 * returned user is "guest".
+	 *
+	 * @return The current user.
+	 */
+	public static function get_current_user ()
+	{
+		if (self::$current_user !== null)
+		{
+			return self::$current_user;
+		}
+	}
+
+	/**
 	 * Returns the dom0 which has the id $id in the database or null.
 	 *
 	 * @param string $id             The identifier of the dom0.
@@ -251,6 +266,36 @@ final class Model
 		}
 		return $acls;
 	}
+
+	/**
+	 * Registers the current user.
+	 * If an user named $name with the password $password exists, this user is
+	 * registered as the current user, which means that each action will be done
+	 * with his permissions.
+	 *
+	 * @param $name
+	 * @param $password
+	 * @param $pw_hashed
+	 *
+	 * @return The user if the registration was a success, otherwise false.
+	 */
+	public static function register_current_user ($name, $password,
+		$pw_hashed = false)
+	{
+
+	}
+
+	/**
+	 * Unregisters the current user.
+	 *
+	 * @return True if the unregistration was a success, otherwise false.
+	 */
+	public static function unregister_current_user ()
+	{
+
+	}
+
+	private static $current_user = null;
 
 	/**
 	 * To avoid unecessary checking and object creation, all dom0s are stored in

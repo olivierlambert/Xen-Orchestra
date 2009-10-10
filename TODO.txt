@@ -1,0 +1,3 @@
+Model::get_current_user ()
+Model::register_current_user ()
+Model::unregister_current_user ()

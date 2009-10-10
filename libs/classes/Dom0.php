@@ -3,11 +3,8 @@
 class Dom0
 {
 	public
-		$vif_record;
-
-	public
-		$id_dom0,
-		$id_metrics_dom0;
+		$id_dom0, // Not use anywhere
+		$id_metrics_dom0; // Idem
 
 	/**
 	 * Create a new Dom0 object.

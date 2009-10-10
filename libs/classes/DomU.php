@@ -2,8 +2,7 @@
 
 class DomU
 {
-
-	public $name, $vcpu_number, $vcpu_use;
+	public $vcpu_number, $vcpu_use;
 	private $id, $xid, $state, $record, $sid, $metrics, $date;
 	private $lastupdate;
 
@@ -62,10 +61,11 @@ class DomU
 	{
 		switch ($name)
 		{
+			case 'dom0':
+			case 'name':
+				return $this->$name;
 			case 'state':
 				return $this->dom0->rpc_query('VM.get_power_state',$this->id);
-			case 'dom0':
-				return $this->$name;
 		}
 		if (isset ($this->$name))
 		{
@@ -153,5 +153,7 @@ class DomU
 	 * @param Dom0
 	 */
 	private $dom0;
+
+	private $name;
 }
 
