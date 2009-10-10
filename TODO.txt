@@ -16,7 +16,7 @@ Model::delete_users()
 Model::create_users()
 Model::get_user()
 Model::get_users()
-Provides a "$force_refresh" parameter.
+Provides a "$ignore_cache" parameter.
 
 Handles the "recovery" user (almighty).
 

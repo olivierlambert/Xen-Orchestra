@@ -11,7 +11,7 @@ class User
 		$this->permission = $permission;
 	}
 
-	public function __get ($name)
+	public function __get($name)
 	{
 		switch ($name)
 		{
@@ -38,7 +38,7 @@ class User
 		}
 	}
 
-	public function __set ($name, $value)
+	public function __set($name, $value)
 	{
 		switch ($name)
 		{

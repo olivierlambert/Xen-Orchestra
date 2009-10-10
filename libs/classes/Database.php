@@ -2,10 +2,6 @@
 
 final class Database extends PDO
 {
-	const ID = 0;
-
-	const NAME = 1;
-
 	public static function get_instance()
 	{
 		if (self::$instance === null)
@@ -60,12 +56,9 @@ final class Database extends PDO
 	 */
 	public function delete_user($name)
 	{
-		$stmt = $this->prepare('DELETE FROM "users" WHERE "name" = :name');
+		$stmt = $this->prepare('DELETE FROM "users" WHERE "name" = ?');
 
-		$r = $stmt->execute(array(
-			':name' => $name
-		));
-		return ($r && ($stmt->rowCount() === 1));
+		return ($stmt->execute(array($name)) && ($stmt->rowCount() === 1));
 	}
 
 	/**
@@ -84,14 +77,36 @@ final class Database extends PDO
 		}
 
 		$stmt = $this->prepare('SELECT "id", "name", "password", "email", '
-			. '"permission" FROM "users" WHERE "' . $by . '" = :value');
+			. '"permission" FROM "users" WHERE "' . $by . '" = ?');
 
-		if (!$stmt->execute(array(':value' => $value))
-			|| (($r = $stmt->fetch(PDO::FETCH_ASSOC)) === false))
+		if (!$stmt->execute(array($value))
+			|| (($r = $stmt->fetch(PDO::FETCH_NUM)) === false))
 		{
 			return false;
 		}
-		return array_map('rtrim', $r);
+		return new User($r[0], rtrim($r[1]), $r[2], rtrim($r[3]),
+			ACL::from_string($r[4]));
+	}
+
+	public function get_users()
+	{
+		$stmt = $this->query('SELECT "id", "name", '
+			. '"password", "email", "permission" FROM "users"');
+
+		if ($stmt === false)
+		{
+			return false;
+		}
+
+		$users = array();
+		while (($r = $stmt->fetch(PDO::FETCH_NUM)) !== false)
+		{
+			$r[1] = rtrim($r[1]);
+			$users[$r[1]] = new User($r[0], $r[1], $r[2], rtrim($r[3]),
+				ACL::from_string($r[4]));
+		}
+
+		return $users;
 	}
 
 	/**
@@ -109,14 +124,9 @@ final class Database extends PDO
 	{
 		$stmt = $this->prepare('INSERT INTO "users" '
 			. '("name", "password", "email", "permission") VALUES '
-			. '(:name, :password, :email, :permission)');
+			. '(?, ?, ?, ?)');
 
-		$r = $stmt->execute(array(
-			':name' => $name,
-			':password' => $password,
-			':email' => $email,
-			':permission' => $permission,
-		));
+		$r = $stmt->execute(array($name, $password, $email, $permission));
 
 		if (!$r || ($stmt->rowCount() == 0)) // The query failed.
 		{
@@ -124,6 +134,17 @@ final class Database extends PDO
 		}
 
 		return $this->lastInsertId('users_id_seq'); // Will only work with PostgreSQL.
+	}
+
+	public function update_user(User $u)
+	{
+		$stmt = $this->prepare('UPDATE "users" SET "name" = ?, "password" = ?, '
+			.'"email" = ?, "permission" = ? WHERE "id" = ?');
+
+		$r = $stmt->execute(array($u->name, $u->password, $u->email,
+			ACL::to_string($u->permission), $u->id));
+
+		return ($r && ($stmt->rowCount() === 1));
 	}
 
 	private static $enabled = null;

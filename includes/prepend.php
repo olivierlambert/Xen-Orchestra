@@ -1,5 +1,7 @@
 <?php
-session_start(); // Used by users management.
+// The session is used for users management.
+session_name('XenOrchestra');
+session_start();
 
 define ('ROOT_DIR', dirname (dirname (__FILE__)));
 

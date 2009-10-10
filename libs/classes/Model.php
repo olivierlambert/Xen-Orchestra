@@ -37,6 +37,7 @@ final class Model
 
 	/**
 	 * Returns the current user.
+	 *
 	 * If the user is not registered or if the database is disabled, the
 	 * returned user is "guest".
 	 *
@@ -68,15 +69,15 @@ final class Model
 	/**
 	 * Returns the dom0 which has the id $id in the database or null.
 	 *
-	 * @param string $id             The identifier of the dom0.
-	 * @param boolean $force_refresh The results are cached, pass true to ignore
-	 *                               it.
+	 * @param string  $id           The identifier of the dom0.
+	 * @param boolean $ignore_cache The results are cached, pass true to ignore
+	 *                              it.
 	 *
 	 * @return The dom0 if present, otherwise false.
 	 */
-	public static function get_dom0($id, $force_refresh = false)
+	public static function get_dom0($id, $ignore_cache = false)
 	{
-		if ($force_refresh)
+		if ($ignore_cache)
 		{
 			$config = Config::get_instance();
 			if (isset($config->$id))
@@ -104,7 +105,7 @@ final class Model
 			return false;
 		}
 
-		// Not found but may exist, recall this method with $force_refresh set
+		// Not found but may exist, recall this method with $ignore_cache set
 		// to true.
 		return self::get_dom0($id, true);
 	}
@@ -112,14 +113,14 @@ final class Model
 	/**
 	 * Returns all the dom0s present in the database.
 	 *
-	 * @param boolean $force_refresh The results are cached, pass true to ignore
-	 *                               it.
+	 * @param boolean $ignore_cache The results are cached, pass true to ignore
+	 *                              it.
 	 *
 	 * @return An array containing all the dom0 (can be empty).
 	 */
-	public static function get_dom0s($force_refresh = false)
+	public static function get_dom0s($ignore_cache = false)
 	{
-		if ($force_refresh || !self::$all_dom0s_retrieved)
+		if ($ignore_cache || !self::$all_dom0s_retrieved)
 		{
 			$config = Config::get_instance();
 			$dom0s = array(); // Necessary for the force refresh.
@@ -202,7 +203,7 @@ final class Model
 	 * If $password is not null, the user's password will also be checked, if
 	 * not correct, the function will return false.
 	 *
-	 * @param string $name          The user's name.
+	 * @param string      $name     The user's name.
 	 * @param string|null $password The user's password.
 	 *
 	 * @return The user or false.
@@ -219,23 +220,17 @@ final class Model
 			}
 			if (Database::is_enabled())
 			{
-				$user = Database::get_instance()->get_user('name', $name);
+				self::$users[$name] = Database::get_instance()->get_user('name',
+					$name);
 
-				if ($user === false)
+				if (self::$users[$name] === false)
 				{
 					if ($name !== 'guest')
 					{
-						return self::$users[$name] = false;
+						return false;
 					}
-
 					// There must be a "guest" user in the database.
 					self::create_user('guest', '', '', ACL::NONE);
-				}
-				else
-				{
-					self::$users[$name] = new User($user['id'], $user['name'],
-						$user['password'], $user['email'],
-						ACL::from_string($user['permission']));
 				}
 			}
 			else
@@ -266,43 +261,28 @@ final class Model
 		return self::$users[$name];
 	}
 
-	public static function get_users()
+	public static function get_users($ignore_cache = false)
 	{
-		if (self::$all_users_retrieved)
+		if (self::$all_users_retrieved && !$ignore_cache)
 		{
 			return self::$users;
 		}
 
+		self::$all_users_retrieved = true;
+
 		if (!Database::is_enabled())
 		{
-			self::$all_users_retrieved = true;
 			return self::$users = array(
 				'guest' => self::get_default_guest()
 			);
 		}
 
-		self::$users = array();
-		$stmt = Database::get_instance()->query('SELECT "id", "name", '
-			. '"password", "email", "permission" FROM "users"');
-
-		// What should we do if $stmt equals false?
-
-
-		while (($r = $stmt->fetch(PDO::FETCH_NUM)) !== false)
-		{
-			$r = array_map('rtrim', $r);
-			self::$users[$r[1]] = new User($r[0], $r[1], $r[2], $r[3],
-				ACL::from_string($r[4]));
-		}
-
+		self::$users = Database::get_instance()->get_users();
 		if (!isset(self::$users['guest'])) // "guest" must always exist.
 		{
-			self::$all_users_retrieved = false;
-			self::get_user('guest'); // Ensures "guest" exi
+			// There must be a "guest" user in the database.
+			self::create_user('guest', '', '', ACL::NONE);
 		}
-
-		self::$all_users_retrieved = true;
-
 		return self::$users;
 	}
 
@@ -385,9 +365,7 @@ final class Model
 	 */
 	public static function update_user(User $u)
 	{
-		return (Database::is_enabled()
-			&& Database::get_instance()->update_user($u->id, $u->name,
-				$u->password, $u->email, ACL::to_string($u->permission)));
+		return (Database::is_enabled() && Database::get_instance()->update_user($u));
 	}
 
 	/**
