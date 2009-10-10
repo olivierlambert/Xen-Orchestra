@@ -18,7 +18,6 @@ if ($dom0 === false)
 {
 	error('No such dom0.');
 }
-
 $domU = $dom0->getDomU($name);
 if ($domU === false)
 {

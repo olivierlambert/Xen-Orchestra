@@ -95,7 +95,7 @@ final class Model
 			return self::$dom0s[$id] = false; // It may have existed.
 		}
 
-		if (isset(self::$dom0s, $id))
+		if (isset(self::$dom0s[$id]))
 		{
 			return (self::$dom0s[$id]);
 		}
