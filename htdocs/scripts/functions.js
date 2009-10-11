@@ -1,76 +1,43 @@
+var data;
+var refresh_time;
+var portal;
+var windows = [];
 var win = null;
 
-function disp_vm(id,domN,vm) {
-	var url1 = 'vm.php?vm=';
-	var url2 = '&dom0=';
-	var urlfinal = url1+id+url2+domN;
-	win = new Window({
-		title : vm,
-		url : urlfinal,
-		className:"alphacube",
-		width : 450,
-		height : 450
-	});
-	win.show();
-}
-
-function disp_migrate(id,domN) {
-	var url1 = 'migrate.php?vm=';
-	var url2 = '&dom0=';
-	var urlfinal = url1+id+url2+domN;
-	win = new Window(
-	{
-		title : "Live Migration",
-		url : urlfinal,
-		className:"alphacube",
-		showProgress: true,
-		width : 400,
-		//height : 100
-	}
-	);
-win.show();
-
-}
-
-function close_simple() {
-	top.win.close(true);
-}
-
-function close_reload() {
-	top.win.close(true);
-	setTimeout(function() {top.location.reload(true);},100);
-}
-
-function call_cpu_buttons(cpus)
+function html_cpu_meters(cpus)
 {
 	var n = cpus.length;
-	if (n == 0)
+	if (n === 0)
 	{
-		return '';
+		return '&nbsp;';
 	}
-	else
+	
+	var result = '';
+	for (var i = 0; i < n; i++)
 	{
-		var result = '';
-		for (var i=0;i<n;i++) {
-			if (cpus[i]<25) {
-				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cgreen.png">';
-			}
-			else if (cpus[i]<50) {
-				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cyellow.png">';
-			}
-			else if (cpus[i]<75) {
-				result = result+'<img border=0 title="'+cpus[i]+'" src="img/corange.png">';
-			}
-			else {
-				result = result+'<img border=0 title="'+cpus[i]+'" src="img/cred.png">';
-			}
+		if (cpus[i] < 25)
+		{
+			result += '<img border=0 title="'+cpus[i]+'" src="img/cgreen.png">';
 		}
-		return result;
+		else if (cpus[i] < 50)
+		{
+			result += '<img border=0 title="'+cpus[i]+'" src="img/cyellow.png">';
+		}
+		else if (cpus[i] < 75)
+		{
+			result += '<img border=0 title="'+cpus[i]+'" src="img/corange.png">';
+		}
+		else
+		{
+			result += '<img border=0 title="'+cpus[i]+'" src="img/cred.png">';
+		}
 	}
+	return result;
 }
-function display_vm(name,state,id,n)
+
+function display_vm(name, id, n)
 {
-	var url = 'display_domU.php?name='+name+'&state='+state+'&id='+id+'';
+	var url = 'display_domU.php?name='+name+'&id='+id+'';
 	var req = new Ajax.Request(url,
 	{
 		method:'get',
@@ -104,149 +71,78 @@ function display_vm(name,state,id,n)
 	}
 	);
 }
-function content_dom0(domUs,number,id)
-{
-	var result = '';
-	if (number<1)
-	{
-		return '<p>No DomU detected</p>';
-	}
-	else
-	{
-		var table_templ =
-		{
-			tabletop : '<table><th>Name</th><th>State</th><th>Load</th>',
-			tablebottom : '</table>'
-		};
-		domUs.each(function (domU)
-		{
-			result+='<tr id="'+domU.name+'" onclick="display_vm(\''+domU.name+'\',\''+domU.state+'\',\''+id+'\')">';
-			result+='<td>'+domU.name+'</td>';
-			result+='<td>'+domU.state+'</td>';
-			result+='<td>'+call_cpu_buttons(domU.cpu_use)+'</td>';
-			result+='</tr>';
-		});
-		var templ = new Template('#{tabletop}'+result+'#{tablebottom}');
-		return templ.evaluate(table_templ);
-	}
-}
 
-function set_effects(previousdomUs,domUs)
-{
-	if (previousdomUs != null)
-	{
-		var n_prev_domUs = previousdomUs.size();
-		var n_domUs = domUs.size();
-		
+// New functions
 
-		if (n_domUs > 0)
-		{
-			domUs.each(function (domU)
-			{
-				var not_finded = true;
-				previousdomUs.each(function (previousdomU)
-				{
-					if (previousdomU.name === domU.name)
-					{
-						not_finded = false;
-						if (previousdomU.state != domU.state)
-						{
-							Effect.Pulsate(domU.name, { pulses: 4, duration: 4 });
-						}
-					}
-				});
-				if (not_finded)
-				{
-					Effect.Pulsate(domU.name, { pulses: 4, duration: 4 });
-				}
-			});
-		}
-	}
-}
-
-function refresh_windows(windows,response,previousjson)
+function refresh()
 {
-	var url = 'display_dom0.php';
-	var req = new Ajax.PeriodicalUpdater('page',url,
-	{
-		method:'get',
-		frequency: response,
-		decay: 1.2,
-		onSuccess: function(transport)
+	new Ajax.Request('display_dom0.php', {
+		method: 'get',
+		onComplete: function(transport)
 		{
-			var result = transport.responseText;
-			var json = result.evalJSON();
-			var n = json.size();
-			for (var i=0;i<n;i++)
-			{
-				var content = content_dom0(json[i].domUs,json[i].vm_number,json[i].id);
-				windows[i].setContent(content);
-				windows[i].updateHeight();
-				if (previousjson != null)
-				{
-				set_effects(previousjson[i].domUs,json[i].domUs);
-				}
-			}
-			previousjson = json;
+			update_portal(transport.responseText.evalJSON());
+			
+			setTimeout(refresh, refresh_time);
+		},
+		onFailure: function()
+		{
+			alert('Something went wrong...');
 		}
 	});
 }
 
-document.observe('dom:loaded',function(e)
+function update_portal()
 {
-	var portal = new Xilinus.Portal("#main div");
-	var url = 'refresh_time.php';
-	var req = new Ajax.Request(url,
+	while (w = windows.pop())
 	{
-		method:'get',
-		onComplete: function(transport)
-		{
-			response = transport.responseText || "20";
-		},
-		onFailure: function()
-		{
-			alert('Something went wrong...');
-		}
+		portal.remove(w);
 	}
-	);
-	var url = 'display_dom0.php';
-	var req = new Ajax.Request(url,
+	
+	var weightleft = 0;
+	var weightright = 0;
+	data.each(function (dom0)
 	{
-		method:'get',
-		onComplete: function(transport)
+		var w = new Xilinus.Widget()
+			.setTitle(dom0.name)
+			.setContent(content_dom0(dom0));
+		if (weightleft <= weightright)
 		{
-			var result = transport.responseText;
-			var json = result.evalJSON();
-			var weightleft = 0;
-			var weightright = 0;
-			var windows = new Array();
-			json.each(function(item)
-			{
-				var content = content_dom0(item.domUs,item.vm_number,item.id);
-				var window = new Xilinus.Widget().setTitle(item.name).setContent(content);
-				if (weightleft <= weightright)
-				{
-					weightleft = weightleft+item.vm_number+1;
-					portal.add(window, 0);
-				}
-				else
-				{
-					weighright = weightright+item.vm_number+1;
-					portal.add(window,1);
-				}
-				windows.push(window);
-			});
-			setTimeout(function()
-			{
-				refresh_windows(windows,response,json);
-			},response*1000);
-
-		},
-		onFailure: function()
-		{
-			alert('Something went wrong...');
+			weightleft += dom0.vm_number + 1;
+			portal.add(w, 0);
 		}
-	}
-	);
+		else
+		{
+			weighright += dom0.vm_number + 1;
+			portal.add(w, 1);
+		}
+		windows.push(w);
+	});
 }
-);
+
+function content_dom0(dom0)
+{
+	if (dom0.vm_number === 0)
+	{
+		return '<p>No DomU detected</p>';
+	}
+	
+	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
+	dom0.domUs.each(function (domU)
+	{
+		result += '<tr id="' + domU.name
+			+ '" onclick="display_vm(\'' + domU.name + '\',\'' + dom0.id
+			+ '\')"><td>' + domU.name + '</td><td>' + domU.state
+			+ '</td><td>' + html_cpu_meters(domU.cpu_use)
+			+ '</td></tr>';
+	});
+	return result + '</table>';
+}
+
+document.observe('dom:loaded', function ()
+{
+	portal = new Xilinus.Portal("#main div");
+	
+	update_portal();
+			
+	setTimeout(refresh, refresh_time);
+});

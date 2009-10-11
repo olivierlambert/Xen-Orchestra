@@ -181,6 +181,7 @@ caption {
 
 #main td {
 	/*margin : 5 5 5 5 px;*/
+	cursor:  pointer;
 	padding : 5px 5px;
 	text-align : center;
 	color: #eee;
@@ -196,7 +197,6 @@ caption {
 
 #main tr:hover {
 	background-color: #111;
-	cursor:  pointer;
 }
 
 #main img
