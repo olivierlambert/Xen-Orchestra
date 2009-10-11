@@ -133,7 +133,7 @@ final class Database extends PDO
 			return false;
 		}
 
-		return $this->lastInsertId('users_id_seq'); // Will only work with PostgreSQL.
+		return $this->lastInsertId();
 	}
 
 	public function update_user(User $u)

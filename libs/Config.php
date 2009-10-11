@@ -60,7 +60,7 @@ abstract class Config implements IteratorAggregate
 		if (isset($this->entries[$name]))
 		{
 			$this->entries[$name] = $value;
-			$changed = true;
+			$this->changed = true;
 		}
 	}
 
