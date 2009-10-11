@@ -434,6 +434,7 @@ final class Model
 	{
 		if ($permission === null)
 		{
+			$cfg = Config::get_instance();
 			if (isset($cfg->global['default_guest_permission']))
 			{
 				$permission = ACL::from_string($cfg->global['default_guest_permission']);

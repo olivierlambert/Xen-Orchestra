@@ -84,9 +84,11 @@ function display_vm(name,state,id,n)
 				showProgress: true,
 			});
 			var date = new Date(json.date*1000);
+			var date2 = new Date(json.lastupdate*1000);
 			var html = '<div id="vm"><h3>Overview</h3></div>';
 			html+='<p>State : '+json.state+'</p>';
 			html+='<p>Date of creation : '+date+'</p>';
+			html+='<p>Date of creation : '+date2+'</p>';
 			html+='<p>VCPU number : '+json.vcpu_number+'</p>';
 
 			win.setTitle(name);
@@ -135,13 +137,14 @@ function set_effects(previousdomUs,domUs)
 	{
 		var n_prev_domUs = previousdomUs.size();
 		var n_domUs = domUs.size();
-		var not_finded = true;
+		
 
 		if (n_domUs > 0)
 		{
-			previousdomUs.each(function (previousdomU)
+			domUs.each(function (domU)
 			{
-				domUs.each(function (domU)
+				var not_finded = true;
+				previousdomUs.each(function (previousdomU)
 				{
 					if (previousdomU.name === domU.name)
 					{

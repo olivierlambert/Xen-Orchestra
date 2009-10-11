@@ -25,3 +25,9 @@ if ($domU === false)
 }
 
 echo json_encode($domU->get_all_infos());
+/*
+$u = Model::get_current_user();
+$u = Model::get_user('julien', 'toto');
+
+$u->can(ACL::READ, 'dls.gomfogmfd', 'test');
+*/
