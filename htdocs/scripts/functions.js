@@ -112,7 +112,7 @@ function update_portal()
 		}
 		else
 		{
-			weighright += dom0.vm_number + 1;
+			weightright += dom0.vm_number + 1;
 			portal.add(w, 1);
 		}
 		windows.push(w);
