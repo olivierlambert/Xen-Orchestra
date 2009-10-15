@@ -258,9 +258,52 @@ width: 50%;
 float:left;
 }
 
+/* TABS IN VM WINDOW */
+#vm ul.subsection_tabs {
+text-decoration:none;
+text-align : center;
+list-style:none;
+margin:0 0 0 0;
+padding:0px;
+clear:both;
+border-bottom:1px solid #ccc;
+height:26px;
+clear:both
+}
+
+#vm ul.subsection_tabs li.tab {
+float:left;
+margin-right:9px;
+text-align:center
+}
+
+#vm ul.subsection_tabs li.tab a {
+display:block;
+height:20px;
+padding:6px 6px 0 6px;
+background-color:#fff;
+color:#666;
+width:60px
+}
+
+#vm ul.subsection_tabs li.tab a:hover {
+color:#666
+}
+
+#vm ul.subsection_tabs li.tab a.active {
+background-color:#ddd
+}
+
+#vm ul.subsection_tabs li.source_code {
+float:right
+}
+
+
 .center {
 	text-align : center;
 }
+
+
 /* Sliding doors technique */
 .widget_nw {
 	background:transparent url(alphacube/white/top_left.gif) no-repeat;
@@ -404,7 +447,7 @@ button.positive, .buttons a.positive{
 	border-bottom:1px solid #444;
 }
 .menu1 li {
-	/*float:right;*/
+	float:left;
 	margin: auto;
 	text-align: center;
 }

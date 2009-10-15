@@ -37,6 +37,7 @@ function html_cpu_meters(cpus)
 
 function display_vm(name, id, n)
 {
+
 	var url = 'display_domU.php?name='+name+'&id='+id+'';
 	var req = new Ajax.Request(url,
 	{
@@ -52,17 +53,39 @@ function display_vm(name, id, n)
 			});
 			var date = new Date(json.date*1000);
 			var date2 = new Date(json.lastupdate*1000);
-			var html = '<div id="vm"><h3>Overview</h3></div>';
+			var html = '<div id="vm">';
+			html+='<ul id="tabs_example_one" class="menu1" >';
+			html+='<li><a href="#overview"><b><img src="img/information.png" alt=""/>Overview</b></a></li>';
+			html+='<li><a href="#cpu"><b><img src="img/cpu.png" alt=""/>CPU</a></b></li>';
+			html+='<li><a href="#ram"><b><img src="img/ram.png" alt=""/>RAM</a></b></li>';
+			html+='<li><a href="#network"><b><img src="img/world.png" alt=""/>Network</a></b></li>';
+			html+='<li><a href="#storage"><b><img src="img/database_gear.png" alt=""/>Storage</a></b></li>';
+			html+='<li><a href="#misc"><b><img src="img/wrench.png" alt=""/>Misc</a></b></li>';
+			html+= '</ul><div id="overview">';
 			html+='<p>State : '+json.state+'</p>';
 			html+='<p>Date of creation : '+date+'</p>';
-			html+='<p>Date of creation : '+date2+'</p>';
-			html+='<p>VCPU number : '+json.vcpu_number+'</p>';
-
+			html+='<p>Cap: '+json.cap+'</p>';
+			html+='<p>Weight: '+json.weight+'</p></div>';
+			html+='<div id="cpu">';
+			html+='<p>VCPU use : '+json.vcpu_use+'</p>';
+			html+='<p>VCPU at startup : '+json.vcpus_at_startup+'</p>';
+			html+='<p>VCPU number : '+json.vcpu_number+'</p></div>';
+			html+='<div id="ram">';
+			html+='<p>RAM : '+json.d_min_ram/(1024*1024)+' MB</p></div>';
+			html+='<div id="network"></div>';
+			html+='<div id="storage"></div>';
+			html+='<div id="misc">';
+			html+='<p>On shutdown : '+json.actions_after_shutdown+'</p>';
+			html+='<p>On reboot : '+json.actions_after_reboot+'</p>';
+			html+='<p>On crash : '+json.actions_after_crash+'</p></div>';
+			html+='</div>';
 			win.setTitle(name);
 			win.setHTMLContent(html);
+			new Control.Tabs('tabs_example_one');
 			win.show();
-			win.updateWidth();
-			win.updateHeight();
+			//win.updateWidth();
+			win.setSize(500,200);
+			//win.updateHeight();
 		},
 		onFailure: function()
 		{
@@ -129,6 +152,7 @@ function content_dom0(dom0)
 	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
 	dom0.domUs.each(function (domU)
 	{
+		  
 		result += '<tr id="' + domU.name
 			+ '" onclick="display_vm(\'' + domU.name + '\',\'' + dom0.id
 			+ '\')"><td>' + domU.name + '</td><td>' + domU.state
@@ -140,9 +164,11 @@ function content_dom0(dom0)
 
 document.observe('dom:loaded', function ()
 {
+
+
 	portal = new Xilinus.Portal("#main div");
-	
 	update_portal();
-			
+
 	setTimeout(refresh, refresh_time);
+
 });
