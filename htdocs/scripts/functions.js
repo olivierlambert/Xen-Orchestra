@@ -5,17 +5,18 @@
 var dom0s = {};
 
 /**
- * TODO: write doc.
+ * Time between each refresh (in seconds)
  */
 var refresh_time;
 
 /**
- * TODO: write doc.
+ * The portal object : refer to class portal, which displays dom0s in
+ * panels, which can be moved.
  */
 var portal;
 
 /**
- * TODO: write doc.
+ * Table which contains all dom0s panels
  */
 var dom0s_panels = [];
 
@@ -42,7 +43,10 @@ Object.extendRecursively = function (destination, source)
 };
 
 /**
- * TODO: write doc.
+ * Display CPU meters in function of their load 
+ * (green/yellow/orange/red)
+ * 
+ * @param cpus Table of cpus with their respective load
  */
 function html_cpu_meters(cpus)
 {
@@ -76,7 +80,10 @@ function html_cpu_meters(cpus)
 }
 
 /**
- * TODO: write doc.
+ * Display a window with all informations about a selectionned domU
+ * 
+ * @param dom0_id The identifier of the dom0 the domU belongs to.
+ * @param domU_id The domU's identifier. 
  */
 function domU_window(dom0_id, domU_id)
 {
@@ -215,7 +222,8 @@ function display_vm(dom0_id, domU_id)
 // New functions
 
 /**
- * TODO: write doc.
+ * Refresh the page every "refresh_time" seconds
+ * 
  */
 function refresh()
 {
@@ -234,7 +242,9 @@ function refresh()
 }
 
 /**
- * TODO: write doc.
+ * Draw and display dom0s panels. Place them in order to optimize
+ * space on the screen.
+ * 
  */
 function update_portal()
 {
@@ -266,7 +276,9 @@ function update_portal()
 }
 
 /**
- * TODO: write doc.
+ * Fill a Dom0 panel with its information : each row contain a domU.
+ * 
+ * @param dom0_id The identifier of the dom0.
  */
 function content_dom0(dom0_id)
 {
@@ -310,7 +322,9 @@ function register_info(info)
 }
 
 /**
- * TODO: write doc.
+ * The main observer : when the dom is loaded, create new portal object
+ * and call update portal. Refresh is called after "refresh_time" secs.
+ *
  */
 document.observe('dom:loaded', function () {
 	portal = new Xilinus.Portal("#main div");
