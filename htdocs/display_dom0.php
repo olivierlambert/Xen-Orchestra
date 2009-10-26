@@ -1,7 +1,13 @@
 <?php
 require_once dirname (__FILE__) . '/../includes/prepend.php';
 
-$result = array();
+$data = array(
+	'dom0s' => array(), // Contains all the dom0s.
+	
+	// Tells JavaScript that this list is exhaustive and it has to
+	// remove all dom0s/domUs not listed.
+	'exhaustive' => true
+);
 
 $u = Model::get_current_user();
 
@@ -9,7 +15,6 @@ foreach (Model::get_dom0s() as $dom0)
 {
 	// The array for this dom0.
 	$tmp = array(
-		'id' => $dom0->id,
 		'name' => $dom0->address
 	);
 
@@ -27,19 +32,19 @@ foreach (Model::get_dom0s() as $dom0)
 		{
 			if ($u->can(ACL::READ, $dom0->id, $domU->name))
 			{
-				$tmp['domUs'][] = array(
+				$tmp['domUs'][$domU->id] = array(
 					'name' => $domU->name,
 					'state' => $domU->state,
-					'cpu_number' => $domU->vcpu_number,
-					'cpu_use' => $domU->vcpu_use
+					'vcpu_number' => $domU->vcpu_number,
+					'vcpu_use' => $domU->vcpu_use
 				);
 			}
 		}
 	}
 	if (!empty($tmp['domUs']) || $u->can(ACL::READ, $dom0->id))
 	{
-		$result[] = $tmp;
+		$data['dom0s'][$dom0->id] = $tmp;
 	}
 }
 
-echo json_encode($result);
+echo json_encode($data);

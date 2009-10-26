@@ -3,19 +3,19 @@
 class DomU
 {
 	public $vcpu_number, $vcpu_use;
-	private $id, $xid, $state, $record, $sid, $metrics, $date;
+	private $xid, $state, $record, $sid, $metrics, $date, $domid;
 	private $lastupdate;
 
-	public function __construct($id, Dom0 $dom0)
+	public function __construct($xid, Dom0 $dom0)
 	{
-		$this->id = $id;
+		$this->xid = $xid;
 		$this->dom0 = $dom0;
-		$this->record = $this->dom0->rpc_query('VM.get_record',$this->id);
-
+		
 		// get needed variables
+		$this->record = $this->dom0->rpc_query('VM.get_record', $this->xid);
 		$this->sid 			= $this->record['uuid'];
 		$this->name 		= $this->record['name_description'];
-		$this->xid 			= $this->record['domid'];
+		$this->domid		= $this->record['domid'];
 		$this->state 		= $this->record['power_state'];
 
 		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->record['metrics']);
@@ -40,14 +40,14 @@ class DomU
 			case 'resume':
 			case 'suspend':
 			case 'unpause':
-				$this->dom0->rpc_query ('VM.' . $name, $this->id);
+				$this->dom0->rpc_query ('VM.' . $name, $this->xid);
 				break;
 			case 'reboot':
-				$this->dom0->rpc_query('VM.hard_reboot', $this->id);
+				$this->dom0->rpc_query('VM.hard_reboot', $this->xid);
 				break;
 			case 'shutdown':
 				//* TODO: decide wether we use hard or clean shutdown.
-				$this->dom0->rpc_query('VM.hard_shutdown', $this->id);
+				$this->dom0->rpc_query('VM.hard_shutdown', $this->xid);
 				/*/
 				$this->dom0->rpc_query('VM.clean_shutdown',$this->id);
 				//*/
@@ -62,10 +62,12 @@ class DomU
 		switch ($name)
 		{
 			case 'dom0':
+				return $this->dom0;
+			case 'id':
 			case 'name':
-				return $this->$name;
+				return $this->name;
 			case 'state':
-				return $this->dom0->rpc_query('VM.get_power_state',$this->id);
+				return $this->dom0->rpc_query('VM.get_power_state',$this->xid);
 		}
 		if (isset ($this->$name))
 		{
@@ -99,7 +101,6 @@ class DomU
 			'state' => $this->state
 		);
 	}
-
 
 	public function get_all_infos()
 	{
@@ -137,13 +138,13 @@ class DomU
 	public function migrate($dest,$live)
 	{
 		$port = array('port' => 8002);
-		$params = array($this->id, $dest, true, $port);
+		$params = array($this->xid, $dest, true, $port);
 		$this->dom0->rpc_query('VM.migrate', $params);
 	}
 
 	public function start($is_paused)
 	{
-		$params = array($this->id, $is_paused);
+		$params = array($this->xid, $is_paused);
 		$this->dom0->rpc_query('VM.start', $params);
 	}
 
@@ -156,4 +157,3 @@ class DomU
 
 	private $name;
 }
-
