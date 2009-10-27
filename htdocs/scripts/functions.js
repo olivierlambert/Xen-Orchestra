@@ -25,6 +25,9 @@ var dom0s_panels = [];
  */
 var domUs_windows = {};
 
+/**
+ * TODO: write doc.
+ */
 Object.extendRecursively = function (destination, source)
 {
 	for (var property in source)
@@ -43,6 +46,33 @@ Object.extendRecursively = function (destination, source)
 };
 
 /**
+ * Number of running asynchronous tasks.
+ */
+tasks = 0;
+
+/**
+ * TODO: write doc.
+ */
+function task_start()
+{
+	if (tasks++ === 0)
+	{
+		$(document.documentElement).setStyle ({'cursor': 'progress'});
+	}
+}
+
+/**
+ * TODO: write doc.
+ */
+function task_stop()
+{
+	if (--tasks === 0)
+	{
+		$(document.documentElement).setStyle ({'cursor': 'auto'});
+	}
+}
+
+/**
  * Display CPU meters in function of their load 
  * (green/yellow/orange/red)
  * 
@@ -59,22 +89,24 @@ function html_cpu_meters(cpus)
 	var result = '';
 	for (var i = 0; i < n; i++)
 	{
+		result += '<img title="'+cpus[i]+'" src="img/c';
 		if (cpus[i] < 25)
 		{
-			result += '<img border=0 title="'+cpus[i]+'" src="img/cgreen.png">';
+			result += 'green';
 		}
 		else if (cpus[i] < 50)
 		{
-			result += '<img border=0 title="'+cpus[i]+'" src="img/cyellow.png">';
+			result += 'yellow';
 		}
 		else if (cpus[i] < 75)
 		{
-			result += '<img border=0 title="'+cpus[i]+'" src="img/corange.png">';
+			result += 'orange';
 		}
 		else
 		{
-			result += '<img border=0 title="'+cpus[i]+'" src="img/cred.png">';
+			result += 'red';
 		}
+		result += '.png">';
 	}
 	return result;
 }
@@ -186,15 +218,18 @@ function action_vm(dom0_id, domU_id, action)
 	var url = 'display_domU.php?dom0=' + dom0_id + '&domU=' + domU_id
 		+ '&action=' + action;
 	
+	task_start();
 	new Ajax.Request(url, {
 		method: 'get',
 		onComplete: function (transport)
 		{
 			register_info(transport.responseText.evalJSON());
 			domU_window (dom0_id, domU_id);
+			task_stop();
 		},
 		onFailure: function ()
 		{
+			task_stop();
 			alert('Something went wrong...');
 		}
 	});
@@ -216,15 +251,18 @@ function display_vm(dom0_id, domU_id)
 		return;
 	}
 	
+	task_start();
 	new Ajax.Request('display_domU.php?domU='+domU_id+'&dom0='+dom0_id, {
 		method: 'get',
 		onComplete: function (transport)
 		{
 			register_info(transport.responseText.evalJSON());
 			domU_window (dom0_id, domU_id);
+			task_stop();
 		},
 		onFailure: function ()
 		{
+			task_stop();
 			alert('Something went wrong...');
 		}
 	});
@@ -233,20 +271,22 @@ function display_vm(dom0_id, domU_id)
 // New functions
 
 /**
- * Refresh the page every "refresh_time" seconds
- * 
+ * Every "refresh_time" seconds, gets fresher info and updates display.
  */
 function refresh()
 {
+	task_start();
 	new Ajax.Request('display_dom0.php', {
 		method: 'get',
 		onComplete: function(transport)
 		{
 			register_info(transport.responseText.evalJSON());
 			setTimeout(refresh, refresh_time);
+			task_stop();
 		},
 		onFailure: function()
 		{
+			task_stop();
 			alert('Something went wrong...');
 		}
 	});
@@ -336,7 +376,8 @@ function register_info(info)
  * and call update portal. Refresh is called after "refresh_time" secs.
  *
  */
-document.observe('dom:loaded', function () {
+document.observe('dom:loaded', function ()
+{
 	portal = new Xilinus.Portal("#main div");
 	update_portal();
 
