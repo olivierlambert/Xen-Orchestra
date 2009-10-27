@@ -11,41 +11,29 @@ class DomU
 		$this->xid = $xid;
 		$this->dom0 = $dom0;
 		
-		// get needed variables
-		$this->record = $this->dom0->rpc_query('VM.get_record', $this->xid);
-		$this->sid 			= $this->record['uuid'];
-		$this->name 		= $this->record['name_description'];
-		$this->domid		= $this->record['domid'];
-		$this->state 		= $this->record['power_state'];
-
-		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->record['metrics']);
-
-		$this->vcpu_number = $this->metrics['VCPUs_number'];
-		$this->date = $this->metrics['start_time'];
-		$this->lastupdate = $this->metrics['last_updated'];
-
-		$this->vcpu_use = array();
-		foreach($this->metrics['VCPUs_utilisation'] as $cpu)
-		{
-			$this->vcpu_use[] = round($cpu * 100, 2);
-		}
+		// Get info.
+		$this->refresh();
 	}
 
 	public function __call($name, $arguments)
 	{
 		switch ($name)
 		{
-			case 'destroy':
+			case 'delete':
 			case 'pause':
-			case 'resume':
-			case 'suspend':
-			case 'unpause':
 				$this->dom0->rpc_query ('VM.' . $name, $this->xid);
 				break;
-			case 'reboot':
-				$this->dom0->rpc_query('VM.hard_reboot', $this->xid);
+			case 'play':
+				if ($this->state === 'Paused')
+				{
+					$this->dom0->rpc_query ('VM.unpause', $this->xid);
+				}
+				else
+				{
+					$this->start();
+				}
 				break;
-			case 'shutdown':
+			case 'stop':
 				//* TODO: decide wether we use hard or clean shutdown.
 				$this->dom0->rpc_query('VM.hard_shutdown', $this->xid);
 				/*/
@@ -67,7 +55,7 @@ class DomU
 			case 'name':
 				return $this->name;
 			case 'state':
-				return $this->dom0->rpc_query('VM.get_power_state',$this->xid);
+				return $this->record['power_state'];
 		}
 		if (isset ($this->$name))
 		{
@@ -142,10 +130,31 @@ class DomU
 		$this->dom0->rpc_query('VM.migrate', $params);
 	}
 
-	public function start($is_paused)
+	public function start($is_paused = false)
 	{
 		$params = array($this->xid, $is_paused);
 		$this->dom0->rpc_query('VM.start', $params);
+	}
+
+	public function refresh()
+	{
+		$this->record = $this->dom0->rpc_query('VM.get_record', $this->xid);
+		$this->sid 			= $this->record['uuid'];
+		$this->name 		= $this->record['name_description'];
+		$this->domid		= $this->record['domid'];
+		$this->state 		= $this->record['power_state'];
+
+		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->record['metrics']);
+
+		$this->vcpu_number = $this->metrics['VCPUs_number'];
+		$this->date = $this->metrics['start_time'];
+		$this->lastupdate = $this->metrics['last_updated'];
+
+		$this->vcpu_use = array();
+		foreach($this->metrics['VCPUs_utilisation'] as $cpu)
+		{
+			$this->vcpu_use[] = round($cpu * 100, 2);
+		}
 	}
 
 	/**

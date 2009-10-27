@@ -7,6 +7,8 @@ function error($message)
 	exit;
 }
 
+$action = isset ($_GET['action']) ? $_GET['action'] : false;
+
 $dom0_id = isset ($_GET['dom0']) ? $_GET['dom0'] : false;
 $domU_id = isset ($_GET['domU']) ? $_GET['domU'] : false;
 
@@ -26,6 +28,24 @@ $domU = $dom0->getDomU($domU_id);
 if ($domU === false)
 {
 	error('No such domU.');
+}
+
+if ($action)
+{
+	if (!$u->can(ACL::WRITE, $dom0_id, $domU_id))
+	{
+		error('Access denied');
+	}
+	switch ($action)
+	{
+		case 'delete':
+		case 'pause':
+		case 'play':
+		case 'stop':
+			$domU->$action();
+	}
+	
+	$domU->refresh();
 }
 
 // In the future, the user may request info about more than one domU.

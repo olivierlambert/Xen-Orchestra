@@ -80,46 +80,33 @@ function html_cpu_meters(cpus)
 }
 
 /**
- * Display a window with all informations about a selectionned domU
+ * Display a new window with all informations about a selectionned domU
  * 
  * @param dom0_id The identifier of the dom0 the domU belongs to.
  * @param domU_id The domU's identifier. 
  */
 function domU_window(dom0_id, domU_id)
 {
-	if (domUs_windows[domU_id] !== undefined)
-	{
-		// The window already exists, maybe we should put it on the
-		// foreground.
-		return;
-	}
-
-	domUs_windows[domU_id] = new Window({
-		className: 'alphacube',
-		showProgress: true,
-		onClose: function ()
-		{
-			delete domUs_windows[domU_id];
-		}
-	});
 	var domU = dom0s[dom0_id].domUs[domU_id];
 	
-	var date = new Date(domU.date * 1000);
-	var html = '<div id="vm">';
-	html+='<ul id="tabs_example_one" class="menuvm" >';
-	html+='<li><a href="#overview"><b><img src="img/information.png" alt=""/>Overview</b></a></li>';
-	html+='<li><a href="#cpu"><b><img src="img/cpu.png" alt=""/>CPU</a></b></li>';
-	html+='<li><a href="#ram"><b><img src="img/ram.png" alt=""/>RAM</a></b></li>';
-	html+='<li><a href="#network"><b><img src="img/world.png" alt=""/>Network</a></b></li>';
-	html+='<li><a href="#storage"><b><img src="img/database_gear.png" alt=""/>Storage</a></b></li>';
-	html+='<li><a href="#misc"><b><img src="img/wrench.png" alt=""/>Misc</a></b></li>';
-	html+= '</ul><div id="overview" class="text">';
+	var html_id = escape(dom0_id + domU_id).replace(/\.|#|%/g, '_');
 	
-	html+='<br/><p><b>State: </b>'+domU.state+'</p>';
-	html+='<p><b>System: </b>'+domU.kernel+'</p>';
-	html+='<p><b>CPU installed: </b>'+domU.vcpu_number+'</p>';
-	html+='<p><b>RAM installed: </b>'+domU.d_min_ram/(1024*1024)+' MB</p>';
-	html+='<p><b>Date of creation: </b>' + date + '</p>';
+	var date = new Date(domU.date * 1000);
+	var html = '<div id="vm">'
+		+ '<ul id="tabs_' + html_id + '" class="menuvm">'
+		+ '<li><a href="#overview_' + html_id + '"><b><img src="img/information.png" alt=""/>Overview</b></a></li>'
+		+ '<li><a href="#cpu_' + html_id + '"><b><img src="img/cpu.png" alt=""/>CPU</a></b></li>'
+		+ '<li><a href="#ram_' + html_id + '"><b><img src="img/ram.png" alt=""/>RAM</a></b></li>'
+		+ '<li><a href="#network_' + html_id + '"><b><img src="img/world.png" alt=""/>Network</a></b></li>'
+		+ '<li><a href="#storage_' + html_id + '"><b><img src="img/database_gear.png" alt=""/>Storage</a></b></li>'
+		+ '<li><a href="#misc_' + html_id + '"><b><img src="img/wrench.png" alt=""/>Misc</a></b></li>'
+		+  '</ul><div id="overview_' + html_id + '" class="text">';
+	
+	html+='<br/><p><b>State: </b>'+domU.state+'</p>'
+		+ '<p><b>System: </b>'+domU.kernel+'</p>'
+		+ '<p><b>CPU installed: </b>'+domU.vcpu_number+'</p>'
+		+ '<p><b>RAM installed: </b>'+domU.d_min_ram/(1024*1024)+' MB</p>'
+		+ '<p><b>Date of creation: </b>' + date + '</p>';
 	
 	html += '<p><b>Actions: </b><br/>';
 	if (domU.state === 'Running')
@@ -137,41 +124,53 @@ function domU_window(dom0_id, domU_id)
 	actions.push('destroy');
 	for (var i = 0; i < actions.length; ++i)
 	{
-		html += '<img src="img/' + actions[i]
-			+ '.png" alt="" onclick="action_vm (\'' 
-			+ dom0_id + '\', \'', + domU.name + '\', '
-			+ '\'' + actions[i] + '\')" />';
+		html += ('<img src="img/' + actions[i]
+			+ '.png" alt="" onclick="action_vm (\'' + dom0_id
+			+ '\', \'' + domU.name + '\', \'' + actions[i] + '\')" />');
 	}
 	html+='</p>';
 	
 	html+='<p><b>Live migration to: </b>xenb1 &nbsp xena2</p></div>';
 
-	html+='<div id="cpu">';
-	html+='<br/><p><b>VCPU use:</b> '+domU.vcpu_use+'</p>';
-	html+='<p><b>VCPU at startup:</b> '+domU.vcpus_at_startup+'</p>';
-	html+='<p><b>VCPU number:</b> '+domU.vcpu_number+'</p>';
-	html+='<p><b>Cap:</b> '+domU.cap+'</p>';
-	html+='<p><b>Weight:</b> '+domU.weight+'</p></div>';
+	html+='<div id="cpu_' + html_id + '">'
+		+ '<br/><p><b>VCPU use:</b> '+domU.vcpu_use+'</p>'
+		+ '<p><b>VCPU at startup:</b> '+domU.vcpus_at_startup+'</p>'
+		+ '<p><b>VCPU number:</b> '+domU.vcpu_number+'</p>'
+		+ '<p><b>Cap:</b> '+domU.cap+'</p>'
+		+ '<p><b>Weight:</b> '+domU.weight+'</p></div>';
 
-	html+='<div id="ram">';
-	html+='<br/><b><p>RAM:</b> '+domU.d_min_ram/(1024*1024)+' MB</p></div>';
+	html+='<div id="ram_' + html_id + '">'
+		+ '<br/><b><p>RAM:</b> '+domU.d_min_ram/(1024*1024)+' MB</p></div>';
 	
-	html+='<div id="network"></div>';
+	html+='<div id="network_' + html_id + '"></div>';
 	
-	html+='<div id="storage"></div>';
+	html+='<div id="storage_' + html_id + '"></div>';
 	
-	html+='<div id="misc">';
-	html+='<br/><b><p>On shutdown:</b> '+domU.actions_after_shutdown+'</p>';
-	html+='<b><p>On reboot:</b> '+domU.actions_after_reboot+'</p>';
-	html+='<b><p>On crash:</b> '+domU.actions_after_crash+'</p></div>';
+	html+='<div id="misc_' + html_id + '">'
+		+ '<br/><b><p>On shutdown:</b> '+domU.actions_after_shutdown+'</p>'
+		+ '<b><p>On reboot:</b> '+domU.actions_after_reboot+'</p>'
+		+ '<b><p>On crash:</b> '+domU.actions_after_crash+'</p></div>';
 	
 	html+='</div>';
-	
-	domUs_windows[domU_id].setTitle('<b>'+domU.name+'</b> (' + dom0s[dom0_id].name + ')');
+
+	title = '<b>'+domU.name+'</b> (' + dom0s[dom0_id].name + ')';
+
+	if (domUs_windows[domU_id] === undefined)
+	{
+		domUs_windows[domU_id] = new Window({
+			className: 'alphacube',
+			showProgress: true,
+			onClose: function ()
+			{
+				delete domUs_windows[domU_id];
+			}
+		});
+		domUs_windows[domU_id].show();
+		domUs_windows[domU_id].setSize(500, 203);
+	}
+	domUs_windows[domU_id].setTitle(title);
 	domUs_windows[domU_id].setHTMLContent(html);
-	new Control.Tabs('tabs_example_one');
-	domUs_windows[domU_id].show();
-	domUs_windows[domU_id].setSize(500, 203);
+	new Control.Tabs('tabs_' + html_id);
 }
 
 /**
@@ -182,16 +181,24 @@ function domU_window(dom0_id, domU_id)
  * @param domU   The domU's identifier.
  * @param action The action to do among (destroy, halt, pause, start).
  */
-/*function action_vm(dom0_id, domU_id, action)
+function action_vm(dom0_id, domU_id, action)
 {
 	var url = 'display_domU.php?dom0=' + dom0_id + '&domU=' + domU_id
 		+ '&action=' + action;
+	
 	new Ajax.Request(url, {
 		method: 'get',
 		onComplete: function (transport)
 		{
-			var
-}*/
+			register_info(transport.responseText.evalJSON());
+			domU_window (dom0_id, domU_id);
+		},
+		onFailure: function ()
+		{
+			alert('Something went wrong...');
+		}
+	});
+}
 
 /**
  * Gets information about a domU and display (or refresh) the domU's
@@ -202,8 +209,13 @@ function domU_window(dom0_id, domU_id)
  */
 function display_vm(dom0_id, domU_id)
 {
-	// TO DO : prepare refresh if value or action is maded (give id of windows then refresh it)
-	// see idwindow for that
+	if (domUs_windows[domU_id] !== undefined)
+	{
+		// The window already exists, maybe we should put it on the
+		// foreground.
+		return;
+	}
+	
 	new Ajax.Request('display_domU.php?domU='+domU_id+'&dom0='+dom0_id, {
 		method: 'get',
 		onComplete: function (transport)
@@ -215,8 +227,7 @@ function display_vm(dom0_id, domU_id)
 		{
 			alert('Something went wrong...');
 		}
-	}
-	);
+	});
 }
 
 // New functions
@@ -244,7 +255,6 @@ function refresh()
 /**
  * Draw and display dom0s panels. Place them in order to optimize
  * space on the screen.
- * 
  */
 function update_portal()
 {
