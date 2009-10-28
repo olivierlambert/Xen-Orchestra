@@ -226,35 +226,39 @@ caption
 /* COLUMNS NETVIBES LIKE */
 #widget_col_0
 {
-float:left;
-width: 50%;
+	float:left;
+	width: 50%;
 }
 
 #widget_col_1
 {
-width: 50%;
-float:left;
+	width: 50%;
+	float:left;
 }
 
 /* TABS IN VM WINDOW */
 #vm
 {
-color: #ddd;
+	color: #ddd;
 }
 
 #vm ul
 {
-margin:0 0 0 0;
+	margin:0 0 0 0;
 }
 
 #vm p
 {
-font: 90% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
-margin-top: 0px;
-margin-bottom : 0.4em;
-padding-left: 10em;
+	font: 90% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	margin-top: 0px;
+	margin-bottom : 0.4em;
+	padding-left: 10em;
 }
-
+/* ACTION BUTTON */
+.button
+{
+	cursor:pointer;
+}
 
 /* MENU IN VM PAGE */
 .menuvm

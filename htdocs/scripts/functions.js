@@ -156,7 +156,7 @@ function domU_window(dom0_id, domU_id)
 	actions.push('destroy');
 	for (var i = 0; i < actions.length; ++i)
 	{
-		html += ('<img src="img/' + actions[i]
+		html += ('<img class="button" src="img/' + actions[i]
 			+ '.png" alt="" onclick="action_vm (\'' + dom0_id
 			+ '\', \'' + domU.name + '\', \'' + actions[i] + '\')" />');
 	}
