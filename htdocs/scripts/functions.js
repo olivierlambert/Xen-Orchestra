@@ -167,9 +167,7 @@ function domU_window(dom0_id, domU_id)
 			+ '.png" alt="" onclick="action_vm (\'' + dom0_id
 			+ '\', \'' + domU.name + '\', \'' + actions[i] + '\')" />');
 	}
-	html+='</p>';
-
-	html+='<p><b>Live migration to: </b>xenb1 &nbsp xena2</p></div>';
+	html+='</p></div>';
 
 	html+='<div id="cpu_' + html_id + '">'
 		+ '<br/><p><b>VCPU use:</b> '+domU.vcpu_use+'</p>'
@@ -205,7 +203,7 @@ function domU_window(dom0_id, domU_id)
 			}
 		});
 		domUs_windows[domU_id].show();
-		domUs_windows[domU_id].setSize(500, 203);
+		domUs_windows[domU_id].setSize(500, 204);
 	}
 	domUs_windows[domU_id].setTitle(title);
 	domUs_windows[domU_id].setHTMLContent(html);

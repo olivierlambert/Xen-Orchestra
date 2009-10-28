@@ -27,16 +27,17 @@
 		<li><a href="index.php"><b><img src="img/house.png" alt=""/>Home</b></a></li>
 		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>Configuration</b></a></li>
 		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM management</b></a></li>
-	</ul>
-	<div id="login">
+		<div id="login">
 		<form action="">
 			<p>
-				<input type="text" id="name" name="name" />
-				<input type="password" id="password" name="password" />
-				<input type="submit" label="Log in" />
+				User: <input type="text" id="name" name="name"/>
+				Password: <input type="password" id="password" name="password"/>
+				<input type="submit" label="Login" value="Log in"/>
 			</p>
 		</form>
 	</div>
+	</ul>
+
 	<script type="text/javascript">
 		refresh_time = <?php echo $refresh ?>;
 		register_info("<?php echo addcslashes($json, '"') ?>".evalJSON());

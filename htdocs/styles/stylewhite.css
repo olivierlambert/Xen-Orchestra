@@ -128,13 +128,6 @@ h1 a
 	text-indent: -3000em;
 }
 
-form
-{
-	margin-top: 2em;
-	margin-bottom: 2em;
-	text-align : center
-}
-
 #dl
 {
 	text-align: center;
@@ -254,6 +247,38 @@ caption
 	margin-bottom : 0.4em;
 	padding-left: 10em;
 }
+
+/* LOGIN FORM */
+#login
+{
+	color: white;
+	font: 90% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	margin-top: -3px;
+	margin-right: 10px;
+	margin-bottom: -10px;
+	float: right;
+}
+
+#login input
+{
+	background:#eee;
+	border: 1px solid #1e1e1e;
+	width: 80px;
+	/*height: 15px;*/
+}
+
+#login form p input
+{
+	-moz-border-radius: 4px;
+	font: 100% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	width: 60px;
+}
+
+#password
+{
+	width: 160px;
+}
+
 /* ACTION BUTTON */
 .button
 {
@@ -281,7 +306,7 @@ caption
 }
 .menuvm li
 {
-	font: 80% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	font: 82% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
 	margin: 0;
 	padding: 0;
 }
@@ -410,9 +435,11 @@ caption
 
 .menu1 li a b
 {
+	text-transform: uppercase;
 	float:left;
 	display:block;
-	padding:0 16px 0 8px;
+	padding:0px 16px 0px 8px;
+	margin-top: 2px;
 }
 
 .menu1 li.current a
