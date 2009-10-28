@@ -58,8 +58,9 @@ if (!isset($_GET['a']))
 {
 	$v = new Gallic_View(ROOT_DIR . '/templates/index.php');
 
-	$v->refresh = (Config::get_instance()->global['refresh'] * 1000);
+	$v->user = Model::get_current_user()->name;
 	$v->json = dom0s_json()->get();
+	$v->refresh = (Config::get_instance()->global['refresh'] * 1000);
 
 	$v->render();
 	exit;
@@ -73,20 +74,31 @@ if ($_GET['a'] === 'login')
 		$msg->error('Invalid name');
 		exit;
 	}
+
+	if (!Database::is_enabled())
+	{
+		$msg->error('The database is disabled');
+		exit;
+	}
+
 	$password = isset($_GET['password']) ? $_GET['password'] : '';
-	$u = Model::register_current_user($name, $password);
+	$u = Model::register_current_user($name, $password, true);
 	if ($u === false)
 	{
 		$msg->error('Incorrect username or password');
 	}
 	else
 	{
-		$msg->username = $u->name;
+		$msg->user = $u->name;
 	}
 }
 elseif ($_GET['a'] === 'logout')
 {
-	unregister_current_user();
+	Model::unregister_current_user();
+
+	assert(Model::get_current_user()->name === 'guest');
+
+	$msg->user = 'guest';
 }
 elseif ($_GET['a'] === 'dom0s')
 {

@@ -5,13 +5,21 @@
 	<title>Xen Orchestra</title>
 
 	<script type="text/javascript" src="scripts/prototype.js"></script>
-	<script type="text/javascript" src="scripts/functions.js"></script>
 	<script type="text/javascript" src="scripts/windows_js_1.3/javascripts/window.js"></script>
 	<script type="text/javascript" src="scripts/windows_js_1.3/javascripts/tooltip.js"></script>
 	<script type="text/javascript" src="scripts/scriptaculous.js"></script>
 	<script type="text/javascript" src="scripts/portal.js"></script>
 	<script type="text/javascript" src="scripts/livepipe.js"></script>
 	<script type="text/javascript" src="scripts/tabs.js"></script>
+
+	<script type="text/javascript" src="scripts/md5.js"></script>
+
+	<script type="text/javascript" src="scripts/functions.js"></script>
+	<script type="text/javascript">
+		user = '<?php echo addcslashes($user, '\'') ?>';
+		refresh_time = <?php echo $refresh ?>;
+		register_info('<?php echo addcslashes($json, '\'') ?>'.evalJSON());
+	</script>
 
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/stylewhite.css" />
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/alphacube.css" />
@@ -27,24 +35,12 @@
 		<li><a href="index.php"><b><img src="img/house.png" alt=""/>Home</b></a></li>
 		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>Configuration</b></a></li>
 		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM management</b></a></li>
-		<div id="login">
-		<form action="">
-			<p>
-				User: <input type="text" id="name" name="name"/>
-				Password: <input type="password" id="password" name="password"/>
-				<input type="submit" label="Login" value="Log in"/>
-			</p>
-		</form>
-	</div>
+		<div id="login"></div>
 	</ul>
-
-	<script type="text/javascript">
-		refresh_time = <?php echo $refresh ?>;
-		register_info("<?php echo addcslashes($json, '"') ?>".evalJSON());
-	</script>
 	<div id="main">
 		<div id="widget_col_0"></div>
 		<div id="widget_col_1"></div>
 	</div>
 </body>
 </html>
+

@@ -261,17 +261,13 @@ caption
 
 #login input
 {
+	-moz-border-radius: 4px;
+	border-radius: 4px;
 	background:#eee;
 	border: 1px solid #1e1e1e;
-	width: 80px;
-	/*height: 15px;*/
-}
-
-#login form p input
-{
-	-moz-border-radius: 4px;
 	font: 100% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
 	width: 60px;
+	/*height: 15px;*/
 }
 
 #password
@@ -485,3 +481,4 @@ caption
 	width:16px;
 	height:16px;
 }
+

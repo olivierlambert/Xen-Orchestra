@@ -25,6 +25,11 @@ var dom0s_panels = [];
 var domUs_windows = {};
 
 /**
+ * Contains the name of the current user.
+ */
+var user = 'guest';
+
+/**
  * Indicates whether the user is dragging a panel.
  *
  * Used to prevent the panel "doubling effect": the panels are not
@@ -367,11 +372,116 @@ function content_dom0(dom0_id)
 	return result + '</table>';
 }
 
+function login(event)
+{
+	event.stop();
+
+	var name = $F('name');
+
+	if (name === '')
+	{
+		alert('The name field is mandatory.');
+		return;
+	}
+
+	var password = $F('password');
+	new Ajax.Request('index.php', {
+		method: 'get',
+		parameters: {
+			'a': 'login',
+			'name': name,
+			'password': MD5(password)
+		},
+		onComplete: function (data)
+		{
+			var json = data.responseText.evalJSON();
+			if (json.error_code !== 0)
+			{
+				alert('Error: ' + json.error_message);
+				return;
+			}
+
+			register_info(json);
+			draw_log_area();
+		}
+	});
+}
+
+function logout(event)
+{
+	event.stop();
+
+	new Ajax.Request('index.php', {
+		method: 'get',
+		parameters: {
+			'a': 'logout'
+		},
+		onComplete: function (data)
+		{
+			var json = data.responseText.evalJSON();
+			if (json.error_code !== 0)
+			{
+				alert('Error: ' + json.error_message);
+				return;
+			}
+
+			register_info(json);
+			draw_log_area();
+		}
+	});
+}
+
+function draw_log_area()
+{
+	var d = $('login');
+	if (user === 'guest') // The user is able to log in.
+	{
+		d.update(new Element('form')
+			.insert(new Element('p')
+				.insert('User: ')
+				.insert(new Element('input', {
+					'type': 'text',
+					'name': 'name',
+					'id': 'name'
+				}))
+				.insert(' Password: ')
+				.insert(new Element('input', {
+					'type': 'password',
+					'name': 'password',
+					'id': 'password'
+				}))
+				.insert(' ')
+				.insert(new Element('input', {
+					'type': 'submit',
+					'value': 'Log in'
+				}))
+			)
+			.observe('submit', login)
+		);
+	}
+	else
+	{
+		d.update(new Element('p')
+			.insert('Logged as <em>' + user + '</em>. ')
+			.insert(new Element('input', {'type': 'button', 'value': 'Log out'})
+				.observe('click', logout)
+			)
+		);
+	}
+}
+
 /**
  * TODO: write doc.
  */
 function register_info(info)
 {
+	if ((info.user !== undefined)
+		&& (info.user !== user))
+	{
+		user = info.user;
+		draw_log_area();
+	}
+
 	if (info.exhaustive)
 	{
 		dom0s = {};
@@ -388,33 +498,12 @@ function register_info(info)
 	}
 }
 
-function login(event)
-{
-	event.stop();
-
-	var name = $F('name');
-	var password = $F('password');
-	new Ajax.Request('index.php', {
-		method: 'get',
-		parameters: {
-			'a': 'login',
-			'name': name,
-			'password': password
-		},
-		onComplete: function (data)
-		{
-			var json = data.responseText.evalJSON();
-
-		}
-	});
-}
-
 /**
  * When the DOM is fully loaded, initialize all listeners and Portal.
  */
 document.observe('dom:loaded', function ()
 {
-	$$('#login form')[0].observe('submit', login);
+	draw_log_area();
 
 	Xilinus.Portal.prototype.startDrag_old = Xilinus.Portal.prototype.startDrag;
 	Xilinus.Portal.prototype.startDrag = function (eventName, draggable)
@@ -434,3 +523,4 @@ document.observe('dom:loaded', function ()
 
 	setTimeout(refresh, refresh_time);
 });
+
