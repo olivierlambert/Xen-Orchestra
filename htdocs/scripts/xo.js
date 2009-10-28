@@ -438,13 +438,13 @@ function draw_log_area()
 	{
 		d.update(new Element('form')
 			.insert(new Element('p')
-				.insert('User: ')
+				.insert('<label for="name">User: </label>')
 				.insert(new Element('input', {
 					'type': 'text',
 					'name': 'name',
 					'id': 'name'
 				}))
-				.insert(' Password: ')
+				.insert(' <label for="password">Password: </label>')
 				.insert(new Element('input', {
 					'type': 'password',
 					'name': 'password',

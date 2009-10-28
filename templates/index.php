@@ -14,7 +14,7 @@
 
 	<script type="text/javascript" src="scripts/md5.js"></script>
 
-	<script type="text/javascript" src="scripts/functions.js"></script>
+	<script type="text/javascript" src="scripts/xo.js"></script>
 	<script type="text/javascript">
 		user = '<?php echo addcslashes($user, '\'') ?>';
 		refresh_time = <?php echo $refresh ?>;
