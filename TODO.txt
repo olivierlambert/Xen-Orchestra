@@ -27,6 +27,3 @@ When an user is deleted, also delete his ACLs.
 Live migration
 
 Handle more correctly errors sent throught JavaScript.
-
-Prevent user from moving the dom0s panels to avoid "doubling effect" or
-just update their content instead of deleting and recreating.

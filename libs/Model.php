@@ -17,6 +17,7 @@ final class Model
 
 		$id = Database::get_instance()->insert_user($name, $password, $email,
 			ACL::to_string($permission));
+
 		if ($id === false)
 		{
 			return false;

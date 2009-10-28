@@ -133,7 +133,7 @@ final class Database extends PDO
 			return false;
 		}
 
-		return $this->lastInsertId();
+		return $this->lastInsertId('users_id_seq');
 	}
 
 	public function update_user(User $u)

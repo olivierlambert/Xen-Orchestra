@@ -1,13 +1,3 @@
-<?php
-if (!isset ($footer) || ($footer !== false && !is_string ($footer)))
-{
-	$footer = dirname (__FILE__) . '/footer.html';
-}
-if ($footer !== false)
-{
-	register_shutdown_function (create_function ('$f', 'include $f;'), $footer);
-}
-?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -34,7 +24,26 @@ if ($footer !== false)
 		<a href=".">XenOrchestra</a>
 	</h1>
 	<ul class="menu1">
-		<li><a href="index.php"><b><img src="img/house.png" alt=""/>HOME</b></a></li>
-		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>CONFIGURATION</b></a></li>
-		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM MANAGEMENT</b></a></li>
+		<li><a href="index.php"><b><img src="img/house.png" alt=""/>Home</b></a></li>
+		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>Configuration</b></a></li>
+		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM management</b></a></li>
 	</ul>
+	<div id="login">
+		<form action="">
+			<p>
+				<input type="text" id="name" name="name" />
+				<input type="password" id="password" name="password" />
+				<input type="submit" label="Log in" />
+			</p>
+		</form>
+	</div>
+	<script type="text/javascript">
+		refresh_time = <?php echo $refresh ?>;
+		register_info("<?php echo addcslashes($json, '"') ?>".evalJSON());
+	</script>
+	<div id="main">
+		<div id="widget_col_0"></div>
+		<div id="widget_col_1"></div>
+	</div>
+</body>
+</html>

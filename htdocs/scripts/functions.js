@@ -8,7 +8,6 @@ var dom0s = {};
  * Time between each refresh (in seconds)
  */
 var refresh_time;
-
 /**
  * The portal object : refer to class portal, which displays dom0s in
  * panels, which can be moved.
@@ -24,6 +23,14 @@ var dom0s_panels = [];
  * TODO: write doc.
  */
 var domUs_windows = {};
+
+/**
+ * Indicates whether the user is dragging a panel.
+ *
+ * Used to prevent the panel "doubling effect": the panels are not
+ * updated when on_drag is true.
+ */
+var on_drag = false;
 
 /**
  * TODO: write doc.
@@ -73,9 +80,9 @@ function task_stop()
 }
 
 /**
- * Display CPU meters in function of their load 
+ * Display CPU meters in function of their load
  * (green/yellow/orange/red)
- * 
+ *
  * @param cpus Table of cpus with their respective load
  */
 function html_cpu_meters(cpus)
@@ -85,7 +92,7 @@ function html_cpu_meters(cpus)
 	{
 		return '&nbsp;';
 	}
-	
+
 	var result = '';
 	for (var i = 0; i < n; i++)
 	{
@@ -113,16 +120,16 @@ function html_cpu_meters(cpus)
 
 /**
  * Display a new window with all informations about a selectionned domU
- * 
+ *
  * @param dom0_id The identifier of the dom0 the domU belongs to.
- * @param domU_id The domU's identifier. 
+ * @param domU_id The domU's identifier.
  */
 function domU_window(dom0_id, domU_id)
 {
 	var domU = dom0s[dom0_id].domUs[domU_id];
-	
+
 	var html_id = escape(dom0_id + domU_id).replace(/\.|#|%/g, '_');
-	
+
 	var date = new Date(domU.date * 1000);
 	var html = '<div id="vm">'
 		+ '<ul id="tabs_' + html_id + '" class="menuvm">'
@@ -133,13 +140,13 @@ function domU_window(dom0_id, domU_id)
 		+ '<li><a href="#storage_' + html_id + '"><b><img src="img/database_gear.png" alt=""/>Storage</a></b></li>'
 		+ '<li><a href="#misc_' + html_id + '"><b><img src="img/wrench.png" alt=""/>Misc</a></b></li>'
 		+  '</ul><div id="overview_' + html_id + '" class="text">';
-	
+
 	html+='<br/><p><b>State: </b>'+domU.state+'</p>'
 		+ '<p><b>System: </b>'+domU.kernel+'</p>'
 		+ '<p><b>CPU installed: </b>'+domU.vcpu_number+'</p>'
 		+ '<p><b>RAM installed: </b>'+domU.d_min_ram/(1024*1024)+' MB</p>'
 		+ '<p><b>Date of creation: </b>' + date + '</p>';
-	
+
 	html += '<p><b>Actions: </b><br/>';
 	if (domU.state === 'Running')
 	{
@@ -161,7 +168,7 @@ function domU_window(dom0_id, domU_id)
 			+ '\', \'' + domU.name + '\', \'' + actions[i] + '\')" />');
 	}
 	html+='</p>';
-	
+
 	html+='<p><b>Live migration to: </b>xenb1 &nbsp xena2</p></div>';
 
 	html+='<div id="cpu_' + html_id + '">'
@@ -173,16 +180,16 @@ function domU_window(dom0_id, domU_id)
 
 	html+='<div id="ram_' + html_id + '">'
 		+ '<br/><b><p>RAM:</b> '+domU.d_min_ram/(1024*1024)+' MB</p></div>';
-	
+
 	html+='<div id="network_' + html_id + '"></div>';
-	
+
 	html+='<div id="storage_' + html_id + '"></div>';
-	
+
 	html+='<div id="misc_' + html_id + '">'
 		+ '<br/><b><p>On shutdown:</b> '+domU.actions_after_shutdown+'</p>'
 		+ '<b><p>On reboot:</b> '+domU.actions_after_reboot+'</p>'
 		+ '<b><p>On crash:</b> '+domU.actions_after_crash+'</p></div>';
-	
+
 	html+='</div>';
 
 	title = '<b>'+domU.name+'</b> (' + dom0s[dom0_id].name + ')';
@@ -208,19 +215,22 @@ function domU_window(dom0_id, domU_id)
 /**
  * Sends a request to XO to change the current of state of a domU,
  * then display/refresh the domU's window.
- * 
+ *
  * @param dom0   The identifier of the dom0 the domU belongs to.
  * @param domU   The domU's identifier.
  * @param action The action to do among (destroy, halt, pause, start).
  */
 function action_vm(dom0_id, domU_id, action)
 {
-	var url = 'display_domU.php?dom0=' + dom0_id + '&domU=' + domU_id
-		+ '&action=' + action;
-	
 	task_start();
-	new Ajax.Request(url, {
+	new Ajax.Request('index.php', {
 		method: 'get',
+		parameters: {
+			'a': 'domU',
+			'action': action,
+			'dom0': dom0_id,
+			'domU': domU_id
+		},
 		onComplete: function (transport)
 		{
 			register_info(transport.responseText.evalJSON());
@@ -238,7 +248,7 @@ function action_vm(dom0_id, domU_id, action)
 /**
  * Gets information about a domU and display (or refresh) the domU's
  * window.
- * 
+ *
  * @param dom0_id The identifier of the dom0 the domU belongs to.
  * @param domU_id The domU's identifier.
  */
@@ -250,10 +260,15 @@ function display_vm(dom0_id, domU_id)
 		// foreground.
 		return;
 	}
-	
+
 	task_start();
-	new Ajax.Request('display_domU.php?domU='+domU_id+'&dom0='+dom0_id, {
+	new Ajax.Request('index.php', {
 		method: 'get',
+		parameters: {
+			'a': 'domU',
+			'dom0': dom0_id,
+			'domU': domU_id
+		},
 		onComplete: function (transport)
 		{
 			register_info(transport.responseText.evalJSON());
@@ -276,8 +291,11 @@ function display_vm(dom0_id, domU_id)
 function refresh()
 {
 	task_start();
-	new Ajax.Request('display_dom0.php', {
+	new Ajax.Request('index.php', {
 		method: 'get',
+		parameters: {
+			'a': 'dom0s'
+		},
 		onComplete: function(transport)
 		{
 			register_info(transport.responseText.evalJSON());
@@ -302,7 +320,7 @@ function update_portal()
 	{
 		portal.remove(w);
 	}
-	
+
 	var weightleft = 0;
 	var weightright = 0;
 	for (dom0_id in dom0s)
@@ -327,7 +345,7 @@ function update_portal()
 
 /**
  * Fill a Dom0 panel with its information : each row contain a domU.
- * 
+ *
  * @param dom0_id The identifier of the dom0.
  */
 function content_dom0(dom0_id)
@@ -337,7 +355,7 @@ function content_dom0(dom0_id)
 	{
 		return '<p>No DomU detected</p>';
 	}
-	
+
 	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
 	for (domU_id in dom0.domUs)
 	{
@@ -361,24 +379,59 @@ function register_info(info)
 		dom0s = {};
 	}
 
-	if (info.dom0s !== undefined)
+	if ((info.dom0s !== undefined) && !(info.dom0s instanceof Array))
 	{
 		Object.extendRecursively(dom0s, info.dom0s);
-		if (portal !== undefined)
-		{
-			update_portal();
-		}
+	}
+
+	if ((portal !== undefined) && !on_drag)
+	{
+		update_portal();
 	}
 }
 
+function login(event)
+{
+	event.stop();
+
+	var name = $F('name');
+	var password = $F('password');
+	new Ajax.Request('index.php', {
+		method: 'get',
+		parameters: {
+			'a': 'login',
+			'name': name,
+			'password': password
+		},
+		onComplete: function (data)
+		{
+			var json = data.responseText.evalJSON();
+
+		}
+	});
+}
+
 /**
- * The main observer : when the dom is loaded, create new portal object
- * and call update portal. Refresh is called after "refresh_time" secs.
- *
+ * When the DOM is fully loaded, initialize all listeners and Portal.
  */
 document.observe('dom:loaded', function ()
 {
-	portal = new Xilinus.Portal("#main div");
+	$$('#login form')[0].observe('submit', login);
+
+	Xilinus.Portal.prototype.startDrag_old = Xilinus.Portal.prototype.startDrag;
+	Xilinus.Portal.prototype.startDrag = function (eventName, draggable)
+	{
+		on_drag = true;
+		this.startDrag_old(eventName, draggable);
+	}
+	Xilinus.Portal.prototype.endDrag_old = Xilinus.Portal.prototype.endDrag;
+	Xilinus.Portal.prototype.endDrag = function (eventName, draggable)
+	{
+		on_drag = false;
+		this.endDrag_old(eventName, draggable);
+	}
+
+	portal = new Xilinus.Portal('#main div');
 	update_portal();
 
 	setTimeout(refresh, refresh_time);

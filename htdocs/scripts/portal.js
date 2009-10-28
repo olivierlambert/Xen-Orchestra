@@ -256,9 +256,8 @@ Object.extend(Xilinus.Portal.prototype, {
     var widget = draggable.element;      
     if (!this._widgets.find(function(w) {return w == widget.widget}))
       return;
-    
     var column = widget.ghost.parentNode;
-    
+    //refresh_time = saved_refresh_time;
     column.insertBefore(draggable.element, widget.ghost); 
     widget.ghost.remove();   
     
