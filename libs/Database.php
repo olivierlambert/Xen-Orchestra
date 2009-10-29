@@ -151,3 +151,4 @@ final class Database extends PDO
 
 	private static $instance = null;
 }
+

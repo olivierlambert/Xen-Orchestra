@@ -1,6 +1,7 @@
 <?php
 // The session is used for users management.
-session_name('XenOrchestra');
+session_name('XO');
+session_set_cookie_params(31*24*3600); // One month.
 session_start();
 
 define ('ROOT_DIR', dirname (dirname (__FILE__)));
@@ -12,3 +13,4 @@ function __autoload($class_name)
 {
 	require_once 'libs/' . $class_name . '.php';
 }
+

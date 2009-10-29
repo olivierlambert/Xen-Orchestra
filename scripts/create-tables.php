@@ -1,0 +1,84 @@
+#!/usr/bin/php
+<?php
+require dirname(__FILE__) . '/../libs/prepend.php';
+
+if (!Database::is_enabled())
+{
+	$c->writeln('The database is disabled.', STDERR);
+	exit;
+}
+
+$d = new DirectoryIterator(ROOT_DIR . '/sql');
+
+$entries = array();
+foreach ($d as $entry)
+{
+	$filename = $entry->getFilename();
+	if (!$entry->isDir() && (substr($filename, -4) === '.sql'))
+	{
+		$entries[] = array(
+			'name' => substr($filename, 0, -4),
+			'path' => $entry->getPathname()
+		);
+	}
+}
+
+$c = new CLIHelper();
+
+$n = count($entries);
+if ($n === 0)
+{
+	$c->writeln('No SQL scripts available.');
+	exit;
+}
+
+for (;;)
+{
+	$c->writeln($n . ' script(s) available.');
+	foreach ($entries as $i => $entry)
+	{
+		$c->writeln(' ' . ($i + 1) . ': ' . $entry['name']);
+	}
+
+	$i = $c->prompt('Enter the number of the one you want: ') - 1;
+
+	if (isset($entries[$i]))
+	{
+		break;
+	}
+	$c->writeln('*** This entry is incorrect.');
+	$c->writeln();
+}
+
+$c->writeln('You have selected "' . $entries[$i]['name'] . '".');
+
+$lines = file($entries[$i]['path']);
+$sql = '';
+foreach ($lines as $line)
+{
+	if (empty($line)) // Absolutly no characters, not even PHP_EOL.
+	{
+		continue;
+	}
+
+	if ($line[0] === '#') // Comment line, ignore it.
+	{
+		continue;
+	}
+
+	$sql .= $line;
+}
+
+$queries = explode(";\n", $sql);
+
+$db = Database::get_instance();
+foreach ($queries as $query)
+{
+	if (empty($query))
+	{
+		continue;
+	}
+
+	var_dump($db->exec($query));
+}
+

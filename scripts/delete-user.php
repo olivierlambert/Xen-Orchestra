@@ -2,22 +2,22 @@
 <?php
 require_once dirname (__FILE__) . '/../libs/prepend.php';
 
+$c = new CLIHelper();
+
 if (!Database::is_enabled())
 {
-	echo 'The database is disabled.', PHP_EOL;
+	$c->writeln('The database is disabled.');
 	exit;
 }
 
-$stdin = fopen('php://stdin', 'r');
-
-echo 'Username: ';
-$username = trim(fgets($stdin));
+$username = $c->prompt('Username: ');
 
 if (Model::delete_user($username) !== false)
 {
-	echo 'User deleted.', PHP_EOL;
+	$c->writeln('User deleted.');
 }
 else
 {
-	echo 'User deletion failed.', PHP_EOL;
+	$c->writeln('User deletion failed.', STDERR);
 }
+

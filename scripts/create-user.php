@@ -2,32 +2,30 @@
 <?php
 require_once dirname (__FILE__) . '/../libs/prepend.php';
 
+$c = new CLIHelper();
+
 if (!Database::is_enabled())
 {
-	echo 'The database is disabled.', PHP_EOL;
+	$c->writeln('The database is disabled.');
 	exit;
 }
 
-$stdin = fopen('php://stdin', 'r');
+$username = trim($c->prompt('Username: '));
 
-echo 'Username: ';
-$username = trim(fgets($stdin));
+$password = trim($c->prompt('Password: '));
 
-echo 'Password: ';
-$password = trim(fgets($stdin));
+$email = trim($c->prompt('Email: '));
 
-echo 'Email: ';
-$email = trim(fgets($stdin));
-
-echo 'Permission (NONE, read, write, admin): ';
-$permission = ACL::from_string(strtoupper(trim(fgets($stdin))));
+$permission = trim($c->prompt('Permission (NONE, read, write, admin): '));
+$permission = ACL::from_string(strtoupper($permission));
 
 $u = Model::create_user($username, $password, $email, $permission);
 if ($u !== false)
 {
-	echo 'User created with identifier ', $u->id, '.', PHP_EOL;
+	$c->writeln('User created with identifier ' . $u->id . '.');
 }
 else
 {
-	echo 'User creation failed.', PHP_EOL;
+	$c->writeln('User creation failed.', STDERR);
 }
+
