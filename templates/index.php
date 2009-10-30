@@ -31,12 +31,12 @@
 	<h1>
 		<a href=".">XenOrchestra</a>
 	</h1>
+
 	<ul class="menu1">
 		<li><a href="index.php"><b><img src="img/house.png" alt=""/>Home</b></a></li>
 		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>Configuration</b></a></li>
 		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM management</b></a></li>
-		<div id="login"></div>
-	</ul>
+	<div id="login"></div></ul>
 	<div id="main">
 		<div id="widget_col_0"></div>
 		<div id="widget_col_1"></div>

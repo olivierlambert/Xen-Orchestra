@@ -208,7 +208,7 @@ function domU_window(dom0_id, domU_id)
 			}
 		});
 		domUs_windows[domU_id].show();
-		domUs_windows[domU_id].setSize(500, 204);
+		domUs_windows[domU_id].setSize(500, 206);
 	}
 	domUs_windows[domU_id].setTitle(title);
 	domUs_windows[domU_id].setHTMLContent(html);
