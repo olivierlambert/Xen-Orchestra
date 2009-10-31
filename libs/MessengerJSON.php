@@ -47,10 +47,19 @@ class MessengerJSON
 
 	public function get()
 	{
-		$data = $this->data + array(
-			'error_code' => $this->error_code,
-			'error_message' => $this->error_msg
-		);
+		if ($this->error_code !== 0)
+		{
+			$data = $this->data + array(
+				'error_code' => $this->error_code,
+				'error_message' => $this->error_msg
+			);
+		}
+		else
+		{
+			$data = $this->data + array(
+				'error_code' => 0
+			);
+		}
 		return json_encode($data);
 	}
 
@@ -68,3 +77,4 @@ class MessengerJSON
 
 	private $error_code = self::ERR_NONE;
 }
+

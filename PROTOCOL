@@ -1,0 +1,18 @@
+THIS FILE IS A WORK IN PROGRESS.
+
+In this file, we will try to formalise the protocol (over JSON) used to make
+PHP and JavaScript communicate (for now only from PHP to JS).
+
+- error_code: Used to indicate if and what error occured. Possible values:
+  - 0: no error
+  - 1: unknown error
+
+- error_message: If error_code is different from 0, this value contains a
+  message describing the error which can be display to the user.
+
+- user: When the current user changes, this entry is present and contains the
+  name of the new current user. When the user is not logged in, the current user
+  is "guest".
+
+- dom0s:
+

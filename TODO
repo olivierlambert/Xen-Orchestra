@@ -27,3 +27,4 @@ When an user is deleted, also delete his ACLs.
 Live migration
 
 Handle more correctly errors sent throught JavaScript.
+

@@ -67,7 +67,7 @@ tasks = 0;
  */
 function task_start()
 {
-	if (tasks++ === 0)
+	if (tasks++ === 0) // First task to start.
 	{
 		$(document.documentElement).setStyle ({'cursor': 'progress'});
 	}
@@ -78,7 +78,7 @@ function task_start()
  */
 function task_stop()
 {
-	if (--tasks === 0)
+	if (--tasks === 0) // Last task to end.
 	{
 		$(document.documentElement).setStyle ({'cursor': 'auto'});
 	}
@@ -225,25 +225,14 @@ function domU_window(dom0_id, domU_id)
  */
 function action_vm(dom0_id, domU_id, action)
 {
-	task_start();
-	new Ajax.Request('index.php', {
-		method: 'get',
-		parameters: {
-			'a': 'domU',
-			'action': action,
-			'dom0': dom0_id,
-			'domU': domU_id
-		},
-		onComplete: function (transport)
+	send_request('domU', {'action': action, 'dom0': dom0_id, 'domU': domU_id}, {
+		onSuccess: function ()
 		{
-			register_info(transport.responseText.evalJSON());
 			domU_window (dom0_id, domU_id);
-			task_stop();
 		},
 		onFailure: function ()
 		{
-			task_stop();
-			alert('Something went wrong...');
+			notify('The request did not succeed.');
 		}
 	});
 }
@@ -264,24 +253,14 @@ function display_vm(dom0_id, domU_id)
 		return;
 	}
 
-	task_start();
-	new Ajax.Request('index.php', {
-		method: 'get',
-		parameters: {
-			'a': 'domU',
-			'dom0': dom0_id,
-			'domU': domU_id
-		},
-		onComplete: function (transport)
+	send_request('domU', {'dom0': dom0_id, 'domU': domU_id}, {
+		onSuccess: function ()
 		{
-			register_info(transport.responseText.evalJSON());
 			domU_window (dom0_id, domU_id);
-			task_stop();
 		},
 		onFailure: function ()
 		{
-			task_stop();
-			alert('Something went wrong...');
+			notify('The request did not succeed.');
 		}
 	});
 }
@@ -293,22 +272,10 @@ function display_vm(dom0_id, domU_id)
  */
 function refresh()
 {
-	task_start();
-	new Ajax.Request('index.php', {
-		method: 'get',
-		parameters: {
-			'a': 'dom0s'
-		},
-		onComplete: function(transport)
+	send_request('dom0s', undefined, {
+		onComplete: function ()
 		{
-			register_info(transport.responseText.evalJSON());
 			setTimeout(refresh, refresh_time);
-			task_stop();
-		},
-		onFailure: function()
-		{
-			task_stop();
-			alert('Something went wrong...');
 		}
 	});
 }
@@ -365,7 +332,7 @@ function content_dom0(dom0_id)
 		var domU = dom0.domUs[domU_id];
 		result += '<tr id="' + domU.name
 			+ '" onclick="display_vm(\'' + dom0_id + '\',\'' + domU_id
-			+'\')"><td>' + domU.name + '</td><td>' + domU.state
+			+ '\')"><td>' + domU.name + '</td><td>' + domU.state
 			+ '</td><td>' + html_cpu_meters(domU.vcpu_use)
 			+ '</td></tr>';
 	}
@@ -380,30 +347,13 @@ function login(event)
 
 	if (name === '')
 	{
-		alert('The name field is mandatory.');
+		notify('The name field is mandatory.');
 		return;
 	}
 
-	var password = $F('password');
-	new Ajax.Request('index.php', {
-		method: 'get',
-		parameters: {
-			'a': 'login',
-			'name': name,
-			'password': MD5(password)
-		},
-		onComplete: function (data)
-		{
-			var json = data.responseText.evalJSON();
-			if (json.error_code !== 0)
-			{
-				alert('Error: ' + json.error_message);
-				return;
-			}
-
-			register_info(json);
-			draw_log_area();
-		}
+	send_request('login', {
+		'name': name,
+		'password': MD5($F('password'))
 	});
 }
 
@@ -411,24 +361,7 @@ function logout(event)
 {
 	event.stop();
 
-	new Ajax.Request('index.php', {
-		method: 'get',
-		parameters: {
-			'a': 'logout'
-		},
-		onComplete: function (data)
-		{
-			var json = data.responseText.evalJSON();
-			if (json.error_code !== 0)
-			{
-				alert('Error: ' + json.error_message);
-				return;
-			}
-
-			register_info(json);
-			draw_log_area();
-		}
-	});
+	send_request('logout');
 }
 
 function draw_log_area()
@@ -471,10 +404,66 @@ function draw_log_area()
 }
 
 /**
+ * Sends a request with AJAX and once completed transmits the results to
+ * register_info.
+ *
+ * @param action The action (string).
+ * @param [parameters] Parameters to transmit (object).
+ * @param [options] Options (object).
+ */
+function send_request(action, parameters, options)
+{
+	var ar_options = {
+		'method': 'get',
+		'onComplete': function (data)
+		{
+			task_stop();
+			if ((options !== undefined)
+				&& (typeof(options.onComplete) === 'function'))
+			{
+				options.onComplete(data);
+			}
+		},
+		'onSuccess': function (data)
+		{
+			register_info(data.responseText.evalJSON());
+			if ((options !== undefined)
+				&& (typeof(options.onSuccess) === 'function'))
+			{
+				options.onSuccess(data);
+			}
+		}
+	};
+	if (parameters !== undefined)
+	{
+		ar_options.parameters = parameters;
+	}
+	if (options !== undefined)
+	{
+		if (typeof(options.onFailure) === 'function')
+		{
+			ar_options.onFailure = options.onFailure;
+		}
+		if (typeof(options.method) === 'string')
+		{
+			ar_options.method = options.method;
+		}
+	}
+
+	task_start();
+	new Ajax.Request('index.php?a=' + encodeURIComponent(action), ar_options);
+}
+
+/**
  * TODO: write doc.
  */
 function register_info(info)
 {
+	if (info.error_code !== 0)
+	{
+		notify('Error: ' + info.error_message);
+	}
+
 	if ((info.user !== undefined)
 		&& (info.user !== user))
 	{
@@ -496,6 +485,16 @@ function register_info(info)
 	{
 		update_portal();
 	}
+}
+
+/**
+ * Presents a notification message to the user.
+ *
+ * For the moment, it uses an alert box, but in the future it may be prettier.
+ */
+function notify(message)
+{
+	alert(message);
 }
 
 /**
