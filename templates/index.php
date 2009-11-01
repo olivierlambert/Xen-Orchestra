@@ -16,9 +16,12 @@
 
 	<script type="text/javascript" src="scripts/xo.js"></script>
 	<script type="text/javascript">
-		user = '<?php echo addcslashes($user, '\'') ?>';
-		refresh_time = <?php echo $refresh ?>;
-		register_info('<?php echo addcslashes($json, '\'') ?>'.evalJSON());
+	//<![CDATA[
+		document.observe('dom:loaded', function ()
+		{
+			register_info('<?php echo addcslashes($json, '\'') ?>'.evalJSON());
+		});
+	//]]>
 	</script>
 
 	<link rel="stylesheet" media="screen" type="text/css" href="styles/stylewhite.css" />

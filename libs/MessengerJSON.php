@@ -60,7 +60,12 @@ class MessengerJSON
 				'error_code' => 0
 			);
 		}
-		return json_encode($data);
+		$json = json_encode($data);
+		if ($json === '[]') // The root element must be an object.
+		{
+			return '{}';
+		}
+		return $json;
 	}
 
 	public function send()

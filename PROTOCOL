@@ -3,6 +3,12 @@ THIS FILE IS A WORK IN PROGRESS.
 In this file, we will try to formalise the protocol (over JSON) used to make
 PHP and JavaScript communicate (for now only from PHP to JS).
 
+The root element is an object which (may) has the following entries.
+
+
+Always:
+=======
+
 - error_code: Used to indicate if and what error occured. Possible values:
   - 0: no error
   - 1: unknown error
@@ -10,9 +16,52 @@ PHP and JavaScript communicate (for now only from PHP to JS).
 - error_message: If error_code is different from 0, this value contains a
   message describing the error which can be display to the user.
 
+
+"login" or "logout":
+====================
+
 - user: When the current user changes, this entry is present and contains the
   name of the new current user. When the user is not logged in, the current user
   is "guest".
 
-- dom0s:
+
+"dom0s":
+========
+
+- dom0s: An array containing all the Dom0s the user is able to see.
+
+- dom0s[i]: An object describing a Dom0.
+  - id: A unique identifier for this Dom0.
+  - address: The full address of this Dom0 (name/IP ':' port).
+  - ro: A boolean which indicates if this dom0 whether read-only (the user cannot
+    migrate a vm to it.
+  - domUs: An array containing all the DomUs belonging to this Dom0 the user is
+    able to see.
+
+- dom0s[i].domUs[j]: An object describing a DomU.
+  - cpus: An array containing the utilisation level in percentage of the CPUs.
+  - id: Unique identifier of the DomU.
+  - name: The name of the DomU.
+  - ro: A boolean which indicates whether this domU is read-only.
+  - state: The current power state (Running, Halted, Paused).
+
+
+"domU":
+=======
+
+- domU: An object describing the requested DomU.
+  - cap: ???
+  - cpus: An array containing the utilisation level in percentage of the CPUs.
+  - d_min_ram: ???
+  - dom0_id: The identifier of the Dom0 this DomU belongs to.
+  - id: Unique identifier of the DomU.
+  - kernel: The path to the kernel.
+  - name: The name of the DomU.
+  - on_crash: Action to do after the DomU crashes.
+  - on_reboot: Action to do after the DomU reboots.
+  - on_shutdown: Action to do after the DomU shutdowns.
+  - ro: A boolean which indicates whether this domU is read-only.
+  - state: The current power state (Running, Halted, Paused).
+  - start_time: Timestamp which indicates when the DomU started.
+  - weight: ???
 

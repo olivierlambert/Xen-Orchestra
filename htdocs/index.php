@@ -20,35 +20,40 @@ function dom0s_json($msg = NULL)
 	{
 		// The array for this dom0.
 		$tmp = array(
-			'name' => $dom0->address
+			'address' => $dom0->address,
+			'domUs' => array(),
+			'id' => $dom0->id,
+			'ro' => !$u->can(ACL::WRITE, $dom0->id),
 		);
 
 		$domUs = $dom0->getDomUs();
-		if (empty($domUs))
+		$n = count($domUs);
+		if ($n !== 0)
 		{
-			$tmp['vm_number'] = 0;
-			$tmp['domUs'] = null;
-		}
-		else
-		{
-			$tmp['vm_number'] = count($domUs);
-			$tmp['domUs'] = array();
 			foreach ($domUs as $domU)
 			{
 				if ($u->can(ACL::READ, $dom0->id, $domU->name))
 				{
-					$tmp['domUs'][$domU->id] = array(
+					$cpus = $domU->VCPUs_utilisation;
+					foreach ($cpus as &$cpu)
+					{
+						$cpu = 100 * round($cpu, 4);
+					}
+					sort($cpus);
+
+					$tmp['domUs'][] = array(
+						'cpus' => $cpus,
+						'id' => $domU->id,
 						'name' => $domU->name,
-						'state' => $domU->state,
-						'vcpu_number' => $domU->vcpu_number,
-						'vcpu_use' => $domU->vcpu_use
+						'ro' => !$u->can(ACL::WRITE, $dom0->id, $domU->name),
+						'state' => $domU->power_state,
 					);
 				}
 			}
 		}
 		if (!empty($tmp['domUs']) || $u->can(ACL::READ, $dom0->id))
 		{
-			$msg->dom0s[$dom0->id] = $tmp;
+			$msg->dom0s[] = $tmp;
 		}
 	}
 	return $msg;
@@ -58,9 +63,11 @@ if (!isset($_GET['a']))
 {
 	$v = new Gallic_View(ROOT_DIR . '/templates/index.php');
 
-	$v->user = Model::get_current_user()->name;
-	$v->json = dom0s_json()->get();
-	$v->refresh = (Config::get_instance()->global['refresh'] * 1000);
+	$msg = dom0s_json();
+	$msg->user = Model::get_current_user()->name;
+	$msg->refresh = Config::get_instance()->global['refresh'] * 1000;
+
+	$v->json = $msg->get();
 
 	$v->render();
 	exit;
@@ -151,18 +158,27 @@ elseif ($_GET['a'] === 'domU')
 		$domU->refresh();
 	}
 
-	// In the future, the user may request info about more than one domU.
-	$msg->dom0s = array(
-		$dom0_id => array(
-			'domUs' => array(
-				$domU_id => $domU->get_all_infos()
-			)
-		)
-	);
+	$cpus = $domU->VCPUs_utilisation;
+	foreach ($cpus as &$cpu)
+	{
+		$cpu = 100 * round($cpu, 4);
+	}
+	sort($cpus);
 
-	// Tells JavaScript that this list is exhaustive and it has to
-	// keep all dom0s/domUs not listed.
-	$msg->exhaustive = false;
+	// In the future, the user may request info about more than one domU.
+	$msg->domU = array(
+		'cap' => $domU->VCPUs_params['cap'],
+		'cpus' => $cpus,
+		'd_min_ram' => $domU->memory_dynamic_min,
+		'dom0_id' => $domU->dom0->id,
+		'id' => $domU->id,
+		'kernel' => $domU->PV_kernel,
+		'name' => $domU->name,
+		'ro' => !$u->can(ACL::WRITE, $dom0->id, $domU->name),
+		'state' => $domU->power_state,
+		'start_time' => $domU->start_time->timestamp,
+		'weight' => $domU->VCPUs_params['weight'],
+	);
 }
 else
 {
