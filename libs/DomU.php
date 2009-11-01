@@ -17,7 +17,7 @@ class DomU
 				$this->dom0->rpc_query ('VM.' . $name, $this->xid);
 				break;
 			case 'play':
-				if ($this->state === 'Paused')
+				if ($this->power_state === 'Paused')
 				{
 					$this->dom0->rpc_query ('VM.unpause', $this->xid);
 				}
