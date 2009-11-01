@@ -69,6 +69,7 @@ Dom0.prototype = {
 		this.domUs[domU.id] = domU;
 
 		this._panel.setContent(content_dom0(this));
+		this._panel.updateHeight();
 	},
 	removeDomU: function (domU_id)
 	{
@@ -593,6 +594,8 @@ function notify(message)
  */
 document.observe('dom:loaded', function ()
 {
+	draw_log_area();
+
 	Xilinus.Portal.prototype.startDrag_old = Xilinus.Portal.prototype.startDrag;
 	Xilinus.Portal.prototype.startDrag = function (eventName, draggable)
 	{
