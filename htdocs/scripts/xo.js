@@ -199,7 +199,7 @@ DomU.prototype = {
 		html += '</div>';
 
 		html+='<div id="cpu_' + html_id + '">'
-			+ '<br/><p><b>VCPU use:</b> '+this.vcpu_use+'</p>'
+			+ '<br/><p><b>VCPU use:</b> '+html_cpu_values(this.cpus)+'</p>'
 			+ '<p><b>VCPU number:</b> '+this.cpus.length+'</p>'
 			+ '<p><b>Cap:</b> '+this.cap+'</p>'
 			+ '<p><b>Weight:</b> '+this.weight+'</p></div>';
@@ -288,6 +288,25 @@ function html_cpu_meters(cpus)
 	return result;
 }
 
+/**
+ * Display CPU values in digital
+ *
+ * @param cpus Table of cpus with their respective load
+ */
+function html_cpu_values(cpus)
+{
+	var n = cpus.length;
+	if (n === 0)
+	{
+		return '&nbsp;';
+	}
+	result=' ';
+	for (var i = 0; i < n; i++)
+	{
+		result += cpus[i]+'% ';
+	}
+	return result;
+}
 /**
  * Sends a request to XO to change the current of state of a domU,
  * then display/refresh the domU's window.

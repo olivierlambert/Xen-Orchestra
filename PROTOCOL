@@ -50,9 +50,17 @@ Always:
 =======
 
 - domU: An object describing the requested DomU.
-  - cap: ???
   - cpus: An array containing the utilisation level in percentage of the CPUs.
-  - d_min_ram: ???
+  - weight: A domain with a weight of 512 will get twice as much CPU as a domain with a weight
+    of 256 on a contended host. Legal weights range from 1 to 65535 and the default is 256
+  - cap: The cap optionally fixes the maximum amount of CPU a domain will be able to consume,
+    even if the host system has idle CPU cycles. The cap is expressed in percentage of one
+    physical CPU: 100 is 1 physical CPU, 50 is half a CPU, 400 is 4 CPUs, etc.
+    The default, 0, means there is no upper cap.
+  - d_min_ram: Dynamic Minimum RAM : how many min RAM the system can have while running
+  - d_max_ram: Dynamic Max RAM : how many max RAM the system can have while running
+  - s_min_ram: Static Min RAM : how many min RAM the system can have at startup
+  - s_max_ram: Static Max RAM : how many max RAM the system can have at startup
   - dom0_id: The identifier of the Dom0 this DomU belongs to.
   - id: Unique identifier of the DomU.
   - kernel: The path to the kernel.
@@ -63,5 +71,5 @@ Always:
   - ro: A boolean which indicates whether this domU is read-only.
   - state: The current power state (Running, Halted, Paused).
   - start_time: Timestamp which indicates when the DomU started.
-  - weight: ???
+
 

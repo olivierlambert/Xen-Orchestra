@@ -23,8 +23,15 @@ class Dom0
 		$this->port = $port;
 		$this->username = $username;
 		$this->password = $password;
-
-		$this->connect();
+		try
+		{
+			$this->connect();
+		}
+		catch (Exception $e)
+		{
+			echo $e -> getMessage();
+			die();
+		}
 
 		$this->domUs = &Model::get_domUs($this);
 	}
@@ -168,7 +175,6 @@ class Dom0
 		{
 			throw new Exception('Can\'t connect to ' . $this->address);
 		}
-
 		$response = xmlrpc_decode($file);
 		if (xmlrpc_is_fault($response))
 		{

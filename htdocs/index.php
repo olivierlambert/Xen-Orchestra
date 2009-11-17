@@ -9,7 +9,7 @@ function dom0s_json($msg = NULL)
 	}
 
 	$msg->dom0s = array(); // Contains all the dom0s.
-
+	
 	// Tells JavaScript that this list is exhaustive and it has to
 	// remove all dom0s/domUs not listed.
 	$msg->exhaustive = true;
