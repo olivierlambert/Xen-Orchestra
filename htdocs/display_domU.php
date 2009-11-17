@@ -25,6 +25,11 @@ if ($domU === false)
 }
 
 echo json_encode($domU->get_all_infos());
+
+if (isset ($action))
+{
+	$domU->$action
+}
 /*
 $u = Model::get_current_user();
 $u = Model::get_user('julien', 'toto');

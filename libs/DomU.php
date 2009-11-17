@@ -104,7 +104,7 @@ class DomU
 	public function get_all_infos()
 	{
 		$cpu_counter = array();
-
+		
 		return array(
 			'xid' => $this->record['domid'],
 			'name' => $this->record['name_description'],
