@@ -1,7 +1,7 @@
 ### FIRST OF ALL, THIS IS A PRE ALPHA VERSION ##
 
 So, this is NOT secure so far. Use it carefully to do some test
-and reports bugs. 
+and reports bugs.
 
 Go to :
 http://project.xen-orchestra.com
@@ -15,7 +15,7 @@ Please use "xm new domU.cfg" when you add a DomU, beside "xm create domU.cfg".
 Reasons on http://xen-orchestra.com/?p=96
 
 ### HOW TO CONFIGURE XEN DOM0 FOR CALL THE API ###
-# Ultra small documentation, please read the comment in 
+# Ultra small documentation, please read the comment in
 # xen configuration file
 
 - edit :
@@ -34,3 +34,4 @@ Carefully read :
 # key and certificate location:
 #
 #                    (9367 pam '' /etc/xen/xen-api.key /etc/xen/xen-api.crt)
+

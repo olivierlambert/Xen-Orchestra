@@ -3,7 +3,7 @@ html
 	background-color: #eee;
 	font-family:arial, verdana, sans-serif;
 	font-size: 10pt;
-
+	height: 100%
 }
 
 body
@@ -128,13 +128,6 @@ h1 a
 	text-indent: -3000em;
 }
 
-form
-{
-	margin-top: 2em;
-	margin-bottom: 2em;
-	text-align : center
-}
-
 #dl
 {
 	text-align: center;
@@ -226,35 +219,68 @@ caption
 /* COLUMNS NETVIBES LIKE */
 #widget_col_0
 {
-float:left;
-width: 50%;
+	float:left;
+	width: 50%;
 }
 
 #widget_col_1
 {
-width: 50%;
-float:left;
+	width: 50%;
+	float:left;
 }
 
 /* TABS IN VM WINDOW */
 #vm
 {
-color: #ddd;
+	color: #ddd;
 }
 
 #vm ul
 {
-margin:0 0 0 0;
+	margin:0 0 0 0;
 }
 
 #vm p
 {
-font: 90% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
-margin-top: 0px;
-margin-bottom : 0.4em;
-padding-left: 10em;
+	font: 90% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	margin-top: 0px;
+	margin-bottom : 0.4em;
+	padding-left: 10em;
 }
 
+/* LOGIN FORM */
+#login
+{
+	color: white;
+	font: 90% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	margin-top: 0px;
+	margin-right: 10px;
+	margin-bottom: -10px;
+	float: right;
+	z-index: 10;
+}
+
+#login input
+{
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	background:#eee;
+	border: 1px solid #1e1e1e;
+	font: 82% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	width: 60px;
+	/*height: 15px;*/
+}
+
+#password
+{
+	width: 160px;
+}
+
+/* ACTION BUTTON */
+.button
+{
+	cursor:pointer;
+}
 
 /* MENU IN VM PAGE */
 .menuvm
@@ -277,7 +303,7 @@ padding-left: 10em;
 }
 .menuvm li
 {
-	font: 80% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
+	font: 82% "Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif;
 	margin: 0;
 	padding: 0;
 }
@@ -384,6 +410,7 @@ padding-left: 10em;
 }
 .menu1 li
 {
+	z-index: 0;
 	float:left;
 	margin: auto;
 	text-align: center;
@@ -406,9 +433,10 @@ padding-left: 10em;
 
 .menu1 li a b
 {
+	text-transform: uppercase;
 	float:left;
 	display:block;
-	padding:0 16px 0 8px;
+	padding:0px 16px 0px 8px;
 }
 
 .menu1 li.current a
@@ -454,3 +482,4 @@ padding-left: 10em;
 	width:16px;
 	height:16px;
 }
+

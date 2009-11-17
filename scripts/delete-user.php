@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+require_once dirname (__FILE__) . '/../libs/prepend.php';
+
+$c = new CLIHelper();
+
+if (!Database::is_enabled())
+{
+	$c->writeln('The database is disabled.');
+	exit;
+}
+
+$username = $c->prompt('Username: ');
+
+if (Model::delete_user($username) !== false)
+{
+	$c->writeln('User deleted.');
+}
+else
+{
+	$c->writeln('User deletion failed.', STDERR);
+}
+

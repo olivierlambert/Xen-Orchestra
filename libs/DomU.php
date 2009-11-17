@@ -2,52 +2,36 @@
 
 class DomU
 {
-	public $vcpu_number, $vcpu_use;
-	private $id, $xid, $state, $record, $sid, $metrics, $date;
-	private $lastupdate;
-
-	public function __construct($id, Dom0 $dom0)
+	public function __construct($xid, Dom0 $dom0)
 	{
-		$this->id = $id;
+		$this->xid = $xid;
 		$this->dom0 = $dom0;
-		$this->record = $this->dom0->rpc_query('VM.get_record',$this->id);
-
-		// get needed variables
-		$this->sid 			= $this->record['uuid'];
-		$this->name 		= $this->record['name_description'];
-		$this->xid 			= $this->record['domid'];
-		$this->state 		= $this->record['power_state'];
-
-		$this->metrics = $this->dom0->rpc_query('VM_metrics.get_record',$this->record['metrics']);
-
-		$this->vcpu_number = $this->metrics['VCPUs_number'];
-		$this->date = $this->metrics['start_time'];
-		$this->lastupdate = $this->metrics['last_updated'];
-
-		$this->vcpu_use = array();
-		foreach($this->metrics['VCPUs_utilisation'] as $cpu)
-		{
-			$this->vcpu_use[] = round($cpu * 100, 2);
-		}
 	}
 
 	public function __call($name, $arguments)
 	{
 		switch ($name)
 		{
-			case 'destroy':
+			case 'delete':
 			case 'pause':
-			case 'resume':
-			case 'suspend':
-			case 'unpause':
-				$this->dom0->rpc_query ('VM.' . $name, $this->id);
+				$this->dom0->rpc_query ('VM.' . $name, $this->xid);
 				break;
-			case 'reboot':
-				$this->dom0->rpc_query('VM.hard_reboot', $this->id);
+			case 'play':
+				if ($this->power_state === 'Paused')
+				{
+					$this->dom0->rpc_query ('VM.unpause', $this->xid);
+				}
+				else
+				{
+					$this->dom0->rpc_query('VM.start', array(
+						$this->xid,
+						false // Do not start paused.
+					));
+				}
 				break;
-			case 'shutdown':
+			case 'stop':
 				//* TODO: decide wether we use hard or clean shutdown.
-				$this->dom0->rpc_query('VM.hard_shutdown', $this->id);
+				$this->dom0->rpc_query('VM.hard_shutdown', $this->xid);
 				/*/
 				$this->dom0->rpc_query('VM.clean_shutdown',$this->id);
 				//*/
@@ -59,14 +43,40 @@ class DomU
 
 	public function __get($name)
 	{
-		switch ($name)
+		if ($name === 'dom0')
 		{
-			case 'dom0':
-			case 'name':
-				return $this->$name;
-			case 'state':
-				return $this->dom0->rpc_query('VM.get_power_state',$this->id);
+			return $this->dom0;
 		}
+
+		if (isset(self::$aliases[$name]))
+		{
+			$name = self::$aliases[$name];
+		}
+
+		if ($this->vm_record === null)
+		{
+			$this->vm_record = $this->dom0->rpc_query(
+				'VM.get_record',
+				$this->xid
+			);
+		}
+		if (isset($this->vm_record[$name]))
+		{
+			return $this->vm_record[$name];
+		}
+
+		if ($this->vm_metrics_record === null)
+		{
+			$this->vm_metrics_record = $this->dom0->rpc_query(
+				'VM_metrics.get_record',
+				$this->vm_record['metrics']
+			);
+		}
+		if (isset($this->vm_metrics_record[$name]))
+		{
+			return $this->vm_metrics_record[$name];
+		}
+
 		if (isset ($this->$name))
 		{
 			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
@@ -92,17 +102,16 @@ class DomU
 		}
 	}
 
-	public function get_preview()
+	public function migrate($dest, $live)
 	{
-		return array(
-			'name' => $this->name,
-			'state' => $this->state
-		);
+		$port = array('port' => 8002);
+		$params = array($this->xid, $dest, true, $port);
+		$this->dom0->rpc_query('VM.migrate', $params);
 	}
 
-
-	public function get_all_infos()
+	public function lol()
 	{
+/*
 		$cpu_counter = array();
 		
 		return array(
@@ -132,20 +141,22 @@ class DomU
 			'date' => $this->date->timestamp,
 			'lastupdate' => $this->lastupdate->timestamp
 		);
+*/
+		return ($this->dom0->rpc_query('VM.get_record', $this->xid));
 	}
 
-	public function migrate($dest,$live)
+	public function refresh()
 	{
-		$port = array('port' => 8002);
-		$params = array($this->id, $dest, true, $port);
-		$this->dom0->rpc_query('VM.migrate', $params);
+		$this->vm_record = null;
+		$this->vm_metrics_record = null;
 	}
 
-	public function start($is_paused)
-	{
-		$params = array($this->id, $is_paused);
-		$this->dom0->rpc_query('VM.start', $params);
-	}
+	static private $aliases = array(
+		'id' => 'uuid',
+		'name' => 'name_label',
+	);
+
+	private $xid;
 
 	/**
 	 * The dom0 this domU belongs to.
@@ -154,6 +165,8 @@ class DomU
 	 */
 	private $dom0;
 
-	private $name;
+	private $vm_record = null;
+
+	private $vm_metrics_record = null;
 }
 

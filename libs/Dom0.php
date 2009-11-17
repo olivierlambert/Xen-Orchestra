@@ -64,11 +64,11 @@ class Dom0
 		}
 	}
 
-	public function getDomU($name)
+	public function getDomU($id)
 	{
-		if (isset ($this->domUs[$name]))
+		if (isset ($this->domUs[$id]))
 		{
-			return $this->domUs[$name];
+			return $this->domUs[$id];
 		}
 		return false;
 	}

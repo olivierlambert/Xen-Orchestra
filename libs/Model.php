@@ -17,6 +17,7 @@ final class Model
 
 		$id = Database::get_instance()->insert_user($name, $password, $email,
 			ACL::to_string($permission));
+
 		if ($id === false)
 		{
 			return false;
@@ -175,14 +176,14 @@ final class Model
 					{
 						if ($domU_->state === 'Halted')
 						{
-							unset (self::$domUs_by_dom0s[$dom0_id][$domU->name]);
+							unset (self::$domUs_by_dom0s[$dom0_id][$domU->id]);
 							unset (self::$domUs_by_names[$domU->name][$dom0_id]);
 						}
 					}
 				}
 			}
 
-			self::$domUs_by_dom0s[$dom0->id][$domU->name] = $domU;
+			self::$domUs_by_dom0s[$dom0->id][$domU->id] = $domU;
 			if (!isset(self::$domUs_by_names[$domU->name]))
 			{
 				self::$domUs_by_names[$domU->name] = array($dom0->id => $domU);
