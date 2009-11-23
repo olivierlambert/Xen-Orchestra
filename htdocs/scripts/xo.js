@@ -67,7 +67,7 @@ Dom0.prototype = {
 	addDomU: function (domU)
 	{
 		this.domUs[domU.id] = domU;
-
+		
 		this._panel.setContent(content_dom0(this));
 		this._panel.updateHeight();
 	},
@@ -81,6 +81,7 @@ Dom0.prototype = {
 		delete this.domUs[domU_id];
 
 		this._panel.setContent(content_dom0(this));
+		this._panel.updateHeight();
 	},
 };
 
@@ -127,10 +128,12 @@ DomU.prototype = {
 		}
 		this.dom0 = dom0;
 		this.dom0.addDomU(this);
+		//this._panel.updateHeight();
 
 		if (this.window !== null)
 		{
 			this._refresh_window();
+			this._panel.updateHeight();
 		}
 	},
 	open_window: function ()

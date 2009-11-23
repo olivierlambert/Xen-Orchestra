@@ -91,6 +91,7 @@ Object.extend(Xilinus.Widget.prototype, {
     $(this._contentDiv).setStyle({height: null})
       
     var h = $(this._contentDiv).getHeight();
+	//alert(h);
     $(this._contentDiv).setStyle({height: h + "px"})
   },
   
@@ -201,7 +202,6 @@ Object.extend(Xilinus.Portal.prototype, {
   // EVENTS CALLBACKS
   widgetMouseOver: function(event) {   
     this._clearTimer();
-      
     var element =  Event.element(event).up(".widget");
     if (this._currentOverWidget == null || this._currentOverWidget != element) {
       if (this._currentOverWidget && this._currentOverWidget != element)

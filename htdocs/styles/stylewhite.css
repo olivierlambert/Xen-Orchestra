@@ -138,21 +138,19 @@ caption
 	font-size: 0.8em;
 }
 
+
 #main table
 {
-	margin : auto;
+	margin-bottom : 0px;
 	text-align : center;
 	font-size : 0.89em;
-	border-width:3px;
-	border-style:medium solid;
-	border-color:#444;
 	border-collapse:collapse;
 	width:100%;
 }
 
 #main th
 {
-	margin : 5 5 5 5 px;
+	/*margin : 5 5 5 5 px;*/
 	padding : 8px 8px;
 	text-align : center;
 	color: #111;
@@ -369,6 +367,8 @@ caption
 	padding:5px;
 	border-right:1px solid #bbb;
 	margin-right:5px;
+	margin-bottom : 0px;
+	/*padding-bottom: 0px;*/
 }
 
 .widget_statusbar
