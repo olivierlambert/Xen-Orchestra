@@ -19,8 +19,8 @@
  * @license http://www.gnu.org/licenses/gpl-3.0-standalone.html GPLv3
  **/
 
-require_once dirname (__FILE__) . '/../includes/prepend.php';
-require 'includes/header.php';
+require_once dirname (__FILE__) . '/../libs/prepend.php';
+//require 'includes/header.php';
 ?>
 <div id="main"
 <h3>Available API method on Dom0's (debug purpose)</h3>
