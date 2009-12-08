@@ -198,23 +198,23 @@ DomU.prototype = {
 		{
 			if (this.state === 'Running')
 			{
-				var actions = ['pause', 'stop'];
+				var actions = ['pause', 'stop', 'poweroff'];
 			}
 			else if (this.state === 'Paused')
 			{
-				var actions = ['play', 'stop'];
+				var actions = ['play', 'stop', 'poweroff'];
 			}
 			else if (this.state === 'Halted')
 			{
-				var actions = ['play'];
+				var actions = ['play', 'destroy'];
 			}
-			actions.push('destroy');
+			//actions.push('destroy');
 
 			html += '<p><b>Actions: </b><br/>';
 			for (var i = 0; i < actions.length; ++i)
 			{
 				html += ('<img class="button" src="img/' + actions[i]
-					+ '.png" alt="" onclick="action_vm (\'' + this.id + '\', \''
+					+ '.png" alt="" title="'+ actions[i] +'" onclick="action_vm (\'' + this.id + '\', \''
 					+ actions[i] + '\')" />');
 			}
 			html += '</p>';

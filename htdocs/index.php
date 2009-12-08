@@ -171,6 +171,7 @@ elseif ($_GET['a'] === 'domU')
 			case 'pause':
 			case 'play':
 			case 'stop':
+			case 'poweroff':
 				$domU->$action();
 		}
 

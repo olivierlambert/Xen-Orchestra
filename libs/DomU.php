@@ -48,10 +48,7 @@ class DomU
 				}
 				break;
 			case 'stop':
-				//* TODO: decide wether we use hard or clean shutdown.
-				// Need to separate clean and hard shutdown, e.g poweroff
-				//$this->dom0->rpc_query('VM.hard_shutdown', $this->xid);
-				$this->dom0->rpc_query('VM.clean_shutdown',$this->id);
+				$this->dom0->rpc_query('VM.clean_shutdown',$this->xid);
 				break;
 			case 'poweroff':
 				$this->dom0->rpc_query('VM.hard_shutdown', $this->xid);
