@@ -41,15 +41,16 @@ class Dom0
 		$this->port = $port;
 		$this->username = $username;
 		$this->password = $password;
-		try
-		{
+		//try
+		//{
 			$this->connect();
-		}
+		//}
+		/*
 		catch (Exception $e)
 		{
 			echo $e -> getMessage();
 			die();
-		}
+		}*/
 
 		$this->domUs = &Model::get_domUs($this);
 	}
@@ -173,6 +174,7 @@ class Dom0
 	 */
 	private $domUs;
 
+
 	private function connect()
 	{
 		$method = 'session.login_with_password';
@@ -184,7 +186,8 @@ class Dom0
 			'content' => $request
 		)));
 
-		$file = file_get_contents(
+		ini_set('default_socket_timeout',4);
+		$file = @file_get_contents(
 			'http://' . $this->address . ':' . $this->port,
 			false,
 			$context

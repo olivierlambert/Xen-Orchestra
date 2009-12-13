@@ -105,12 +105,20 @@ final class Model
 				$entries = $config->$id;
 
 				list($address, $port) = explode (':', $id, 2);
-				return self::$dom0s[$id] = new Dom0(
-					$address,
-					$port,
-					isset($entries['username']) ? $entries['username'] : 'none',
-					isset($entries['password']) ? $entries['password'] : 'none'
-				);
+				try
+				{
+					return self::$dom0s[$id] = new Dom0(
+						$address,
+						$port,
+						isset($entries['username']) ? $entries['username'] : 'none',
+						isset($entries['password']) ? $entries['password'] : 'none'
+					);
+				}
+				catch (Exception $e)
+				{
+					var_dump($e->getMessage());
+					echo "\nERROR !! \n";
+				}
 			}
 			// There is no such dom0.
 			return self::$dom0s[$id] = false; // It may have existed.
@@ -151,13 +159,21 @@ final class Model
 				if (is_array($entries) && (strpos($entry, ':') !== false))
 				{
 					list($address, $port) = explode (':', $entry, 2);
-
-					self::$dom0s[$entry] = new Dom0(
-						$address,
-						$port,
-						isset($entries['username']) ? $entries['username'] : 'none',
-						isset($entries['password']) ? $entries['password'] : 'none'
-					);
+					try
+					{
+						self::$dom0s[$entry] = new Dom0(
+							$address,
+							$port,
+							isset($entries['username']) ? $entries['username'] : 'none',
+							isset($entries['password']) ? $entries['password'] : 'none'
+						);
+					}
+					catch (Exception $e)
+					{
+						// so far just put error in $error var
+						// TODO : use error code to display on web page
+						$error = $e->getMessage();
+					}
 				}
 			}
 		}
