@@ -116,8 +116,7 @@ final class Model
 				}
 				catch (Exception $e)
 				{
-					var_dump($e->getMessage());
-					echo "\nERROR !! \n";
+						return false;
 				}
 			}
 			// There is no such dom0.
