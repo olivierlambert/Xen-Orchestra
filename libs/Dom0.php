@@ -41,16 +41,8 @@ class Dom0
 		$this->port = $port;
 		$this->username = $username;
 		$this->password = $password;
-		//try
-		//{
-			$this->connect();
-		//}
-		/*
-		catch (Exception $e)
-		{
-			echo $e -> getMessage();
-			die();
-		}*/
+
+		$this->connect();
 
 		$this->domUs = &Model::get_domUs($this);
 	}

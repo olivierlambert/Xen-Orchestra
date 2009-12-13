@@ -172,7 +172,9 @@ final class Model
 					{
 						// so far just put error in $error var
 						// TODO : use error code to display on web page
-						$error = $e->getMessage();
+						$error = 'ERROR: '.$address.' is not reachable.';
+						//echo $error;
+						//self::$dom0s[$entry] = $error;
 					}
 				}
 			}
