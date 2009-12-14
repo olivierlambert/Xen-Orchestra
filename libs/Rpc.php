@@ -65,6 +65,7 @@ class Rpc {
 		{
 			return $this->response = $response['ErrorDescription'];
 		}
+		fclose($file);
 	}
 
 	public function __toString()
