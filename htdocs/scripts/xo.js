@@ -87,7 +87,7 @@ Dom0.prototype = {
 	addDomU: function (domU)
 	{
 		this.domUs[domU.id] = domU;
-		
+
 		this._panel.setContent(content_dom0(this));
 		this._panel.updateHeight();
 	},
@@ -119,8 +119,9 @@ DomU.prototype = {
 	{
 		if (this.window !== null)
 		{
-			// Closes the window.
+			// Close the window
 		}
+		this.dom0.removeDomU(this.id);
 	},
 	update: function (dom0, name, cpus, state, ro, cap, d_min_ram, kernel,
 		on_crash, on_reboot, on_shutdown, start_time, weight)
