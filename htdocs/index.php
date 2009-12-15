@@ -167,7 +167,7 @@ elseif ($_GET['a'] === 'domU')
 		}
 		switch ($action)
 		{
-			case 'delete':
+			case 'destroy':
 			case 'pause':
 			case 'play':
 			case 'stop':

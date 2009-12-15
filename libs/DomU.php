@@ -30,7 +30,7 @@ class DomU
 	{
 		switch ($name)
 		{
-			case 'delete':
+			case 'destroy':
 			case 'pause':
 				$this->dom0->rpc_query ('VM.' . $name, $this->xid);
 				break;
