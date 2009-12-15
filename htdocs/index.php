@@ -145,6 +145,7 @@ elseif ($_GET['a'] === 'domU')
 	}
 
 	$dom0 = Model::get_dom0($dom0_id);
+	$dom0->disconnect();
 	if ($dom0 === false)
 	{
 		$msg->error('No such dom0');

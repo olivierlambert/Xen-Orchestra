@@ -166,7 +166,11 @@ class Dom0
 	 */
 	private $domUs;
 
-
+	public function disconnect()
+	{
+		rpc_query('session.logout');
+	}
+	
 	private function connect()
 	{
 		$method = 'session.login_with_password';
@@ -189,6 +193,7 @@ class Dom0
 			throw new Exception('Can\'t connect to ' . $this->address);
 		}
 		$response = xmlrpc_decode($file);
+		//fclose($file);
 		if (xmlrpc_is_fault($response))
 		{
 			new Exception('XMLRPC error: ' . $response['faultString'] .' ('
@@ -197,5 +202,6 @@ class Dom0
 
 		$id = $response['Value'];
 		$this->connection = new Rpc($this->address, $this->port, $id);
+
 	}
 }

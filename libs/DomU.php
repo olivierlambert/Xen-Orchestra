@@ -122,7 +122,7 @@ class DomU
 	public function migrate($dest, $live)
 	{
 		$port = array('port' => 8002);
-		$params = array($this->xid, $dest, true, $port);
+		$params = array($this->xid, $dest, $live, $port);
 		$this->dom0->rpc_query('VM.migrate', $params);
 	}
 
