@@ -331,8 +331,8 @@ final class Model
 		}
 
 		$db = Database::get_instance();
-		$stmt = $db->prepare('SELECT "dom0_id", "domU_name", "permission" '
-			. 'FROM "acls" WHERE "user_id" = :user_id');
+		$stmt = $db->prepare('SELECT dom0_id, domU_name, permission '
+			. 'FROM acls WHERE user_id = :user_id');
 
 		if (!$stmt->execute(array(':user_id' => $user->id)))
 		{

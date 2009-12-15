@@ -74,7 +74,7 @@ final class Database extends PDO
 	 */
 	public function delete_user($name)
 	{
-		$stmt = $this->prepare('DELETE FROM "users" WHERE "name" = ?');
+		$stmt = $this->prepare('DELETE FROM users WHERE name = ?');
 
 		return ($stmt->execute(array($name)) && ($stmt->rowCount() === 1));
 	}
@@ -94,8 +94,8 @@ final class Database extends PDO
 			return false; // Incorrect query.
 		}
 
-		$stmt = $this->prepare('SELECT "id", "name", "password", "email", '
-			. '"permission" FROM "users" WHERE "' . $by . '" = ?');
+		$stmt = $this->prepare('SELECT id, name, password, email, '
+			. 'permission FROM users WHERE ' . $by . ' = ?');
 
 		if (!$stmt->execute(array($value))
 			|| (($r = $stmt->fetch(PDO::FETCH_NUM)) === false))
@@ -108,8 +108,8 @@ final class Database extends PDO
 
 	public function get_users()
 	{
-		$stmt = $this->query('SELECT "id", "name", '
-			. '"password", "email", "permission" FROM "users"');
+		$stmt = $this->query('SELECT id, name, '
+			. 'password, email, permission FROM users');
 
 		if ($stmt === false)
 		{
@@ -140,8 +140,8 @@ final class Database extends PDO
 	 */
 	public function insert_user($name, $password, $email, $permission)
 	{
-		$stmt = $this->prepare('INSERT INTO "users" '
-			. '("name", "password", "email", "permission") VALUES '
+		$stmt = $this->prepare('INSERT INTO users '
+			. '(name, password, email, permission) VALUES '
 			. '(?, ?, ?, ?)');
 
 		$r = $stmt->execute(array($name, $password, $email, $permission));
@@ -156,8 +156,8 @@ final class Database extends PDO
 
 	public function update_user(User $u)
 	{
-		$stmt = $this->prepare('UPDATE "users" SET "name" = ?, "password" = ?, '
-			.'"email" = ?, "permission" = ? WHERE "id" = ?');
+		$stmt = $this->prepare('UPDATE users SET name = ?, password = ?, '
+			.'email = ?, permission = ? WHERE id = ?');
 
 		$r = $stmt->execute(array($u->name, $u->password, $u->email,
 			ACL::to_string($u->permission), $u->id));
