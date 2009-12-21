@@ -165,12 +165,12 @@ class Dom0
 	 * @var array
 	 */
 	private $domUs;
-
+/*
 	public function disconnect()
 	{
-		rpc_query('session.logout');
+		$this->rpc_query('session.logout');
 	}
-	
+*/
 	private function connect()
 	{
 		$method = 'session.login_with_password';
