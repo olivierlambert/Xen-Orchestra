@@ -136,7 +136,28 @@ final class Model
 		// to true.
 		return self::get_dom0($id, true);
 	}
-
+	
+	/**
+	 * Returns adresses of all others dom0s which have NOT address $address given in parameter.
+	 *
+	 * @param string  $address      Address of the current dom0.
+	 *
+	 * @return adresses $adresses if present, otherwise false.
+	 */
+	public static function get_other_dom0s_addresses($address)
+	{
+		$dom0s = Model::get_dom0s();
+		$adresses = array();
+		foreach ($dom0s as $dom0)
+		{
+			if ($dom0->address !== $address)
+			{
+				array_push($adresses,$dom0->address);
+			}
+		}
+		return ($adresses);
+	}
+	
 	/**
 	 * Returns all the dom0s present in the database.
 	 *

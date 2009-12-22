@@ -199,6 +199,7 @@ elseif ($_GET['a'] === 'domU')
 		'state' => $domU->power_state,
 		'start_time' => $domU->start_time->timestamp,
 		'weight' => $domU->VCPUs_params['weight'],
+		'other_dom0s' => Model::get_other_dom0s_addresses($dom0->address),
 	);
 }
 else

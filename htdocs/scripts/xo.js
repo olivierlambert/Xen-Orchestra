@@ -106,7 +106,7 @@ Dom0.prototype = {
 };
 
 
-function DomU(id, dom0, name, cpus, state, ro)
+function DomU(id, dom0, name, cpus, state, ro, other_dom0s)
 {
 	this.id = id;
 	this.dom0 = null;
@@ -120,17 +120,19 @@ DomU.prototype = {
 		if (this.window !== null)
 		{
 			// Close the window
+			this.window.close();
 		}
 		this.dom0.removeDomU(this.id);
 	},
 	update: function (dom0, name, cpus, state, ro, cap, d_min_ram, kernel,
-		on_crash, on_reboot, on_shutdown, start_time, weight)
+		on_crash, on_reboot, on_shutdown, start_time, weight, other_dom0s )
 	{
 		this.name = name;
 		this.cpus = cpus;
 		this.state = state;
 		this.ro = ro;
-
+		this.other_dom0s = other_dom0s;
+		
 		if (cap !== undefined) // The second part of arguments is optional.
 		{
 			this.cap = cap;
@@ -149,7 +151,6 @@ DomU.prototype = {
 		}
 		this.dom0 = dom0;
 		this.dom0.addDomU(this);
-		//this._panel.updateHeight();
 
 		if (this.window !== null)
 		{
@@ -163,16 +164,18 @@ DomU.prototype = {
 		this.window = new Window({
 			className: 'alphacube',
 			showProgress: true,
+			showEffect:Effect.Appear,
+			width: 500,
+			height: 206,
+			resizable: false,
 			onClose: function ()
 			{
 				_this.window = null;
 			}
 		});
-
 		this._refresh_window();
-
-		this.window.setSize(500, 206);
 		this.window.show();
+		//this.window.showCenter();
 	},
 	_refresh_window: function ()
 	{
@@ -219,6 +222,15 @@ DomU.prototype = {
 					+ actions[i] + '\')" />');
 			}
 			html += '</p>';
+			html += '<p><b>Live Migration to: </b>';
+			html += html_addresses_migration(this.other_dom0s) +'</p>';
+			//for (var i = 0; i < this.other_dom0s.length; ++i)
+			//{
+			//	html += other_dom0s[i];
+			//}
+			//alert(this.other_dom0s);
+			
+			//html += ''+ html_addresses_migration(this.other_dom0s) +'</p>';
 		}
 		html += '</div>';
 
@@ -331,6 +343,36 @@ function html_cpu_values(cpus)
 	}
 	return result;
 }
+
+/**
+ * Display address for live migration
+ *
+ * @param adresses of others Dom0 to migrate
+ */
+function html_addresses_migration(addresses)
+{
+	var result = '';
+	if (addresses == undefined)
+	{
+		result +='No suitable other Dom0 found';
+	}
+	else
+	{
+		var n = addresses.length;
+		if (n === 0)
+		{
+			return 'No suitable other Dom0 found';
+		}
+		result=' ';
+		for (var i = 0; i < n; ++i)
+		{
+			result += addressses[i]+'&nbsp ';
+		}
+	}
+	return result;
+	
+}
+
 /**
  * Sends a request to XO to change the current of state of a domU,
  * then display/refresh the domU's window.
@@ -360,8 +402,7 @@ function display_vm(domU_id)
 	var domU = domUs[domU_id];
 	if (domU.window !== null)
 	{
-		// The window already exists, maybe we should put it on the
-		// foreground.
+		domU.window.toFront();
 		return;
 	}
 
@@ -397,11 +438,13 @@ function refresh()
  */
 function content_dom0(dom0)
 {
-	if (dom0.domUs.length === 0)
-	{
-		return '<p>No DomU detected</p>';
-	}
-
+	//if (dom0.domUs.id === undefined)
+	//{
+	//	return '<p>No DomU detected</p>';
+	//}
+	// TODO : dom0.domUs.length IS NOT DEFINED : BROKEN
+	// BECAUSE dom0.domUs is AN OBJECT NOT A ARRAY
+	//alert(Object.isArray(dom0.domUs));
 	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
 	for (domU_id in dom0.domUs)
 	{
@@ -413,6 +456,7 @@ function content_dom0(dom0)
 			+ '</td></tr>';
 	}
 	return result + '</table>';
+
 }
 
 function login(event)
@@ -618,7 +662,7 @@ function register_info(info)
 		domU.update(dom0, info.domU.name, info.domU.cpus, info.domU.state,
 			info.domU.ro, info.domU.cap, info.domU.d_min_ram, info.domU.kernel,
 			info.domU.on_crash, info.domU.on_reboot, info.domU.on_shutdown,
-			info.domU.start_time, info.domU.weight);
+			info.domU.start_time, info.domU.weight, info.domU.other_dom0s);
 	}
 }
 
@@ -652,7 +696,7 @@ document.observe('dom:loaded', function ()
 		this.endDrag_old(eventName, draggable);
 	}
 
-	portal = new Xilinus.Portal('#main div');
+	portal = new Xilinus.Portal('#main div', {removeEffect: Effect.SwitchOff});
 
 	setTimeout(refresh, refresh_time);
 });

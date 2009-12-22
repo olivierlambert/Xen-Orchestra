@@ -91,7 +91,7 @@ Object.extend(Xilinus.Widget.prototype, {
     $(this._contentDiv).setStyle({height: null})
       
     var h = $(this._contentDiv).getHeight();
-	//alert(h);
+
     $(this._contentDiv).setStyle({height: h + "px"})
   },
   
