@@ -213,14 +213,14 @@ final class Model
 					{
 						if ($domU_->power_state === 'Halted')
 						{
-							unset (self::$domUs_by_dom0s[$dom0_id][$domU->name]);
+							unset (self::$domUs_by_dom0s[$dom0_id][$domU->id]);
 							unset (self::$domUs_by_names[$domU->name][$dom0_id]);
 						}
 					}
 				}
 			}
 
-			self::$domUs_by_dom0s[$dom0->id][$domU->name] = $domU;
+			self::$domUs_by_dom0s[$dom0->id][$domU->id] = $domU;
 			if (!isset(self::$domUs_by_names[$domU->name]))
 			{
 				self::$domUs_by_names[$domU->name] = array($dom0->id => $domU);
@@ -430,7 +430,7 @@ final class Model
 	private static $all_dom0s_retrieved = false;
 
 	/**
-	 * This array contains all the domUs: dom0_ids => name => domU.
+	 * This array contains all the domUs: dom0_ids => domU_id => domU.
 	 *
 	 * @var array
 	 */
