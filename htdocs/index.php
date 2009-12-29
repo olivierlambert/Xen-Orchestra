@@ -174,8 +174,24 @@ elseif ($_GET['a'] === 'domU')
 			case 'stop':
 			case 'poweroff':
 				$domU->$action();
+				break;
 			case 'migrate':
-				$domU->migrate(Model::get_dom0($_GET['t']), true);
+				if (!isset($_GET['t']))
+				{
+					$msg->error('Missing parameter');
+					exit;
+				}
+				$target = Model::get_dom0($_GET['t']);
+				if ($target === false)
+				{
+					$msg->error('Invalid targer');
+					exit;
+				}
+				$domU->migrate($target, true);
+				break;
+			default:
+				$msg->error('Incorrect action');
+				exit;
 		}
 
 		$domU->refresh();
@@ -207,4 +223,3 @@ else
 {
 	$msg->error('No such action');
 }
-

@@ -19,6 +19,7 @@
 	//<![CDATA[
 		document.observe('dom:loaded', function ()
 		{
+			init();
 			register_info('<?php echo addcslashes($json, '\'') ?>'.evalJSON());
 		});
 	//]]>

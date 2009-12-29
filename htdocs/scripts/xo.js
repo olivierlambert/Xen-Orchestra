@@ -29,9 +29,9 @@ var dom0s = {};
 var domUs = {};
 
 /**
- * Time between each refresh (in seconds)
+ * Time between each refresh (in milliseconds)
  */
-var refresh_time = 10;
+var refresh_time = 10000;
 /**
  * The portal object : refer to class portal, which displays dom0s in
  * panels, which can be moved.
@@ -124,6 +124,15 @@ function DomU(id, dom0, name, cpus, state, ro)
 	this.id = id;
 	this.dom0 = null;
 	this.window = null; // Window associated to this DomU.
+
+	this.cap = 'N/A';
+	this.d_min_ram = 'N/A';
+	this.kernel = 'N/A';
+	this.on_crash = 'N/A';
+	this.on_reboot = 'N/A';
+	this.on_shutdown = 'N/A';
+	this.start_time = 'N/A';
+	this.weight = 'N/A';
 
 	this.update(dom0, name, cpus, state, ro);
 }
@@ -678,9 +687,9 @@ function notify(message)
 }
 
 /**
- * When the DOM is fully loaded, initialize all listeners and Portal.
+ * Initialize all listeners and Portal (to call when the Dom is loaded).
  */
-document.observe('dom:loaded', function ()
+function init()
 {
 	draw_log_area();
 
@@ -700,5 +709,5 @@ document.observe('dom:loaded', function ()
 	portal = new Xilinus.Portal('#main div', {removeEffect: Effect.SwitchOff});
 
 	setTimeout(refresh, refresh_time);
-});
+}
 

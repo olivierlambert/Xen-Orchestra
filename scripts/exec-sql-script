@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/bin/env php
 <?php
 require dirname(__FILE__) . '/../libs/prepend.php';
 
@@ -32,6 +32,8 @@ if ($n === 0)
 	exit;
 }
 
+sort($entries);
+
 for (;;)
 {
 	$c->writeln($n . ' script(s) available.');
@@ -61,7 +63,7 @@ foreach ($lines as $line)
 		continue;
 	}
 
-	if ($line[0] === '#') // Comment line, ignore it.
+	if (substr($line, 0, 2) === '--') // Comment line, ignore it.
 	{
 		continue;
 	}
@@ -74,11 +76,13 @@ $queries = explode(";\n", $sql);
 $db = Database::get_instance();
 foreach ($queries as $query)
 {
+	$query = trim($query);
 	if (empty($query))
 	{
 		continue;
 	}
 
+	echo PHP_EOL, 'Query: ', $query, PHP_EOL;
 	var_dump($db->exec($query));
 }
 

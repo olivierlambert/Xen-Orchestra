@@ -1,14 +1,26 @@
 Server Requirements:
 - Apache
 - php5 + php5-xmlrpc
-- joinable Dom0 RPC daemon, see the README.txt
+- joinable Dom0 RPC daemon, see the README
 
-1) Untar the tarball in your /var/www/ folder.
+1) Make sure that:
+   - the folder this file is in and all the files inside are readable by you web
+     server;
+   - the "htdocs" directory is accessible through your web server;
+   - PHP 5 is correctly configured with the following extension:
+     * XML-RPC,
+	 * a PDO driver (mandatory for advanced user management),
+     * the command line interpreter (mandatory for the installation scripts) .
 
-2) RENAME "xen-orchestra.conf.dist" TO ""xen-orchestra.conf" : Otherwise, it doesn't work !
+2) Copy "xen-orchestra.conf.dist" to "xen-orchestra.conf" and edit it accordingly
+   to your configuration.
 
-3)edit your config file named "xen-orchestra.conf", see the comments
+3) If you are using users management:
+   - check if there is an SQL script for your database in the "sql" directory;
+   - if there is not, write one yourself drawing inspiration from existing ones,
+   - execute it (you can use the "exec-sql-script" script in the "scripts"
+     directory),
+   - finally, you can create users with the "create-user" script.
 
-4) Then, open:
-http://your-server-address/xen/htdocs/
+4) Now you can at last open your web browser and start using it.
 
