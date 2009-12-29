@@ -157,12 +157,15 @@ DomU.prototype = {
 			this.weight = weight;
 		}
 
-		if (this.dom0 !== null)
+		if (dom0 !== this.dom0)
 		{
-			this.dom0.removeDomU(this.id);
+			if (this.dom0 !== null)
+			{
+				this.dom0.removeDomU(this.id);
+			}
+			this.dom0 = dom0;
+			this.dom0.addDomU(this);
 		}
-		this.dom0 = dom0;
-		this.dom0.addDomU(this);
 
 		if (this.window !== null)
 		{
@@ -375,35 +378,6 @@ function html_cpu_values(cpus)
 }
 
 /**
- * Display address for live migration
- *
- * @param adresses of others Dom0 to migrate
- */
-function html_addresses_migration(addresses)
-{
-	var result = '';
-	if (addresses == undefined)
-	{
-		result +='No suitable other Dom0 found';
-	}
-	else
-	{
-		var n = addresses.length;
-		if (n === 0)
-		{
-			return 'No suitable other Dom0 found';
-		}
-		result=' ';
-		for (var i = 0; i < n; ++i)
-		{
-			result += addresses[i] + '&nbsp ';
-		}
-	}
-	return result;
-
-}
-
-/**
  * Sends a request to XO to change the current of state of a domU,
  * then display/refresh the domU's window.
  *
@@ -489,32 +463,6 @@ function content_dom0(dom0)
 			+ '</td></tr>';
 	}
 	return result + '</table>';
-
-}
-
-function login(event)
-{
-	event.stop();
-
-	var name = $F('name');
-
-	if (name === '')
-	{
-		notify('The name field is mandatory.');
-		return;
-	}
-
-	send_request('login', {
-		'name': name,
-		'password': MD5($F('password'))
-	});
-}
-
-function logout(event)
-{
-	event.stop();
-
-	send_request('logout');
 }
 
 function draw_log_area()
@@ -542,7 +490,23 @@ function draw_log_area()
 					'value': 'Log in'
 				}))
 			)
-			.observe('submit', login)
+			.observe('submit', function (e)
+			{
+				e.stop();
+
+				var name = $F('name');
+
+				if (name === '')
+				{
+					notify('The name field is mandatory.');
+					return;
+				}
+
+				send_request('login', {
+					'name': name,
+					'password': MD5($F('password'))
+				});
+			})
 		);
 	}
 	else
@@ -550,7 +514,11 @@ function draw_log_area()
 		d.update(new Element('p')
 			.insert('Logged as <em>' + user + '</em>. ')
 			.insert(new Element('input', {'type': 'button', 'value': 'Log out'})
-				.observe('click', logout)
+				.observe('click', function (e)
+				{
+					e.stop();
+					send_request('logout');
+				})
 			)
 		);
 	}
