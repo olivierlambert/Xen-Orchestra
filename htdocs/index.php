@@ -28,7 +28,7 @@ function dom0s_json($msg = NULL)
 	}
 
 	$msg->dom0s = array(); // Contains all the dom0s.
-	
+
 	// Tells JavaScript that this list is exhaustive and it has to
 	// remove all dom0s/domUs not listed.
 	$msg->exhaustive = true;
@@ -174,6 +174,8 @@ elseif ($_GET['a'] === 'domU')
 			case 'stop':
 			case 'poweroff':
 				$domU->$action();
+			case 'migrate':
+				$domU->migrate(Model::get_dom0($_GET['t']), true);
 		}
 
 		$domU->refresh();
@@ -199,7 +201,6 @@ elseif ($_GET['a'] === 'domU')
 		'state' => $domU->power_state,
 		'start_time' => $domU->start_time->timestamp,
 		'weight' => $domU->VCPUs_params['weight'],
-		'other_dom0s' => Model::get_other_dom0s_addresses($dom0->address),
 	);
 }
 else

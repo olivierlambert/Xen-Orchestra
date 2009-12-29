@@ -27,26 +27,26 @@ class Rpc {
 	public $method;
 	public $response;
 
-	public function __construct($address,$port,$id) {
-
+	public function __construct($address, $port ,$id)
+	{
 		$this->address = $address;
 		$this->port = $port;
 		$this->id = $id;
 	}
 
-	public function send ($method,$params=null)
+	public function send($method, $params = null)
 	{
 		$this->method = $method;
-		if ($params==null)
+		if ($params === null)
 		{
 			$this->params = $this->id;
 		}
 		else
 		{
-			$this->params = array_merge((array)$this->id,(array)$params);
+			$this->params = array_merge((array)$this->id, (array)$params);
 		}
 
-		$request = xmlrpc_encode_request($method,$this->params);
+		$request = xmlrpc_encode_request($method, $this->params);
 		$context = stream_context_create(array(
 			'http' => array(
 				'method' => 'POST',
@@ -54,18 +54,17 @@ class Rpc {
 				'content' => $request
 			)
 		));
-		$file = file_get_contents('http://'.$this->address.':'.$this->port, false, $context);
-		$response = xmlrpc_decode($file);
+		$data = file_get_contents('http://'.$this->address.':'.$this->port, false, $context);
+		$response = xmlrpc_decode($data);
 
-		if ($response['Status'] == 'Success')
+		if ($response['Status'] === 'Success')
 		{
 			return $this->response = $response['Value'];
 		}
-		elseif ($response['Status'] == 'Failure')
+		elseif ($response['Status'] === 'Failure')
 		{
 			return $this->response = $response['ErrorDescription'];
 		}
-		fclose($file);
 	}
 
 	public function __toString()

@@ -47,6 +47,11 @@ class Dom0
 		$this->domUs = &Model::get_domUs($this);
 	}
 
+	public function __destruct()
+	{
+		$this->rpc_query('session.logout');
+	}
+
 	public function __get ($name)
 	{
 		switch ($name)
@@ -165,12 +170,7 @@ class Dom0
 	 * @var array
 	 */
 	private $domUs;
-/*
-	public function disconnect()
-	{
-		$this->rpc_query('session.logout');
-	}
-*/
+
 	private function connect()
 	{
 		$method = 'session.login_with_password';
@@ -182,18 +182,16 @@ class Dom0
 			'content' => $request
 		)));
 
-		ini_set('default_socket_timeout',4);
-		$file = @file_get_contents(
+		$data = @file_get_contents(
 			'http://' . $this->address . ':' . $this->port,
 			false,
 			$context
 		);
-		if (!$file)
+		if (!$data)
 		{
 			throw new Exception('Can\'t connect to ' . $this->address);
 		}
-		$response = xmlrpc_decode($file);
-		//fclose($file);
+		$response = xmlrpc_decode($data);
 		if (xmlrpc_is_fault($response))
 		{
 			new Exception('XMLRPC error: ' . $response['faultString'] .' ('
@@ -202,6 +200,5 @@ class Dom0
 
 		$id = $response['Value'];
 		$this->connection = new Rpc($this->address, $this->port, $id);
-
 	}
 }

@@ -94,7 +94,7 @@ class DomU
 			return $this->vm_metrics_record[$name];
 		}
 
-		if (isset ($this->$name))
+		if (isset($this->$name))
 		{
 			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
 		}
@@ -119,47 +119,18 @@ class DomU
 		}
 	}
 
-	public function migrate($dest, $live)
+	/**
+	 * Migrates this domU to the dom0 `$dom0`.
+	 *
+	 * @param dom0 The destination.
+	 * @param live Wether the migration should be live.
+	 */
+	public function migrate(Dom0 $dom0, $live = true)
 	{
 		$port = array('port' => 8002);
-		$params = array($this->xid, $dest, $live, $port);
-		$this->dom0->rpc_query('VM.migrate', $params);
-	}
-
-	public function lol()
-	{
-/*
-		$cpu_counter = array();
-		
-		return array(
-			'xid' => $this->record['domid'],
-			'name' => $this->record['name_description'],
-			'state' => $this->record['power_state'],
-			'kernel' => $this->record['PV_kernel'],
-			'weight' => $this->record['VCPUs_params']['weight'],
-			'cap' => $this->record['VCPUs_params']['cap'],
-			's_max_ram' => $this->record['memory_static_max'],
-			's_min_ram' => $this->record['memory_static_min'],
-			'd_max_ram' => $this->record['memory_dynamic_max'],
-			'd_min_ram' => $this->record['memory_dynamic_min'],
-			'auto_power_on' => $this->record['auto_power_on'],
-			'vcpu_max' => $this->record['VCPUs_max'],
-			'vcpus_at_startup' => $this->record['VCPUs_at_startup'],
-			'actions_after_shutdown' => $this->record['actions_after_shutdown'],
-			'actions_after_reboot' => $this->record['actions_after_reboot'],
-			'actions_after_crash' => $this->record['actions_after_crash'],
-			'template' => $this->record['is_a_template'],
-			'pvargs' => $this->record['PV_args'],
-			'vifs' => $this->record['VIFs'],
-			'vbds' => $this->record['VBDs'],
-			'sid' => $this->record['uuid'],
-			'vcpu_use' => $this->vcpu_use,
-			'vcpu_number' => $this->metrics['VCPUs_number'],
-			'date' => $this->date->timestamp,
-			'lastupdate' => $this->lastupdate->timestamp
-		);
-*/
-		return ($this->dom0->rpc_query('VM.get_record', $this->xid));
+		$params = array($this->xid, $dom0->address, $live, $port);
+		$this->dom0->rpc_query('VM.migrate', $params); // There is a problem here.
+		$this->dom0 = $dom0;
 	}
 
 	public function refresh()

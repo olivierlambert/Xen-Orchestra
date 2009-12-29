@@ -61,6 +61,18 @@ var tasks = 0;
  */
 var balance = 0;
 
+Object.isEmpty = function(object)
+{
+	for (var prop in object)
+	{
+		if (object.hasOwnProperty(prop))
+		{
+			return false;
+		}
+	}
+	return true;
+};
+
 
 function Dom0(id, address, ro)
 {
@@ -83,6 +95,7 @@ Dom0.prototype = {
 		this.ro = ro;
 
 		this._panel.setTitle(this.address).setContent(content_dom0(this));
+		this._panel.updateHeight();
 	},
 	addDomU: function (domU)
 	{
@@ -106,7 +119,7 @@ Dom0.prototype = {
 };
 
 
-function DomU(id, dom0, name, cpus, state, ro, other_dom0s)
+function DomU(id, dom0, name, cpus, state, ro)
 {
 	this.id = id;
 	this.dom0 = null;
@@ -125,14 +138,13 @@ DomU.prototype = {
 		this.dom0.removeDomU(this.id);
 	},
 	update: function (dom0, name, cpus, state, ro, cap, d_min_ram, kernel,
-		on_crash, on_reboot, on_shutdown, start_time, weight, other_dom0s )
+		on_crash, on_reboot, on_shutdown, start_time, weight)
 	{
 		this.name = name;
 		this.cpus = cpus;
 		this.state = state;
 		this.ro = ro;
-		this.other_dom0s = other_dom0s;
-		
+
 		if (cap !== undefined) // The second part of arguments is optional.
 		{
 			this.cap = cap;
@@ -155,7 +167,6 @@ DomU.prototype = {
 		if (this.window !== null)
 		{
 			this._refresh_window();
-			this._panel.updateHeight();
 		}
 	},
 	open_window: function ()
@@ -212,7 +223,6 @@ DomU.prototype = {
 			{
 				var actions = ['play', 'destroy'];
 			}
-			//actions.push('destroy');
 
 			html += '<p><b>Actions: </b><br/>';
 			for (var i = 0; i < actions.length; ++i)
@@ -223,14 +233,15 @@ DomU.prototype = {
 			}
 			html += '</p>';
 			html += '<p><b>Live Migration to: </b>';
-			html += html_addresses_migration(this.other_dom0s) +'</p>';
-			//for (var i = 0; i < this.other_dom0s.length; ++i)
-			//{
-			//	html += other_dom0s[i];
-			//}
-			//alert(this.other_dom0s);
-			
-			//html += ''+ html_addresses_migration(this.other_dom0s) +'</p>';
+
+			var targets = find_possible_targets(this);
+			for (var i = 0; i < targets.length; ++i)
+			{
+				html += '<a href="#" onclick="action_vm(\'' + this.id
+					+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
+					+ dom0s[targets[i]].address + '</a>';
+			}
+			html += '</p>';
 		}
 		html += '</div>';
 
@@ -284,6 +295,25 @@ function task_stop()
 		$(document.documentElement).setStyle ({'cursor': 'auto'});
 	}
 }
+
+/**
+ * TODO: write doc.
+ */
+function find_possible_targets(domU)
+{
+	var targets = [];
+
+	for (var dom0_id in dom0s)
+	{
+		var dom0 = dom0s[dom0_id];
+		if (!dom0.ro && (dom0 !== domU.dom0))
+		{
+			targets.push(dom0_id);
+		}
+	}
+	return targets;
+}
+
 
 /**
  * Display CPU meters in function of their load
@@ -366,24 +396,30 @@ function html_addresses_migration(addresses)
 		result=' ';
 		for (var i = 0; i < n; ++i)
 		{
-			result += addressses[i]+'&nbsp ';
+			result += addresses[i] + '&nbsp ';
 		}
 	}
 	return result;
-	
+
 }
 
 /**
  * Sends a request to XO to change the current of state of a domU,
  * then display/refresh the domU's window.
  *
- * @param domU   The domU's identifier.
- * @param action The action to do among (destroy, halt, pause, start).
+ * @param domU       The domU's identifier.
+ * @param action     The action to do among (destroy, halt, pause, start).
+ * @param parameters Optional parameters (useful for migration).
  */
-function action_vm(domU_id, action)
+function action_vm(domU_id, action, parameters)
 {
 	var dom0_id = domUs[domU_id].dom0.id;
-	send_request('domU', {'action': action, 'dom0': dom0_id, 'domU': domU_id}, {
+	if (parameters === undefined)
+	{
+		parameters = {};
+	}
+	Object.extend(parameters, {'action': action, 'dom0': dom0_id, 'domU': domU_id});
+	send_request('domU', parameters, {
 		onFailure: function ()
 		{
 			notify('The request did not succeed.');
@@ -438,13 +474,10 @@ function refresh()
  */
 function content_dom0(dom0)
 {
-	//if (dom0.domUs.id === undefined)
-	//{
-	//	return '<p>No DomU detected</p>';
-	//}
-	// TODO : dom0.domUs.length IS NOT DEFINED : BROKEN
-	// BECAUSE dom0.domUs is AN OBJECT NOT A ARRAY
-	//alert(Object.isArray(dom0.domUs));
+	if (Object.isEmpty(dom0.domUs))
+	{
+		return '<p>No DomU detected</p>';
+	}
 	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
 	for (domU_id in dom0.domUs)
 	{
@@ -662,7 +695,7 @@ function register_info(info)
 		domU.update(dom0, info.domU.name, info.domU.cpus, info.domU.state,
 			info.domU.ro, info.domU.cap, info.domU.d_min_ram, info.domU.kernel,
 			info.domU.on_crash, info.domU.on_reboot, info.domU.on_shutdown,
-			info.domU.start_time, info.domU.weight, info.domU.other_dom0s);
+			info.domU.start_time, info.domU.weight);
 	}
 }
 

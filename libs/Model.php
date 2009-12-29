@@ -136,28 +136,7 @@ final class Model
 		// to true.
 		return self::get_dom0($id, true);
 	}
-	
-	/**
-	 * Returns adresses of all others dom0s which have NOT address $address given in parameter.
-	 *
-	 * @param string  $address      Address of the current dom0.
-	 *
-	 * @return adresses $adresses if present, otherwise false.
-	 */
-	public static function get_other_dom0s_addresses($address)
-	{
-		$dom0s = Model::get_dom0s();
-		$adresses = array();
-		foreach ($dom0s as $dom0)
-		{
-			if ($dom0->address !== $address)
-			{
-				array_push($adresses,$dom0->address);
-			}
-		}
-		return ($adresses);
-	}
-	
+
 	/**
 	 * Returns all the dom0s present in the database.
 	 *
@@ -219,28 +198,29 @@ final class Model
 			}
 
 			$domU = new DomU($xid, $dom0);
-			if (($domU->state === 'Halted')
+
+			if (($domU->power_state === 'Halted')
 				&& self::is_running_domU_named($domU->name))
 			{
 				continue;
 			}
 
-			if (($domU->state === 'Running') || ($domU->state === 'Paused'))
+			if (($domU->power_state === 'Running') || ($domU->power_state === 'Paused'))
 			{
 				if (isset(self::$domUs_by_names[$domU->name]))
 				{
 					foreach (self::$domUs_by_names[$domU->name] as $dom0_id => $domU_)
 					{
-						if ($domU_->state === 'Halted')
+						if ($domU_->power_state === 'Halted')
 						{
-							unset (self::$domUs_by_dom0s[$dom0_id][$domU->id]);
+							unset (self::$domUs_by_dom0s[$dom0_id][$domU->name]);
 							unset (self::$domUs_by_names[$domU->name][$dom0_id]);
 						}
 					}
 				}
 			}
 
-			self::$domUs_by_dom0s[$dom0->id][$domU->id] = $domU;
+			self::$domUs_by_dom0s[$dom0->id][$domU->name] = $domU;
 			if (!isset(self::$domUs_by_names[$domU->name]))
 			{
 				self::$domUs_by_names[$domU->name] = array($dom0->id => $domU);
@@ -519,7 +499,7 @@ final class Model
 		{
 			foreach (self::$domUs_by_names[$name] as $domU)
 			{
-				if ($domU->state === 'Running')
+				if ($domU->power_state === 'Running')
 				{
 					return true;
 				}
