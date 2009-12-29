@@ -174,7 +174,7 @@ DomU.prototype = {
 	},
 	open_window: function ()
 	{
-		_this = this;
+		var _this = this;
 		this.window = new Window({
 			className: 'alphacube',
 			showProgress: true,
