@@ -217,6 +217,9 @@ elseif ($_GET['a'] === 'domU')
 		'state' => $domU->power_state,
 		'start_time' => $domU->start_time->timestamp,
 		'weight' => $domU->VCPUs_params['weight'],
+		'on_reboot' => $domU->actions_after_reboot,
+		'on_shutdown' => $domU->actions_after_shutdown,
+		'on_crash' => $domU->actions_after_crash,
 	);
 }
 else

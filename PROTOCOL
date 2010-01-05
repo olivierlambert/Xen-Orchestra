@@ -71,5 +71,8 @@ Always:
   - ro: A boolean which indicates whether this domU is read-only.
   - state: The current power state (Running, Halted, Paused).
   - start_time: Timestamp which indicates when the DomU started.
+  - on_reboot: behavior of a DomU after a reboot (can be destroy/restart/preserve)
+  - on_shutdown: behavior of a DomU after a shutdown (can be destroy/restart/preserve)
+  - on_crash: behavior of a DomU after a crash (can be destroy/restart/preserve)
 
 

@@ -271,9 +271,9 @@ DomU.prototype = {
 		html+='<div id="storage_' + html_id + '"></div>';
 
 		html+='<div id="misc_' + html_id + '">'
-			+ '<br/><b><p>On shutdown:</b> '+this.actions_after_shutdown+'</p>'
-			+ '<b><p>On reboot:</b> '+this.actions_after_reboot+'</p>'
-			+ '<b><p>On crash:</b> '+this.actions_after_crash+'</p></div>';
+			+ '<br/><b><p>On shutdown:</b> '+this.on_shutdown+'</p>'
+			+ '<b><p>On reboot:</b> '+this.on_reboot+'</p>'
+			+ '<b><p>On crash:</b> '+this.on_crash+'</p></div>';
 
 		html+='</div>';
 
