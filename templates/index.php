@@ -15,6 +15,7 @@
 	<script type="text/javascript" src="scripts/md5.js"></script>
 
 	<script type="text/javascript" src="scripts/xo.js"></script>
+	<script type="text/javascript" src="scripts/xorender.js"></script>
 	<script type="text/javascript">
 	//<![CDATA[
 		document.observe('dom:loaded', function ()

@@ -246,6 +246,22 @@ caption
 	padding-left: 10em;
 }
 
+#vm table
+{
+	margin-top : 1em;
+	padding-left:2em;
+	border-collapse:collapse;
+	width:70%;
+}
+
+#vm td
+{
+	padding : 5px 5px;
+	padding-left: 2em;
+	font-size: 1.1em;
+	/*color: #111;*/
+}
+
 /* LOGIN FORM */
 #login
 {

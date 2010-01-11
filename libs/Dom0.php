@@ -113,6 +113,12 @@ class Dom0
 		$this->host_infos();
 		return $this->connection->send('host.list_methods');
 	}
+	
+	public function getCpus()
+	{
+		$cpus = $this->connection->send('host_cpu.get_all');
+		return count($cpus);
+	}
 
 	public function get_vif_info($id)
 	{

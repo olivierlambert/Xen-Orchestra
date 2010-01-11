@@ -74,7 +74,7 @@ Object.isEmpty = function(object)
 };
 
 
-function Dom0(id, address, ro)
+function Dom0(id, address, cpus, ro)
 {
 	this.id = id;
 	this.domUs = {};
@@ -82,16 +82,17 @@ function Dom0(id, address, ro)
 	this._panel = new Xilinus.Widget(); // Panel associated to this Dom0.
 	portal.add(this._panel, balance++ % 2);
 
-	this.update(address, ro);
+	this.update(address, cpus, ro);
 }
 Dom0.prototype = {
 	finalize: function ()
 	{
 		portal.remove(this._panel);
 	},
-	update: function (address, ro)
+	update: function (address, cpus, ro)
 	{
 		this.address = address;
+		this.cpus = cpus;
 		this.ro = ro;
 
 		this._panel.setTitle(this.address).setContent(content_dom0(this));
@@ -119,7 +120,7 @@ Dom0.prototype = {
 };
 
 
-function DomU(id, dom0, name, cpus, state, ro)
+function DomU(id, dom0, name, vcpus, state, ro)
 {
 	this.id = id;
 	this.dom0 = null;
@@ -134,7 +135,7 @@ function DomU(id, dom0, name, cpus, state, ro)
 	this.start_time = 'N/A';
 	this.weight = 'N/A';
 
-	this.update(dom0, name, cpus, state, ro);
+	this.update(dom0, name, vcpus, state, ro);
 }
 DomU.prototype = {
 	finalize: function ()
@@ -146,11 +147,11 @@ DomU.prototype = {
 		}
 		this.dom0.removeDomU(this.id);
 	},
-	update: function (dom0, name, cpus, state, ro, cap, d_min_ram, kernel,
+	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel,
 		on_crash, on_reboot, on_shutdown, start_time, weight)
 	{
 		this.name = name;
-		this.cpus = cpus;
+		this.vcpus = vcpus;
 		this.state = state;
 		this.ro = ro;
 
@@ -217,7 +218,7 @@ DomU.prototype = {
 
 		html+='<br/><p><b>State: </b>' + this.state + '</p>'
 			+ '<p><b>System: </b>' + this.kernel + '</p>'
-			+ '<p><b>CPU installed: </b>' + this.cpus.length + '</p>'
+			+ '<p><b>CPU installed: </b>' + this.vcpus.length + '</p>'
 			+ '<p><b>RAM installed: </b>' + this.d_min_ram/(1<<20) + ' MB</p>'
 			+ '<p><b>Date of creation: </b>' + date + '</p>';
 
@@ -258,11 +259,29 @@ DomU.prototype = {
 		html += '</div>';
 
 		html+='<div id="cpu_' + html_id + '">'
-			+ '<br/><p><b>VCPU use:</b> '+html_cpu_values(this.cpus)+'</p>'
-			+ '<p><b>VCPU number:</b> '+this.cpus.length+'</p>'
-			+ '<p><b>Cap:</b> '+this.cap+'</p>'
-			+ '<p><b>Weight:</b> '+this.weight+'</p></div>';
-
+			+ '<form id="cpu_' + html_id + '">'
+			+ '<table>'
+			+ '<tr>'
+			+ '<td>VCPU use:</td><td>'+html_cpu_values(this.vcpus)+'</td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td>VCPU number:</td><td>'+this.vcpus.length+'</td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td>VSet VCPU number:</td><td>'+html_cpu_select(this.dom0.cpus)+'</td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td>Set Cap:</td><td><input type="text" size="2" value="'+this.cap+'"></td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td>Set Weight:</td><td><input type="text" size="2" value="'+this.weight+'"></td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td></td><td><input type="submit" value="OK"></td>'
+			+'</tr>'
+			+'</table>'
+			+ '</form></div>';
+			
 		html+='<div id="ram_' + html_id + '">'
 			+ '<br/><b><p>RAM:</b> '+this.d_min_ram/(1024*1024)+' MB</p></div>';
 
@@ -324,66 +343,6 @@ function find_possible_targets(domU)
 		}
 	}
 	return targets;
-}
-
-
-/**
- * Display CPU meters in function of their load
- * (green/yellow/orange/red)
- *
- * @param cpus Table of cpus with their respective load
- */
-function html_cpu_meters(cpus)
-{
-	var n = cpus.length;
-	if (n === 0)
-	{
-		return '&nbsp;';
-	}
-
-	var result = '';
-	for (var i = 0; i < n; i++)
-	{
-		result += '<img title="'+cpus[i]+'" src="img/c';
-		if (cpus[i] < 25)
-		{
-			result += 'green';
-		}
-		else if (cpus[i] < 50)
-		{
-			result += 'yellow';
-		}
-		else if (cpus[i] < 75)
-		{
-			result += 'orange';
-		}
-		else
-		{
-			result += 'red';
-		}
-		result += '.png">';
-	}
-	return result;
-}
-
-/**
- * Display CPU values in digital
- *
- * @param cpus Table of cpus with their respective load
- */
-function html_cpu_values(cpus)
-{
-	var n = cpus.length;
-	if (n === 0)
-	{
-		return '&nbsp;';
-	}
-	result=' ';
-	for (var i = 0; i < n; i++)
-	{
-		result += cpus[i]+'% ';
-	}
-	return result;
 }
 
 /**
@@ -468,7 +427,7 @@ function content_dom0(dom0)
 		result += '<tr id="' + domU.name
 			+ '" onclick="display_vm(\'' + domU_id + '\')"><td>' + domU.name
 			+ '</td><td>' + domU.state
-			+ '</td><td>' + html_cpu_meters(domU.cpus)
+			+ '</td><td>' + html_cpu_meters(domU.vcpus)
 			+ '</td></tr>';
 	}
 	return result + '</table>';
@@ -619,11 +578,11 @@ function register_info(info)
 			var record = info.dom0s[i];
 			if (dom0s[record.id] === undefined)
 			{
-				dom0s[record.id] = new Dom0(record.id, record.address, record.ro);
+				dom0s[record.id] = new Dom0(record.id, record.address, record.cpus, record.ro);
 			}
 			else
 			{
-				dom0s[record.id].update(record.address, record.ro);
+				dom0s[record.id].update(record.address, record.cpus, record.ro);
 			}
 
 			for (var j = 0; j < record.domUs.length; ++j)
