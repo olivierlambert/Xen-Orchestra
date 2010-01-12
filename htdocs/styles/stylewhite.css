@@ -248,10 +248,15 @@ caption
 
 #vm table
 {
+	margin: auto;
 	margin-top : 1em;
-	padding-left:2em;
 	border-collapse:collapse;
-	width:70%;
+	width:404px;
+}
+
+#vm tr:hover
+{
+	background-color: #1d1d1d;
 }
 
 #vm td
@@ -259,7 +264,7 @@ caption
 	padding : 5px 5px;
 	padding-left: 2em;
 	font-size: 1.1em;
-	/*color: #111;*/
+	text-align: left;
 }
 
 /* LOGIN FORM */

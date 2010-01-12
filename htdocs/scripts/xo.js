@@ -125,7 +125,6 @@ function DomU(id, dom0, name, vcpus, state, ro)
 	this.id = id;
 	this.dom0 = null;
 	this.window = null; // Window associated to this DomU.
-
 	this.cap = 'N/A';
 	this.d_min_ram = 'N/A';
 	this.kernel = 'N/A';
@@ -134,6 +133,9 @@ function DomU(id, dom0, name, vcpus, state, ro)
 	this.on_shutdown = 'N/A';
 	this.start_time = 'N/A';
 	this.weight = 'N/A';
+	this.d_max_ram = 'N/A';
+	this.s_min_ram = 'N/A';
+	this.s_max_ram = 'N/A';
 
 	this.update(dom0, name, vcpus, state, ro);
 }
@@ -147,8 +149,8 @@ DomU.prototype = {
 		}
 		this.dom0.removeDomU(this.id);
 	},
-	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel,
-		on_crash, on_reboot, on_shutdown, start_time, weight)
+	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel, on_crash, on_reboot, 
+		on_shutdown, start_time, weight, d_max_ram, s_min_ram, s_max_ram)
 	{
 		this.name = name;
 		this.vcpus = vcpus;
@@ -165,6 +167,9 @@ DomU.prototype = {
 			this.on_shutdown = on_shutdown;
 			this.start_time = start_time;
 			this.weight = weight;
+			this.d_max_ram = d_max_ram;
+			this.s_min_ram = s_min_ram;
+			this.s_max_ram = s_max_ram;
 		}
 
 		if (dom0 !== this.dom0)
@@ -204,7 +209,6 @@ DomU.prototype = {
 	_refresh_window: function ()
 	{
 		var html_id = escape(this.id).replace(/\.|#|%/g, '_');
-
 		var date = new Date(this.start_time * 1000);
 		var html = '<div id="vm">'
 			+ '<ul id="tabs_' + html_id + '" class="menuvm">'
@@ -260,7 +264,7 @@ DomU.prototype = {
 
 		html+='<div id="cpu_' + html_id + '">'
 			+ '<form id="cpu_' + html_id + '">'
-			+ '<table>'
+			+ '<table class="center">'
 			+ '<tr>'
 			+ '<td>VCPU use:</td><td>'+html_cpu_values(this.vcpus)+'</td>'
 			+'</tr>'
@@ -268,7 +272,7 @@ DomU.prototype = {
 			+ '<td>VCPU number:</td><td>'+this.vcpus.length+'</td>'
 			+'</tr>'
 			+ '<tr>'
-			+ '<td>VSet VCPU number:</td><td>'+html_cpu_select(this.dom0.cpus)+'</td>'
+			+ '<td>Set VCPU number:</td><td>'+html_cpu_select(this.dom0.cpus)+'</td>'
 			+'</tr>'
 			+ '<tr>'
 			+ '<td>Set Cap:</td><td><input type="text" size="2" value="'+this.cap+'"></td>'
@@ -276,14 +280,23 @@ DomU.prototype = {
 			+ '<tr>'
 			+ '<td>Set Weight:</td><td><input type="text" size="2" value="'+this.weight+'"></td>'
 			+'</tr>'
-			+ '<tr>'
-			+ '<td></td><td><input type="submit" value="OK"></td>'
-			+'</tr>'
-			+'</table>'
+			+'</table><br/><p class="center"><input type="submit" value="OK"></p>'
 			+ '</form></div>';
 			
 		html+='<div id="ram_' + html_id + '">'
-			+ '<br/><b><p>RAM:</b> '+this.d_min_ram/(1024*1024)+' MB</p></div>';
+			+ '<form id="ram_' + html_id + '">'
+			+ '<table class="center">'
+			+ '<tr>'
+			+ '<td>Current RAM:</td><td><input type="text" size="2" value="'+this.d_min_ram/(1024*1024)+'"> MB</td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td>Maximum RAM:</td><td><input type="text" size="2" value="'+this.s_max_ram/(1024*1024)+'"> MB</td>'
+			+'</tr>'
+			+ '<tr>'
+			+ '<td>Minimum RAM:</td><td><input type="text" size="2" value="'+this.s_min_ram/(1024*1024)+'"> MB</td>'
+			+'</tr>'
+			+'</table><br/><p class="center"><input type="submit" value="OK"></p>'
+			+ '</form></div>';
 
 		html+='<div id="network_' + html_id + '"></div>';
 

@@ -209,7 +209,6 @@ elseif ($_GET['a'] === 'domU')
 	$msg->domU = array(
 		'cap' => $domU->VCPUs_params['cap'],
 		'cpus' => $cpus,
-		'd_min_ram' => $domU->memory_dynamic_min,
 		'dom0_id' => $domU->dom0->id,
 		'id' => $domU->id,
 		'kernel' => $domU->PV_kernel,
@@ -217,10 +216,15 @@ elseif ($_GET['a'] === 'domU')
 		'ro' => !$u->can(ACL::WRITE, $dom0->id, $domU->name),
 		'state' => $domU->power_state,
 		'start_time' => $domU->start_time->timestamp,
+		'vcpus_max' => $domU->VCPUs_max,
 		'weight' => $domU->VCPUs_params['weight'],
 		'on_reboot' => $domU->actions_after_reboot,
 		'on_shutdown' => $domU->actions_after_shutdown,
 		'on_crash' => $domU->actions_after_crash,
+		'd_min_ram' => $domU->memory_dynamic_min,
+		'd_max_ram' => $domU->memory_dynamic_max,
+		's_min_ram' => $domU->memory_static_min,
+		's_max_ram' => $domU->memory_static_max
 	);
 }
 else
