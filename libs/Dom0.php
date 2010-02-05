@@ -108,16 +108,41 @@ class Dom0
 		$this->id_metrics_dom0 = $this->id_metrics_dom0[0];
 	}
 
+	public function host_memory_free()
+	{
+		$this->host_infos();
+		$freeram = $this->connection->send('host_metrics.get_memory_free', $this->id_metrics_dom0);
+		return round($freeram/(1024*1024));
+		// do a better implementation avoiding code duplication
+	}
+
+	public function host_memory_total()
+	{
+		$this->host_infos();
+		$totalram = $this->connection->send('host_metrics.get_memory_total', $this->id_metrics_dom0);
+		return round($totalram/(1024*1024));
+		// do a better implementation avoiding code duplication
+	}
+
 	public function host_record()
 	{
 		$this->host_infos();
 		return $this->connection->send('host.list_methods');
 	}
-	
+
 	public function getCpus()
 	{
 		$cpus = $this->connection->send('host_cpu.get_all');
 		return count($cpus);
+		// do a better implementation
+	}
+
+	public function getCpus_utilisation()
+	{
+		// To do implement this method to check
+		// if it s possible to get "real" cpu 
+		// utilisation, i.e global load of a Xen
+		// (not the Dom0 himself)
 	}
 
 	public function get_vif_info($id)
