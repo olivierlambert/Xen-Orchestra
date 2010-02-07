@@ -20,10 +20,6 @@
  **/
 class Dom0
 {
-	public
-		$id_dom0, // Not use anywhere
-		$id_metrics_dom0; // Idem
-
 	/**
 	 * Create a new Dom0 object.
 	 *
@@ -44,6 +40,10 @@ class Dom0
 
 		$this->connect();
 
+		$this->xid = $this->rpc_query('host.get_all');
+		$this->id_metrics = $this->rpc_query('host_metrics.get_all');
+		$this->id_metrics = $this->id_metrics[0];
+
 		$this->domUs = &Model::get_domUs($this);
 	}
 
@@ -62,6 +62,31 @@ class Dom0
 			case 'username':
 				return $this->$name;
 		}
+
+		if ($this->record === null)
+		{
+			$this->record = $this->rpc_query(
+			                                 'host.get_record',
+			                                 $this->xid
+			                                 );
+		}
+		if (isset($this->record[$name]))
+		{
+			return $this->record[$name];
+		}
+
+		if ($this->metrics_record === null)
+		{
+			$this->metrics_record = $this->rpc_query(
+			                                         'host_metrics.get_record',
+			                                         $this->id_metrics
+			);
+		}
+		if (isset($this->metrics_record[$name]))
+		{
+			return $this->metrics_record[$name];
+		}
+
 		if (isset ($this->$name))
 		{
 			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
@@ -99,50 +124,6 @@ class Dom0
 	public function getDomUs()
 	{
 		return $this->domUs; // Maybe we should protect it.
-	}
-
-	public function host_infos()
-	{
-		$this->id_dom0 = $this->connection->send('host.get_all');
-		$this->id_metrics_dom0 = $this->connection->send('host_metrics.get_all');
-		$this->id_metrics_dom0 = $this->id_metrics_dom0[0];
-	}
-
-	public function host_memory_free()
-	{
-		$this->host_infos();
-		$freeram = $this->connection->send('host_metrics.get_memory_free', $this->id_metrics_dom0);
-		return round($freeram/(1024*1024));
-		// do a better implementation avoiding code duplication
-	}
-
-	public function host_memory_total()
-	{
-		$this->host_infos();
-		$totalram = $this->connection->send('host_metrics.get_memory_total', $this->id_metrics_dom0);
-		return round($totalram/(1024*1024));
-		// do a better implementation avoiding code duplication
-	}
-
-	public function host_record()
-	{
-		$this->host_infos();
-		return $this->connection->send('host.list_methods');
-	}
-
-	public function getCpus()
-	{
-		$cpus = $this->connection->send('host_cpu.get_all');
-		return count($cpus);
-		// do a better implementation
-	}
-
-	public function getCpus_utilisation()
-	{
-		// To do implement this method to check
-		// if it s possible to get "real" cpu 
-		// utilisation, i.e global load of a Xen
-		// (not the Dom0 himself)
 	}
 
 	public function get_vif_info($id)
@@ -201,6 +182,14 @@ class Dom0
 	 * @var array
 	 */
 	private $domUs;
+
+	private $record = null;
+
+	private $metrics_record = null;
+
+	private $xid;
+
+	private $id_metrics;
 
 	private function connect()
 	{
