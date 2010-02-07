@@ -40,9 +40,9 @@ function dom0s_json($msg = NULL)
 		// The array for this dom0.
 		$tmp = array(
 			'address' => $dom0->address,
-			//'cpus' => $dom0->getCpus(),
-			//'freeram' => $dom0->host_memory_free(),
-			//'totalram' => $dom0->host_memory_total(),
+			'cpus' => $dom0->cpus_record,
+			'freeram' => $dom0->memory_free,
+			'totalram' => $dom0->memory_total,
 			'domUs' => array(),
 			'id' => $dom0->id,
 			'ro' => !$u->can(ACL::WRITE, $dom0->id),

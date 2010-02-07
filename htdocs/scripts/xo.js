@@ -149,7 +149,7 @@ DomU.prototype = {
 		}
 		this.dom0.removeDomU(this.id);
 	},
-	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel, on_crash, on_reboot, 
+	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel, on_crash, on_reboot,
 		on_shutdown, start_time, weight, d_max_ram, s_min_ram, s_max_ram)
 	{
 		this.name = name;
@@ -249,15 +249,19 @@ DomU.prototype = {
 					+ actions[i] + '\')" />');
 			}
 			html += '</p>';
-			html += '<p><b>Live Migration to: </b>';
-
 			var targets = find_possible_targets(this);
-			for (var i = 0; i < targets.length; ++i)
+			if (targets.length !== 0)
 			{
-				html += '<a href="#" onclick="action_vm(\'' + this.id
-					+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
-					+ dom0s[targets[i]].address + '</a>';
+				html += '<p><b>Live Migration to: </b>';
+				for (var i = 0; i < targets.length; ++i)
+				{
+					html += '<a href="#" onclick="action_vm(\'' + this.id
+						+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
+						+ dom0s[targets[i]].address + '</a>';
+				}
+				html += '</p>';
 			}
+			var targets = find_possible_targets(this);
 			html += '</p>';
 		}
 		html += '</div>';
@@ -282,7 +286,7 @@ DomU.prototype = {
 			+'</tr>'
 			+'</table><br/><p class="center"><input type="submit" value="OK"></p>'
 			+ '</form></div>';
-			
+
 		html+='<div id="ram_' + html_id + '">'
 			+ '<form id="ram_' + html_id + '">'
 			+ '<table class="center">'

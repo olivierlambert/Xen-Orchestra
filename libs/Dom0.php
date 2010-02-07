@@ -43,6 +43,7 @@ class Dom0
 		$this->xid = $this->rpc_query('host.get_all');
 		$this->id_metrics = $this->rpc_query('host_metrics.get_all');
 		$this->id_metrics = $this->id_metrics[0];
+		$this->get_cpus_infos();
 
 		$this->domUs = &Model::get_domUs($this);
 	}
@@ -66,9 +67,9 @@ class Dom0
 		if ($this->record === null)
 		{
 			$this->record = $this->rpc_query(
-			                                 'host.get_record',
-			                                 $this->xid
-			                                 );
+											'host.get_record',
+											$this->xid
+											);
 		}
 		if (isset($this->record[$name]))
 		{
@@ -78,15 +79,30 @@ class Dom0
 		if ($this->metrics_record === null)
 		{
 			$this->metrics_record = $this->rpc_query(
-			                                         'host_metrics.get_record',
-			                                         $this->id_metrics
+													'host_metrics.get_record',
+													$this->id_metrics
 			);
 		}
 		if (isset($this->metrics_record[$name]))
 		{
 			return $this->metrics_record[$name];
 		}
-
+/*
+		if ($this->cpus_record === null)
+		{
+			foreach ($this->host_CPUs as $idcpu)
+			{
+				$this->cpus_record[$idcpu] = $this->rpc_query(
+													'host_cpu.get_record',
+													$idcpu
+			);
+			}
+		}
+		if (isset($this->cpus_record[$name]))
+		{
+			return $this->cpus_record[$name];
+		}
+*/
 		if (isset ($this->$name))
 		{
 			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
@@ -135,6 +151,19 @@ class Dom0
 	{
 		return $this->connection->send($method, $params);
 	}
+
+	public function get_cpus_infos()
+	{
+		foreach ($this->host_CPUs as $idcpu)
+		{
+			$this->cpus_record[$idcpu] = $this->rpc_query(
+												'host_cpu.get_record',
+												$idcpu
+		);
+		}
+		return $this->cpus_record;
+	}
+
 
 	/**
 	 * Server address: IP or name.
@@ -186,6 +215,8 @@ class Dom0
 	private $record = null;
 
 	private $metrics_record = null;
+
+	public $cpus_record = null;
 
 	private $xid;
 
