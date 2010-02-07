@@ -95,48 +95,28 @@ Dom0.prototype = {
 		this.cpus = cpus;
 		this.ro = ro;
 
-		this._panel.setTitle(this.address);
-		this._refresh_panel();
+		this._panel.setTitle(this.address).setContent(content_dom0(this));
+		this._panel.updateHeight();
 	},
 	addDomU: function (domU)
 	{
-		if (this.domUs[domU.id] === undefined)
-		{
-			this.domUs[domU.id] = domU;
-			this._refresh_panel();
-		}
+		this.domUs[domU.id] = domU;
+
+		this._panel.setContent(content_dom0(this));
+		this._panel.updateHeight();
 	},
 	removeDomU: function (domU_id)
 	{
-		if (this.domUs[domU_id] !== undefined)
+		if (this.domUs[domU_id] === undefined)
 		{
-			delete this.domUs[domU_id];
-			this._refresh_panel();
+			return;
 		}
+
+		delete this.domUs[domU_id];
+
+		this._panel.setContent(content_dom0(this));
+		this._panel.updateHeight();
 	},
-	_refresh_panel: function ()
-	{
-		var html;
-		if (Object.isEmpty(this.domUs))
-		{
-			html = '<p>No DomU detected</p>';
-		}
-		else
-		{
-			html = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
-			for (domU_id in this.domUs)
-			{
-				var domU = this.domUs[domU_id];
-				html += '<tr id="' + domU.name
-					+ '" onclick="display_vm(\'' + domU_id + '\')"><td>' + domU.name
-					+ '</td><td>' + domU.state
-					+ '</td><td>' + html_cpu_meters(domU.cpus)
-					+ '</td></tr>';
-			}
-			html += '</table>';
-		}
-		this._panel.setContent(html).updateHeight();
-	}
 };
 
 
@@ -169,7 +149,7 @@ DomU.prototype = {
 		}
 		this.dom0.removeDomU(this.id);
 	},
-	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel, on_crash, on_reboot,
+	update: function (dom0, name, vcpus, state, ro, cap, d_min_ram, kernel, on_crash, on_reboot, 
 		on_shutdown, start_time, weight, d_max_ram, s_min_ram, s_max_ram)
 	{
 		this.name = name;
@@ -200,10 +180,6 @@ DomU.prototype = {
 			}
 			this.dom0 = dom0;
 			this.dom0.addDomU(this);
-		}
-		else
-		{
-			this.dom0._refresh_panel();
 		}
 
 		if (this.window !== null)
@@ -273,19 +249,16 @@ DomU.prototype = {
 					+ actions[i] + '\')" />');
 			}
 			html += '</p>';
+			html += '<p><b>Live Migration to: </b>';
 
 			var targets = find_possible_targets(this);
-			if (targets.length !== 0)
+			for (var i = 0; i < targets.length; ++i)
 			{
-				html += '<p><b>Live Migration to: </b>';
-				for (var i = 0; i < targets.length; ++i)
-				{
-					html += '<a href="#" onclick="action_vm(\'' + this.id
-						+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
-						+ dom0s[targets[i]].address + '</a>';
-				}
-				html += '</p>';
+				html += '<a href="#" onclick="action_vm(\'' + this.id
+					+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
+					+ dom0s[targets[i]].address + '</a>';
 			}
+			html += '</p>';
 		}
 		html += '</div>';
 
@@ -309,7 +282,7 @@ DomU.prototype = {
 			+'</tr>'
 			+'</table><br/><p class="center"><input type="submit" value="OK"></p>'
 			+ '</form></div>';
-
+			
 		html+='<div id="ram_' + html_id + '">'
 			+ '<form id="ram_' + html_id + '">'
 			+ '<table class="center">'
@@ -447,6 +420,30 @@ function refresh()
 			setTimeout(refresh, refresh_time);
 		}
 	});
+}
+
+/**
+ * Fill a Dom0 panel with its information : each row contain a domU.
+ *
+ * @param dom0_id The identifier of the dom0.
+ */
+function content_dom0(dom0)
+{
+	if (Object.isEmpty(dom0.domUs))
+	{
+		return '<p>No DomU detected</p>';
+	}
+	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
+	for (domU_id in dom0.domUs)
+	{
+		var domU = dom0.domUs[domU_id];
+		result += '<tr id="' + domU.name
+			+ '" onclick="display_vm(\'' + domU_id + '\')"><td>' + domU.name
+			+ '</td><td>' + domU.state
+			+ '</td><td>' + html_cpu_meters(domU.vcpus)
+			+ '</td></tr>';
+	}
+	return result + '</table>';
 }
 
 function draw_log_area()
