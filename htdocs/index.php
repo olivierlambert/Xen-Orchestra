@@ -40,7 +40,8 @@ function dom0s_json($msg = NULL)
 		// The array for this dom0.
 		$tmp = array(
 			'address' => $dom0->address,
-			'cpus' => $dom0->cpus_record,
+			'cpus_speed' => $dom0->get_cpus_speed(),
+			//'mac' => $dom0->vif_record,
 			'freeram' => $dom0->memory_free,
 			'totalram' => $dom0->memory_total,
 			'domUs' => array(),

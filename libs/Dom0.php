@@ -40,9 +40,11 @@ class Dom0
 
 		$this->connect();
 
-		$this->xid = $this->rpc_query('host.get_all');
-		$this->id_metrics = $this->rpc_query('host_metrics.get_all');
-		$this->id_metrics = $this->id_metrics[0];
+		$this->id_host = $this->rpc_query('host.get_all');
+		$this->id_host_metrics = $this->rpc_query('host_metrics.get_all');
+		$this->id_vif = $this->rpc_query('VIF.get_all');
+		$this->id_vif_metrics = $this->rpc_query('VIF_metrics.get_all');
+		//$this->id_metrics = $this->id_metrics[0];
 		$this->get_cpus_infos();
 
 		$this->domUs = &Model::get_domUs($this);
@@ -64,45 +66,54 @@ class Dom0
 				return $this->$name;
 		}
 
-		if ($this->record === null)
+		if ($this->host_record === null)
 		{
-			$this->record = $this->rpc_query(
+			$this->host_record = $this->rpc_query(
 											'host.get_record',
-											$this->xid
+											$this->id_host
 											);
 		}
-		if (isset($this->record[$name]))
+		if (isset($this->host_record[$name]))
 		{
-			return $this->record[$name];
+			return $this->host_record[$name];
 		}
 
-		if ($this->metrics_record === null)
+		if ($this->host_metrics_record === null)
 		{
-			$this->metrics_record = $this->rpc_query(
+			$this->host_metrics_record = $this->rpc_query(
 													'host_metrics.get_record',
-													$this->id_metrics
+													$this->id_host_metrics
 			);
 		}
-		if (isset($this->metrics_record[$name]))
+		if (isset($this->host_metrics_record[$name]))
 		{
-			return $this->metrics_record[$name];
+			return $this->host_metrics_record[$name];
 		}
-/*
-		if ($this->cpus_record === null)
+
+		if ($this->vif_record === null)
 		{
-			foreach ($this->host_CPUs as $idcpu)
-			{
-				$this->cpus_record[$idcpu] = $this->rpc_query(
-													'host_cpu.get_record',
-													$idcpu
+			$this->vif_record = $this->rpc_query(
+													'vif.get_record',
+													$this->id_host
 			);
-			}
 		}
-		if (isset($this->cpus_record[$name]))
+		if (isset($this->vif_record[$name]))
 		{
-			return $this->cpus_record[$name];
+			return $this->vif_record[$name];
 		}
-*/
+
+		if ($this->vif_metrics_record === null)
+		{
+			$this->vif_metrics_record = $this->rpc_query(
+													'vif_metrics.get_record',
+													$this->id_vif_metrics
+			);
+		}
+		if (isset($this->vif_metrics_record[$name]))
+		{
+			return $this->vif_metrics_record[$name];
+		}
+
 		if (isset ($this->$name))
 		{
 			throw new Exception('Property ' . __CLASS__ . '::' . $name . ' is not readable');
@@ -164,7 +175,37 @@ class Dom0
 		return $this->cpus_record;
 	}
 
+	/* Useless : there is no way to check "global" load of a Xen system */
+	public function get_cpus_load()
+	{
+		$cpus_load = array();
+		$i = 0;
+		foreach ($this->cpus_record as $cpu)
+		{
+			$cpus_load[$i] = round($cpu['utilisation']*100,2);
+			$i++;
+		}
+		return $cpus_load;
+	}
 
+	public function get_cpus_speed()
+	{
+		$cpus_speed = array();
+		$i = 0;
+		foreach ($this->cpus_record as $cpu)
+		{
+			$cpus_speed[$i] = $cpu['speed'];
+			$i++;
+		}
+		return $cpus_speed;
+	}
+
+	/* For debug purpose : very useful so far */
+	public function get_supported_methods()
+	{
+		return $this->connection->send('host.list_methods', $id);
+
+	}
 	/**
 	 * Server address: IP or name.
 	 *
@@ -212,15 +253,23 @@ class Dom0
 	 */
 	private $domUs;
 
-	private $record = null;
+	private $host_record = null;
 
-	private $metrics_record = null;
+	private $host_metrics_record = null;
 
-	public $cpus_record = null;
+	private $vif_record = null;
 
-	private $xid;
+	private $vif_metrics_record = null;
 
-	private $id_metrics;
+	private $cpus_record = null;
+
+	private $id_host_metrics;
+
+	private $id_host;
+
+	private $id_vif_metrics;
+
+	private $id_vif;
 
 	private function connect()
 	{

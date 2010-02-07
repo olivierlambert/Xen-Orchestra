@@ -27,7 +27,7 @@ require_once dirname (__FILE__) . '/../libs/prepend.php';
 <?php
 foreach (Model::get_dom0s() as $dom0)
 {
-	$dom0_array = $dom0->host_record();
+	$dom0_array = $dom0->get_supported_methods();
 	echo '<h4>'.$dom0->id.'</h4>';
 	echo '<p>';
 	foreach ($dom0_array as $dom0) {
