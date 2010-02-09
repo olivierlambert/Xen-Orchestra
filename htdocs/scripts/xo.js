@@ -240,6 +240,10 @@ DomU.prototype = {
 			{
 				var actions = ['play', 'destroy'];
 			}
+			else if (this.state === 'Crashed')
+			{
+				var actions = ['poweroff'];
+			}
 
 			html += '<p><b>Actions: </b><br/>';
 			for (var i = 0; i < actions.length; ++i)
