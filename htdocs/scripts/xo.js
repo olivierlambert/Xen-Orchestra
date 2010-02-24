@@ -208,8 +208,9 @@ DomU.prototype = {
 	},
 	_refresh_window: function ()
 	{
-		var html_id = escape(this.id).replace(/\.|#|%/g, '_');
+		var html_id = escape(this.id).replace(/\.|#|%/g, '_');	
 		var date = new Date(this.start_time * 1000);
+		
 		var html = '<div id="vm">'
 			+ '<ul id="tabs_' + html_id + '" class="menuvm">'
 			+ '<li><a href="#overview_' + html_id + '"><b><img src="img/information.png" alt=""/>Overview</b></a></li>'
@@ -318,10 +319,26 @@ DomU.prototype = {
 		html+='</div>';
 
 		title = '<b>' + this.name + '</b> (' + this.dom0.address + ')';
-
+		
+		// if a tab is currently set
+		if ($('tabs_' + html_id) !== null)
+		{
+			// get the current tab instance
+			var current_instance = Control.Tabs.findByTabId('overview_' + html_id);
+			// save the current link
+			var active_link = current_instance.activeLink;
+			// and remove the current instance from the array of instances
+			// done because instances are not destroyed when new html is set.
+			Control.Tabs.instances = Control.Tabs.instances.without(current_instance);
+		}
+		// set windows title and html
 		this.window.setTitle(title);
+		
 		this.window.setHTMLContent(html);
-		new Control.Tabs('tabs_' + html_id);
+		// set tabs on the new html
+		var tabs = new Control.Tabs('tabs_' + html_id);
+		// and set the active tab to the saved one
+		tabs.setActiveTab(active_link);
 	},
 };
 
