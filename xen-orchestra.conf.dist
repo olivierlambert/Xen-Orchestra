@@ -1,0 +1,60 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Configuration of Xen Orcherstra (XO) ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+; Global configuration ;
+;;;;;;;;;;;;;;;;;;;;;;;;
+[global]
+
+; Refresh Time in seconds for Web Interface, 10 is default
+refresh = 10
+
+; XO can use a database to manage users, but this is optional, you may disable
+; it by uncommenting this entry.
+;disable_database = true
+
+; When the database is disabled, only the guest user is available and what he
+; can do is defined by this entry.
+; - NONE  Guest is not able to see or do anything (this is the default).
+; - READ  Guest is only able to see the list of dom0s/domUs.
+; - WRITE As READ + he is also able to change
+; - ADMIN As WRITE but also gives the power to change Xen Orchestra's
+;         configuration. Normally, ADMIN gives also the ability to create and
+;         manage users but since the database is disabled, this feature is too.
+;default_guest_permission = ADMIN
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Database configuration ;
+;;;;;;;;;;;;;;;;;;;;;;;;;;
+; XO can use a database to manage users and their rights.
+; Since XO uses databases through PDO (PHP Database Object), you have the
+; ability to choose which database you want use.
+; For more information, see http://fr2.php.net/manual/en/pdo.drivers.php
+[database]
+
+; The Database Source Name is used to specify which type of database you want to
+; use and to define the information required to connect to it.
+dsn = "pgsql:host=localhost dbname=xen"
+
+; If your database required an authentication, you have to use the following
+; two entries.
+;username = xen
+;password = "123456789"
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+; Dom0s configuration ;
+;;;;;;;;;;;;;;;;;;;;;;;
+
+; Server address and port. Example for 2 dom0s :
+;
+; [192.168.0.1:9363]
+; username = test1
+; password = test1
+;
+; [xen.intranet.com:9363]
+; username = test1
+; password = test1
