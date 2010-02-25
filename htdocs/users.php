@@ -64,18 +64,74 @@ require_once dirname (__FILE__) . '/../libs/prepend.php';
 		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM management</b></a></li>
 		<li><a href="users.php"><b><img src="img/user.png" alt=""/>User management</b></a></li>
 	<div id="login"></div></ul>
-	<div id="main"
-	<h3>Available API method on Dom0's (debug purpose)</h3>
+	<div id="main">
+
 <?php
-foreach (Model::get_dom0s() as $dom0)
+
+$u = Model::get_current_user();
+
+if (!Database::is_enabled())
 {
-	$dom0_array = $dom0->get_supported_methods();
-	echo '<h4>'.$dom0->id.'</h4>';
-	echo '<p>';
-	foreach ($dom0_array as $dom0) {
-		echo $dom0.'  &nbsp|&nbsp  ';
-	}
-	echo '</p>';
+	echo '<p>/!\ The database is disabled : you cant manage users without enable database /!\</p>';
+	exit;
 }
+
+if ($u->name !== 'admin')
+{
+	echo '<p>You are a NOT an admin user, you can\'t do operations on users. Please login with an admin account.</p>';
+}
+else
+{
+	echo '<p>Here forms with CRUD operations on users. /!\ Work in progress /!\</p>';
+}
+
+
+/*
+if (!isset($_GET['a']))
+{
+	$msg = dom0s_json();
+	$msg->user = Model::get_current_user()->name;
+	echo $msg->user;
+
+	exit;
+}
+$msg = new MessengerJSON(true);
+
+if ($_GET['a'] === 'login')
+{
+	if (!isset($_GET['name']) || (($name = $_GET['name']) === ''))
+	{
+		$msg->error('Invalid name');
+		exit;
+	}
+
+	if (!Database::is_enabled())
+	{
+		$msg->error('The database is disabled');
+		exit;
+	}
+
+	$password = isset($_GET['password']) ? $_GET['password'] : '';
+	$u = Model::register_current_user($name, $password, true);
+	if ($u === false)
+	{
+		$msg->error('Incorrect username or password');
+	}
+	else
+	{
+		$msg->user = $u->name;
+	}
+}
+elseif ($_GET['a'] === 'logout')
+{
+	Model::unregister_current_user();
+
+	assert(Model::get_current_user()->name === 'guest');
+
+	$msg->user = 'guest';
+}*/
 ?>
-</div>
+
+	</div>
+</body>
+</html>

@@ -42,7 +42,7 @@
 		<li><a href="index.php"><b><img src="img/server.png" alt=""/>servers</b></a></li>
 		<li><a href="configuration.php"><b><img src="img/conf.png" alt=""/>Configuration</b></a></li>
 		<li><a href="index.php"><b><img src="img/vm.png" alt=""/>VM management</b></a></li>
-		<li><a href="index.php"><b><img src="img/user.png" alt=""/>User management</b></a></li>
+		<li><a href="users.php"><b><img src="img/user.png" alt=""/>User management</b></a></li>
 	<div id="login"></div></ul>
 	<div id="main">
 		<div id="widget_col_0"></div>

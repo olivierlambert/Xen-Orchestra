@@ -208,9 +208,9 @@ DomU.prototype = {
 	},
 	_refresh_window: function ()
 	{
-		var html_id = escape(this.id).replace(/\.|#|%/g, '_');	
+		var html_id = escape(this.id).replace(/\.|#|%/g, '_');
 		var date = new Date(this.start_time * 1000);
-		
+
 		var html = '<div id="vm">'
 			+ '<ul id="tabs_' + html_id + '" class="menuvm">'
 			+ '<li><a href="#overview_' + html_id + '"><b><img src="img/information.png" alt=""/>Overview</b></a></li>'
@@ -319,7 +319,7 @@ DomU.prototype = {
 		html+='</div>';
 
 		title = '<b>' + this.name + '</b> (' + this.dom0.address + ')';
-		
+
 		// if a tab is currently set
 		if ($('tabs_' + html_id) !== null)
 		{
@@ -333,7 +333,7 @@ DomU.prototype = {
 		}
 		// set windows title and html
 		this.window.setTitle(title);
-		
+
 		this.window.setHTMLContent(html);
 		// set tabs on the new html
 		var tabs = new Control.Tabs('tabs_' + html_id);
@@ -471,6 +471,9 @@ function content_dom0(dom0)
 	return result + '</table>';
 }
 
+/**
+ * Draw the logging area
+ */
 function draw_log_area()
 {
 	var d = $('login');
@@ -708,3 +711,10 @@ function init()
 	setTimeout(refresh, refresh_time);
 }
 
+/**
+ * Initialize all listeners for static pages (users.php etc.)
+ */
+function init_static()
+{
+	draw_log_area();
+}
