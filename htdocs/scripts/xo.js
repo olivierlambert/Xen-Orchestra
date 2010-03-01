@@ -83,10 +83,10 @@ function Dom0(id, address, cpus, freeram, ro)
 {
 	this.id = id;
 	this.domUs = {};
-	
+
 	this._panel = new Xilinus.Widget(); // Panel associated to this Dom0.
 	this.update(address, cpus, freeram, ro);
-	
+
 }
 Dom0.prototype = {
 	finalize: function ()
@@ -114,7 +114,7 @@ Dom0.prototype = {
 		portal.add(this._panel, 0);
 		var content = this._panel.getContent();
 		var weight = content.getHeight();
-		
+
 		if (left <= right)
 		{
 			portal.add(this._panel, 0);
@@ -276,27 +276,27 @@ DomU.prototype = {
 					+ actions[i] + '\')" />');
 			}
 			html += '</p>';
-			var targets = find_possible_targets(this);
-			if (targets.length !== 0)
-			{
-				html += '<p><b>Live Migration to: </b>';
-				for (var i = 0; i < targets.length; ++i)
-				{
-					html += '<a href="#" onclick="action_vm(\'' + this.id
-						+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
-						+ dom0s[targets[i]].address + ' ('
-						+ Math.round(dom0s[targets[i]].freeram/1073741824) +' GB free)</a> ';
-				}
-				html += '</p>';
-			}
-			var targets = find_possible_targets(this);
-			html += '</p>';
+
 		}
 		html += '</div>';
-		
+
 		html+='<div id="livemig_' + html_id + '">'
-			+ '</div>'
-		
+		var targets = find_possible_targets(this);
+		if (targets.length !== 0)
+		{
+			html += '<p><b>Live Migration Target: </b></p><br/>';
+			for (var i = 0; i < targets.length; ++i)
+			{
+				html += '<p><a href="#" onclick="action_vm(\'' + this.id
+					+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
+					+ dom0s[targets[i]].address + '</a> ('
+					+ Math.round(dom0s[targets[i]].freeram/1073741824) +' GB left) </p><br/> ';
+			}
+		}
+		var targets = find_possible_targets(this);
+		//html += '</p>';
+		html += '</div>';
+
 		html+='<div id="cpu_' + html_id + '">'
 			+ '<form id="cpu_' + html_id + '">'
 			+ '<table class="center">'
@@ -559,12 +559,12 @@ function register_info(info)
 			var record = info.dom0s[i];
 			if (dom0s[record.id] === undefined)
 			{
-				dom0s[record.id] = new Dom0(record.id, record.address, 
+				dom0s[record.id] = new Dom0(record.id, record.address,
 				record.cpus, record.freeram, record.ro);
 			}
 			else
 			{
-				dom0s[record.id].update(record.address, record.cpus, 
+				dom0s[record.id].update(record.address, record.cpus,
 				record.freeram, record.ro);
 			}
 
@@ -586,14 +586,14 @@ function register_info(info)
 			}
 
 			delete dom0s_diff[record.id];
-			
+
 			if (isos === 0) // call Intelligent Space Occupation System
 			{
 				dom0s[record.id].isos();
 			}
 		}
 		isos = 1; // ISOS is done once, it's enough
-		
+
 		if (info.exhaustive)
 		{
 			// This list is exhaustive, we have to remove the Dom0s and DomUs
