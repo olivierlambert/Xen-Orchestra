@@ -57,9 +57,15 @@ var on_drag = false;
 var tasks = 0;
 
 /**
- * Helps us distribute the panels.
+ * Helps us distribute the panels : ISOS feature
  */
-var balance = 0;
+var right = 0;
+var left = 0;
+var weight = 0;
+var isos = 0;
+var content;
+
+
 
 Object.isEmpty = function(object)
 {
@@ -73,16 +79,14 @@ Object.isEmpty = function(object)
 	return true;
 };
 
-
 function Dom0(id, address, cpus, ro)
 {
 	this.id = id;
 	this.domUs = {};
-
+	
 	this._panel = new Xilinus.Widget(); // Panel associated to this Dom0.
-	portal.add(this._panel, balance++ % 2);
-
 	this.update(address, cpus, ro);
+	
 }
 Dom0.prototype = {
 	finalize: function ()
@@ -101,9 +105,29 @@ Dom0.prototype = {
 	addDomU: function (domU)
 	{
 		this.domUs[domU.id] = domU;
-
 		this._panel.setContent(content_dom0(this));
 		this._panel.updateHeight();
+	},
+	isos: function ()
+	{
+		portal.add(this._panel, 0);
+		//this._panel.updateHeight();
+		var content = this._panel.getContent();
+		var weight = content.getHeight();
+		//alert(this.domUs.count());
+		//alert(weight);
+		//portal.remove(this._panel);
+		
+		if (left <= right)
+		{
+			portal.add(this._panel, 0);
+			left = weight+left;
+		}
+		else
+		{
+			portal.add(this._panel, 1);
+			right = weight+right;
+		}
 	},
 	removeDomU: function (domU_id)
 	{
@@ -644,8 +668,14 @@ function register_info(info)
 			}
 
 			delete dom0s_diff[record.id];
+			
+			if (isos === 0) // call Intelligent Space Occupation System
+			{
+				dom0s[record.id].isos();
+			}
 		}
-
+		isos = 1; // ISOS is done once, it's enough
+		
 		if (info.exhaustive)
 		{
 			// This list is exhaustive, we have to remove the Dom0s and DomUs
