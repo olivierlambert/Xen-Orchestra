@@ -79,13 +79,13 @@ Object.isEmpty = function(object)
 	return true;
 };
 
-function Dom0(id, address, cpus, ro)
+function Dom0(id, address, cpus, freeram, ro)
 {
 	this.id = id;
 	this.domUs = {};
 	
 	this._panel = new Xilinus.Widget(); // Panel associated to this Dom0.
-	this.update(address, cpus, ro);
+	this.update(address, cpus, freeram, ro);
 	
 }
 Dom0.prototype = {
@@ -93,11 +93,12 @@ Dom0.prototype = {
 	{
 		portal.remove(this._panel);
 	},
-	update: function (address, cpus, ro)
+	update: function (address, cpus, freeram, ro)
 	{
 		this.address = address;
 		this.cpus = cpus;
 		this.ro = ro;
+		this.freeram = freeram;
 
 		this._panel.setTitle(this.address).setContent(content_dom0(this));
 		this._panel.updateHeight();
@@ -215,7 +216,7 @@ DomU.prototype = {
 			showProgress: true,
 			showEffect:Effect.Appear,
 			width: 500,
-			height: 206,
+			height: 250,
 			resizable: false,
 			onClose: function ()
 			{
@@ -234,10 +235,11 @@ DomU.prototype = {
 		var html = '<div id="vm">'
 			+ '<ul id="tabs_' + html_id + '" class="menuvm">'
 			+ '<li><a href="#overview_' + html_id + '"><b><img src="img/information.png" alt=""/>Overview</b></a></li>'
+			+ '<li><a href="#livemig_' + html_id + '"><b><img src="img/livemig.png" alt=""/>Live Mig</b></a></li>'
 			+ '<li><a href="#cpu_' + html_id + '"><b><img src="img/cpu.png" alt=""/>CPU</a></b></li>'
 			+ '<li><a href="#ram_' + html_id + '"><b><img src="img/ram.png" alt=""/>RAM</a></b></li>'
 			+ '<li><a href="#network_' + html_id + '"><b><img src="img/world.png" alt=""/>Network</a></b></li>'
-			+ '<li><a href="#storage_' + html_id + '"><b><img src="img/database_gear.png" alt=""/>Storage</a></b></li>'
+			+ '<li><a href="#storage_' + html_id + '"><b><img src="img/drive.png" alt=""/>Storage</a></b></li>'
 			+ '<li><a href="#misc_' + html_id + '"><b><img src="img/wrench.png" alt=""/>Misc</a></b></li>'
 			+  '</ul><div id="overview_' + html_id + '" class="text">';
 
@@ -282,7 +284,8 @@ DomU.prototype = {
 				{
 					html += '<a href="#" onclick="action_vm(\'' + this.id
 						+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
-						+ dom0s[targets[i]].address + '</a>';
+						+ dom0s[targets[i]].address + ' ('
+						+ Math.round(dom0s[targets[i]].freeram/1073741824) +' GB free)</a> ';
 				}
 				html += '</p>';
 			}
@@ -290,7 +293,10 @@ DomU.prototype = {
 			html += '</p>';
 		}
 		html += '</div>';
-
+		
+		html+='<div id="livemig_' + html_id + '">'
+			+ '</div>'
+		
 		html+='<div id="cpu_' + html_id + '">'
 			+ '<form id="cpu_' + html_id + '">'
 			+ '<table class="center">'
@@ -468,92 +474,6 @@ function refresh()
 }
 
 /**
- * Fill a Dom0 panel with its information : each row contain a domU.
- *
- * @param dom0_id The identifier of the dom0.
- */
-function content_dom0(dom0)
-{
-	if (Object.isEmpty(dom0.domUs))
-	{
-		return '<p>No DomU detected</p>';
-	}
-	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
-	for (domU_id in dom0.domUs)
-	{
-		var domU = dom0.domUs[domU_id];
-		result += '<tr id="' + domU.name
-			+ '" onclick="display_vm(\'' + domU_id + '\')"><td>' + domU.name
-			+ '</td><td>' + domU.state
-			+ '</td><td>' + html_cpu_meters(domU.vcpus)
-			+ '</td></tr>';
-	}
-	return result + '</table>';
-}
-
-/**
- * Draw the logging area
- */
-function draw_log_area()
-{
-	var d = $('login');
-	if (user === 'guest') // The user is able to log in.
-	{
-		d.update(new Element('form')
-			.insert(new Element('p')
-				.insert('<label for="name">User: </label>')
-				.insert(new Element('input', {
-					'type': 'text',
-					'name': 'name',
-					'id': 'name'
-				}))
-				.insert(' <label for="password">Password: </label>')
-				.insert(new Element('input', {
-					'type': 'password',
-					'name': 'password',
-					'id': 'password'
-				}))
-				.insert(' ')
-				.insert(new Element('input', {
-					'type': 'submit',
-					'value': 'Log in'
-				}))
-			)
-			.observe('submit', function (e)
-			{
-				e.stop();
-
-				var name = $F('name');
-
-				if (name === '')
-				{
-					notify('The name field is mandatory.');
-					return;
-				}
-
-				send_request('login', {
-					'name': name,
-					'password': MD5($F('password'))
-				});
-			})
-		);
-	}
-	else
-	{
-		d.update(new Element('p')
-			.insert('Logged as <em>' + user + '</em>. ')
-			.insert(new Element('input', {'type': 'button', 'value': 'Log out'})
-				.observe('click', function (e)
-				{
-					e.stop();
-					send_request('logout');
-				})
-			)
-		);
-	}
-}
-
-/**
  * Sends a request with AJAX and once completed transmits the results to
  * register_info.
  *
@@ -639,11 +559,13 @@ function register_info(info)
 			var record = info.dom0s[i];
 			if (dom0s[record.id] === undefined)
 			{
-				dom0s[record.id] = new Dom0(record.id, record.address, record.cpus, record.ro);
+				dom0s[record.id] = new Dom0(record.id, record.address, 
+				record.cpus, record.freeram, record.ro);
 			}
 			else
 			{
-				dom0s[record.id].update(record.address, record.cpus, record.ro);
+				dom0s[record.id].update(record.address, record.cpus, 
+				record.freeram, record.ro);
 			}
 
 			for (var j = 0; j < record.domUs.length; ++j)

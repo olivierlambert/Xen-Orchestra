@@ -72,3 +72,89 @@ function html_cpu_values(cpus)
 	}
 	return result;
 }
+
+/**
+ * Fill a Dom0 panel with its information : each row contain a domU.
+ *
+ * @param dom0_id The identifier of the dom0.
+ */
+function content_dom0(dom0)
+{
+	if (Object.isEmpty(dom0.domUs))
+	{
+		return '<p>No DomU detected</p>';
+	}
+	var result = '<table><tr><th>Name</th><th>State</th><th>Load</th></tr>';
+	for (domU_id in dom0.domUs)
+	{
+		var domU = dom0.domUs[domU_id];
+		result += '<tr id="' + domU.name
+			+ '" onclick="display_vm(\'' + domU_id + '\')"><td>' + domU.name
+			+ '</td><td>' + domU.state
+			+ '</td><td>' + html_cpu_meters(domU.vcpus)
+			+ '</td></tr>';
+	}
+	return result + '</table>';
+}
+
+/**
+ * Draw the logging area
+ */
+function draw_log_area()
+{
+	var d = $('login');
+	if (user === 'guest') // The user is able to log in.
+	{
+		d.update(new Element('form')
+			.insert(new Element('p')
+				.insert('<label for="name">User: </label>')
+				.insert(new Element('input', {
+					'type': 'text',
+					'name': 'name',
+					'id': 'name'
+				}))
+				.insert(' <label for="password">Password: </label>')
+				.insert(new Element('input', {
+					'type': 'password',
+					'name': 'password',
+					'id': 'password'
+				}))
+				.insert(' ')
+				.insert(new Element('input', {
+					'type': 'submit',
+					'value': 'Log in'
+				}))
+			)
+			.observe('submit', function (e)
+			{
+				e.stop();
+
+				var name = $F('name');
+
+				if (name === '')
+				{
+					notify('The name field is mandatory.');
+					return;
+				}
+
+				send_request('login', {
+					'name': name,
+					'password': MD5($F('password'))
+				});
+			})
+		);
+	}
+	else
+	{
+		d.update(new Element('p')
+			.insert('Logged as <em>' + user + '</em>. ')
+			.insert(new Element('input', {'type': 'button', 'value': 'Log out'})
+				.observe('click', function (e)
+				{
+					e.stop();
+					send_request('logout');
+				})
+			)
+		);
+	}
+}
