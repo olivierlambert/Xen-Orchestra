@@ -111,12 +111,8 @@ Dom0.prototype = {
 	isos: function ()
 	{
 		portal.add(this._panel, 0);
-		//this._panel.updateHeight();
 		var content = this._panel.getContent();
 		var weight = content.getHeight();
-		//alert(this.domUs.count());
-		//alert(weight);
-		//portal.remove(this._panel);
 		
 		if (left <= right)
 		{
