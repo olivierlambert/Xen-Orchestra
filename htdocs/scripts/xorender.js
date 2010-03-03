@@ -1,4 +1,34 @@
 /**
+ * Display a ram bar, to provide quick information about free ram
+ * + the % free
+ *
+ * @param cpus_max Maximum amout of CPU installed on a Dom0
+ */
+function ram_bar(free_ram,total_ram,id)
+{
+	result = '<div id="ProgressBar_'+id+'" class="progressBar">';
+	var pb = $('ProgressBar_'+id);
+	free_ratio = Math.round(free_ram/total_ram * 100);
+	occuped_ratio = -(100 - free_ratio);
+	if (pb)
+	{
+		pb.setStyle({
+			background:'url(img/progress.png)',
+			border:'1px solid grey',
+			width: '100px',
+			height: '15px',
+			padding: '0px',
+			marginLeft: '20em',
+			marginTop: '-1.6em',
+			backgroundPosition:'-200px'
+			});
+		pb.morph({backgroundPosition: occuped_ratio+'px'}, { duration: 10 });
+		//alert(pb.getStyle('background'));
+	}
+	return result += '&nbsp&nbsp&nbsp '+ free_ratio + ' % free</div>';
+}
+
+/**
  * Display a CPU_max list of a dom0
  * 
  *

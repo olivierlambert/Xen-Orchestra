@@ -79,13 +79,13 @@ Object.isEmpty = function(object)
 	return true;
 };
 
-function Dom0(id, address, cpus, freeram, ro)
+function Dom0(id, address, cpus, freeram, totalram, ro)
 {
 	this.id = id;
 	this.domUs = {};
 
 	this._panel = new Xilinus.Widget(); // Panel associated to this Dom0.
-	this.update(address, cpus, freeram, ro);
+	this.update(address, cpus, freeram, totalram, ro);
 
 }
 Dom0.prototype = {
@@ -93,12 +93,13 @@ Dom0.prototype = {
 	{
 		portal.remove(this._panel);
 	},
-	update: function (address, cpus, freeram, ro)
+	update: function (address, cpus, freeram, totalram, ro)
 	{
 		this.address = address;
 		this.cpus = cpus;
 		this.ro = ro;
 		this.freeram = freeram;
+		this.totalram = totalram;
 
 		this._panel.setTitle(this.address).setContent(content_dom0(this));
 		this._panel.updateHeight();
@@ -290,12 +291,14 @@ DomU.prototype = {
 				html += '<p><a href="#" onclick="action_vm(\'' + this.id
 					+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
 					+ dom0s[targets[i]].address + '</a> ('
-					+ Math.round(dom0s[targets[i]].freeram/1073741824) +' GB left) </p><br/> ';
+					+ Math.round(dom0s[targets[i]].freeram/1073741824) +' GB left) '
+					+ ram_bar(dom0s[targets[i]].freeram,dom0s[targets[i]].totalram,i)
+					+ ' </p><br/> ';
 			}
 		}
 		var targets = find_possible_targets(this);
-		//html += '</p>';
 		html += '</div>';
+
 
 		html+='<div id="cpu_' + html_id + '">'
 			+ '<form id="cpu_' + html_id + '">'
@@ -560,12 +563,12 @@ function register_info(info)
 			if (dom0s[record.id] === undefined)
 			{
 				dom0s[record.id] = new Dom0(record.id, record.address,
-				record.cpus, record.freeram, record.ro);
+				record.cpus, record.freeram, record.totalram, record.ro);
 			}
 			else
 			{
 				dom0s[record.id].update(record.address, record.cpus,
-				record.freeram, record.ro);
+				record.freeram, record.totalram, record.ro);
 			}
 
 			for (var j = 0; j < record.domUs.length; ++j)
