@@ -12,17 +12,19 @@ function ram_bar(free_ram,total_ram,id)
 	occuped_ratio = -(100 - free_ratio);
 	if (pb)
 	{
-		pb.setStyle({
-			background:'url(img/progress.png)',
+		Element.setStyle(pb,{
+			background:'url(img/progress.png) left no-repeat',
 			border:'1px solid grey',
 			width: '100px',
 			height: '15px',
 			padding: '0px',
 			marginLeft: '20em',
 			marginTop: '-1.6em',
-			backgroundPosition:'-200px'
+			backgroundPosition:occuped_ratio+'px'
 			});
-		pb.morph({backgroundPosition: occuped_ratio+'px'}, { duration: 10 });
+		// after, if it works, use morph to animate the bar
+		//pb.morph('backgroundPosition: '+occuped_ratio+'px');
+		// DEBUG ALERT
 		//alert(pb.getStyle('background'));
 	}
 	return result += '&nbsp&nbsp&nbsp '+ free_ratio + ' % free</div>';

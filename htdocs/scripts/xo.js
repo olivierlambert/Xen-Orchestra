@@ -299,7 +299,6 @@ DomU.prototype = {
 		var targets = find_possible_targets(this);
 		html += '</div>';
 
-
 		html+='<div id="cpu_' + html_id + '">'
 			+ '<form id="cpu_' + html_id + '">'
 			+ '<table class="center">'
