@@ -233,23 +233,6 @@ DomU.prototype = {
 		var html_id = escape(this.id).replace(/\.|#|%/g, '_');
 		var date = new Date(this.start_time * 1000);
 
-		var html = '<div id="vm">'
-			+ '<ul id="tabs_' + html_id + '" class="menuvm">'
-			+ '<li><a href="#overview_' + html_id + '"><b><img src="img/information.png" alt=""/>Overview</b></a></li>'
-			+ '<li><a href="#livemig_' + html_id + '"><b><img src="img/livemig.png" alt=""/>Live Mig</b></a></li>'
-			+ '<li><a href="#cpu_' + html_id + '"><b><img src="img/cpu.png" alt=""/>CPU</a></b></li>'
-			+ '<li><a href="#ram_' + html_id + '"><b><img src="img/ram.png" alt=""/>RAM</a></b></li>'
-			+ '<li><a href="#network_' + html_id + '"><b><img src="img/world.png" alt=""/>Network</a></b></li>'
-			+ '<li><a href="#storage_' + html_id + '"><b><img src="img/drive.png" alt=""/>Storage</a></b></li>'
-			+ '<li><a href="#misc_' + html_id + '"><b><img src="img/wrench.png" alt=""/>Misc</a></b></li>'
-			+  '</ul><div id="overview_' + html_id + '" class="text">';
-
-		html+='<br/><p><b>State: </b>' + this.state + '</p>'
-			+ '<p><b>System: </b>' + this.kernel + '</p>'
-			+ '<p><b>CPU installed: </b>' + this.vcpus.length + '</p>'
-			+ '<p><b>RAM installed: </b>' + this.d_min_ram/(1<<20) + ' MB</p>'
-			+ '<p><b>Date of creation: </b>' + date + '</p>';
-
 		if (!this.ro)
 		{
 			if (this.state === 'Running')
@@ -268,85 +251,8 @@ DomU.prototype = {
 			{
 				var actions = ['poweroff'];
 			}
-
-			html += '<p><b>Actions: </b><br/>';
-			for (var i = 0; i < actions.length; ++i)
-			{
-				html += ('<img class="button" src="img/' + actions[i]
-					+ '.png" alt="" title="'+ actions[i] +'" onclick="action_vm (\'' + this.id + '\', \''
-					+ actions[i] + '\')" />');
-			}
-			html += '</p>';
-
-		}
-		html += '</div>';
-
-		html+='<div id="livemig_' + html_id + '">'
-		var targets = find_possible_targets(this);
-		if (targets.length !== 0)
-		{
-			html += '<p><b>Live Migration Target: </b></p><br/>';
-			for (var i = 0; i < targets.length; ++i)
-			{
-				html += '<p><a href="#" onclick="action_vm(\'' + this.id
-					+ '\', \'migrate\', {\'t\': \'' + targets[i] + '\'})">'
-					+ dom0s[targets[i]].address + '</a> ('
-					+ Math.round(dom0s[targets[i]].freeram/1073741824) +' GB left) '
-					+ ram_bar(dom0s[targets[i]].freeram,dom0s[targets[i]].totalram,i)
-					+ ' </p><br/> ';
-			}
 		}
 		var targets = find_possible_targets(this);
-		html += '</div>';
-
-		html+='<div id="cpu_' + html_id + '">'
-			+ '<form id="cpu_' + html_id + '">'
-			+ '<table class="center">'
-			+ '<tr>'
-			+ '<td>VCPU use:</td><td>'+html_cpu_values(this.vcpus)+'</td>'
-			+'</tr>'
-			+ '<tr>'
-			+ '<td>VCPU number:</td><td>'+this.vcpus.length+'</td>'
-			+'</tr>'
-			+ '<tr>'
-			+ '<td>Set VCPU number:</td><td>'+html_cpu_select(this.dom0.cpus)+'</td>'
-			+'</tr>'
-			+ '<tr>'
-			+ '<td>Set Cap:</td><td><input type="text" size="2" value="'+this.cap+'"></td>'
-			+'</tr>'
-			+ '<tr>'
-			+ '<td>Set Weight:</td><td><input type="text" size="2" value="'+this.weight+'"></td>'
-			+'</tr>'
-			+'</table><br/><p class="center"><input type="submit" value="OK"></p>'
-			+ '</form></div>';
-
-		html+='<div id="ram_' + html_id + '">'
-			+ '<form id="ram_' + html_id + '">'
-			+ '<table class="center">'
-			+ '<tr>'
-			+ '<td>Current RAM:</td><td><input type="text" size="2" value="'+this.d_min_ram/(1024*1024)+'"> MB</td>'
-			+'</tr>'
-			+ '<tr>'
-			+ '<td>Maximum RAM:</td><td><input type="text" size="2" value="'+this.s_max_ram/(1024*1024)+'"> MB</td>'
-			+'</tr>'
-			+ '<tr>'
-			+ '<td>Minimum RAM:</td><td><input type="text" size="2" value="'+this.s_min_ram/(1024*1024)+'"> MB</td>'
-			+'</tr>'
-			+'</table><br/><p class="center"><input type="submit" value="OK"></p>'
-			+ '</form></div>';
-
-		html+='<div id="network_' + html_id + '"></div>';
-
-		html+='<div id="storage_' + html_id + '"></div>';
-
-		html+='<div id="misc_' + html_id + '">'
-			+ '<br/><b><p>On shutdown:</b> '+this.on_shutdown+'</p>'
-			+ '<b><p>On reboot:</b> '+this.on_reboot+'</p>'
-			+ '<b><p>On crash:</b> '+this.on_crash+'</p></div>';
-
-		html+='</div>';
-
-		title = '<b>' + this.name + '</b> (' + this.dom0.address + ')';
 
 		// if a tab is currently set
 		if ($('tabs_' + html_id) !== null)
@@ -360,9 +266,18 @@ DomU.prototype = {
 			Control.Tabs.instances = Control.Tabs.instances.without(current_instance);
 		}
 		// set windows title and html
-		this.window.setTitle(title);
+		this.window.setTitle('<b id="title"></b> (' + this.dom0.address + ')');
+		$('title').update(this.name);
+		$('title').innerHTML;
+		
+		this.window.setHTMLContent('<div id="vm"><ul id="tabs_' + html_id + '" class="menuvm"></ul></div>');
+		var staticContent = render_vm(this.id,html_id,this.state,this.kernel,this.vcpus,this.d_min_ram,date,actions,this.on_shutdown,this.on_reboot,this.on_crash,this.weight,this.cap,targets);
+		// fill the content with correct data from render_vm
+		$('vm').update(staticContent);
+		$('vm').innerHTML;
+		// Provides effects on different places
+		render_live_vm(targets);
 
-		this.window.setHTMLContent(html);
 		// set tabs on the new html
 		var tabs = new Control.Tabs('tabs_' + html_id);
 		// and set the active tab to the saved one
