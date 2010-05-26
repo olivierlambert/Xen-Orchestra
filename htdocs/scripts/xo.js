@@ -230,7 +230,8 @@ DomU.prototype = {
 	},
 	_refresh_window: function ()
 	{
-		var html_id = escape(this.id).replace(/\.|#|%/g, '_');
+//		var html_id = escape(this.id).replace(/\.|#|%/g, '_');
+		var wId = this.window.getId();
 		var date = new Date(this.start_time * 1000);
 
 		if (!this.ro)
@@ -255,10 +256,10 @@ DomU.prototype = {
 		var targets = find_possible_targets(this);
 
 		// if a tab is currently set
-		if ($('tabs_' + html_id) !== null)
+		if ($('tabs_' + wId) !== null)
 		{
 			// get the current tab instance
-			var current_instance = Control.Tabs.findByTabId('overview_' + html_id);
+			var current_instance = Control.Tabs.findByTabId('overview_' + wId);
 			// save the current link
 			var active_link = current_instance.activeLink;
 			// and remove the current instance from the array of instances
@@ -266,20 +267,20 @@ DomU.prototype = {
 			Control.Tabs.instances = Control.Tabs.instances.without(current_instance);
 		}
 		// set windows title and html
-		this.window.setTitle('<b id="title"></b> (' + this.dom0.address + ')');
-		$('title').update(this.name);
-		$('title').innerHTML;
+		this.window.setTitle('<b id="title_' + wId + '"></b> (' + this.dom0.address + ')');
+		$('title_' + wId).update(this.name);
+		$('title_' + wId).innerHTML;
 		
-		this.window.setHTMLContent('<div id="vm"><ul id="tabs_' + html_id + '" class="menuvm"></ul></div>');
-		var staticContent = render_vm(this.id,html_id,this.state,this.kernel,this.vcpus,this.d_min_ram,date,actions,this.on_shutdown,this.on_reboot,this.on_crash,this.weight,this.cap,targets);
+		this.window.setHTMLContent('<div id="vm_' + wId + '"><ul id="tabs_' + wId + '" class="menuvm"></ul></div>');
+		var staticContent = render_vm(this.id,wId,this.state,this.kernel,this.vcpus,this.d_min_ram,date,actions,this.on_shutdown,this.on_reboot,this.on_crash,this.weight,this.cap,targets);
 		// fill the content with correct data from render_vm
-		$('vm').update(staticContent);
-		$('vm').innerHTML;
+		$('vm_' + wId).update(staticContent);
+		$('vm_' + wId).innerHTML;
 		// Provides effects on different places
 		render_live_vm(targets);
 
 		// set tabs on the new html
-		var tabs = new Control.Tabs('tabs_' + html_id);
+		var tabs = new Control.Tabs('tabs_' + wId);
 		// and set the active tab to the saved one
 		tabs.setActiveTab(active_link);
 	},
